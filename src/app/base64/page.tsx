@@ -251,14 +251,14 @@ function Base64ToolPageContent() {
         <div className='overflow-hidden font-extrabold px-5 md:px-10 lg:px-16'>
           {/* Breadcrumb */}
           <motion.div 
-            className="mt-8 mb-4"
+            className="mt-8 mb-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
             <Link 
               href={language === 'en' ? '/' : '/zh'}
-              className="text-gray-400 hover:text-[#a1c4fd] transition-colors duration-200 flex items-center gap-2 text-sm"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-800/50 hover:bg-gray-700/50 border border-gray-700 hover:border-[#a1c4fd]/50 rounded-lg text-gray-300 hover:text-[#a1c4fd] transition-all duration-200 backdrop-blur-sm text-sm font-medium"
             >
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>

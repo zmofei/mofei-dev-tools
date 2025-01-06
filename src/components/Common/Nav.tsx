@@ -51,9 +51,11 @@ function Nav() {
     // Function to check if current path matches the nav item
     const isActive = (path: string) => {
         if (path === '/') {
-            return pathname === '/';
+            // Check for home page in any language
+            return pathname === '/' || pathname === '/zh' || pathname === '/en';
         } else if (path === '/base64') {
-            return pathname === '/base64';
+            // Check for base64 page in any language
+            return pathname.includes('/base64');
         }
         return false;
     };
@@ -95,6 +97,21 @@ function Nav() {
                 animate={{ scale: 1, opacity: 1, transition: hasAnimated.current ? { duration: 0 } : { type: "spring", damping: 10, stiffness: 200 } }}
             >
                 <motion.a 
+                    className={`transition-colors duration-200 flex items-center gap-1 ${
+                        isActive('/') 
+                            ? 'text-[#a1c4fd] font-medium' 
+                            : 'hover:text-[#a1c4fd]'
+                    }`}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    href={language === 'en' ? '/' : '/zh'}
+                >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/>
+                    </svg>
+                    {t('nav.tools')}
+                </motion.a>
+                <motion.a 
                     className="hover:text-[#a1c4fd] transition-colors duration-200 flex items-center gap-1" 
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
@@ -106,21 +123,6 @@ function Nav() {
                         <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
                     </svg>
                     {t('nav.blog')}
-                </motion.a>
-                <motion.a 
-                    className={`transition-colors duration-200 flex items-center gap-1 ${
-                        isActive('/') 
-                            ? 'text-[#a1c4fd] font-medium' 
-                            : 'hover:text-[#a1c4fd]'
-                    }`}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    href={language === 'en' ? '/' : '/zh'}
-                >
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/>
-                    </svg>
-                    {t('nav.tools')}
                 </motion.a>
                 <motion.a 
                     className="hover:text-[#a1c4fd] transition-colors duration-200 flex items-center gap-1" 
@@ -206,20 +208,6 @@ function Nav() {
                 ">
                     <li className="py-3 md:py-4" style={{ "transformOrigin": "top right" }}>
                         <motion.a 
-                            className="flex items-center justify-end gap-2 text-gray-900/90" 
-                            whileHover={{ scale: 1.2, rotate: 3 }} 
-                            href="https://www.mofei.life/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            {t('nav.blog')}
-                            <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-                            </svg>
-                        </motion.a>
-                    </li>
-                    <li className="py-3 md:py-4" style={{ "transformOrigin": "top right" }}>
-                        <motion.a 
                             className={`flex items-center justify-end gap-2 ${
                                 isActive('/') 
                                     ? 'font-bold text-gray-900 drop-shadow-lg' 
@@ -230,7 +218,21 @@ function Nav() {
                         >
                             {t('nav.tools')}
                             <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/>
+                                <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/>
+                            </svg>
+                        </motion.a>
+                    </li>
+                    <li className="py-3 md:py-4" style={{ "transformOrigin": "top right" }}>
+                        <motion.a 
+                            className="flex items-center justify-end gap-2 text-gray-900/90" 
+                            whileHover={{ scale: 1.2, rotate: 3 }} 
+                            href="https://www.mofei.life/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            {t('nav.blog')}
+                            <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
                             </svg>
                         </motion.a>
                     </li>

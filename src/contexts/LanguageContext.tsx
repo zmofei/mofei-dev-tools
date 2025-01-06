@@ -15,8 +15,8 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 // 翻译内容
 const translations = {
   zh: {
-    'nav.tools': '工具',
-    'nav.github': 'Github',
+    'nav.tools': '工具箱',
+    'nav.github': 'Star & Fork',
     'nav.blog': 'Mofei 的博客',
     'title': '工具合集',
     'subtitle': '这些是Mofei在开发过程中经常使用的便捷工具。分享给大家，希望能让你的工作更轻松一些 😊',
@@ -70,8 +70,8 @@ const translations = {
     'footer.descriptionAfter': '，这里记录了我开发过程中常用的一些工具，也许你也会觉得有用。'
   },
   en: {
-    'nav.tools': 'Tools',
-    'nav.github': 'Github', 
+    'nav.tools': 'All Tools',
+    'nav.github': 'Star & Fork', 
     'nav.blog': "Mofei's Blog",
     'title': 'Tools Collection',
     'subtitle': 'These are the handy tools Mofei frequently uses during development. Sharing them with you, hoping to make your work a bit easier 😊',
