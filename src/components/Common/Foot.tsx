@@ -103,7 +103,7 @@ function Foot() {
                     </foreignObject>
                 </svg>
                 <svg
-                    className="outline-none flex md:hidden mb-10 " viewBox="0 0 2318 200"
+                    className="outline-none flex md:hidden mb-0" viewBox="0 0 2318 200"
                 >
                     <foreignObject width="100%" height="100%">
                         <p className="text-[200px] text-center font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-slate-800 via-slate-700 to-slate-900" style={{

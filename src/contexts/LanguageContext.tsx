@@ -71,7 +71,7 @@ const translations = {
   en: {
     'nav.tools': 'Tools',
     'nav.github': 'Github', 
-    'nav.blog': "Mofei&apos;s Blog",
+    'nav.blog': "Mofei's Blog",
     'title': 'Tools Collection',
     'subtitle': 'These are the handy tools Mofei frequently uses during development. Sharing them with you, hoping to make your work a bit easier 😊',
     'categories.text': 'Text Tools',
