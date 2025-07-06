@@ -252,7 +252,10 @@ function Nav() {
                         <div className="flex items-center justify-end">
                             <div className="flex bg-white/20 rounded-full p-1">
                                 <button
-                                    onClick={() => setLanguage('zh')}
+                                    onClick={() => {
+                                        setLanguage('zh');
+                                        setShow(false);
+                                    }}
                                     className={`px-3 py-1 rounded-full text-lg font-medium transition-all duration-300 ${
                                         language === 'zh'
                                             ? 'bg-white text-gray-900 shadow-lg'
@@ -262,7 +265,10 @@ function Nav() {
                                     中文
                                 </button>
                                 <button
-                                    onClick={() => setLanguage('en')}
+                                    onClick={() => {
+                                        setLanguage('en');
+                                        setShow(false);
+                                    }}
                                     className={`px-3 py-1 rounded-full text-lg font-medium transition-all duration-300 ${
                                         language === 'en'
                                             ? 'bg-white text-gray-900 shadow-lg'

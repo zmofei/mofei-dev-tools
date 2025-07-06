@@ -32,8 +32,8 @@ const translations = {
     'footer.moreTools': '更多工具即将推出',
     'footer.moreToolsDesc': '更多实用工具正在开发中，包括JSON格式化、颜色工具、正则测试等等。敬请期待！',
     'footer.bigText.desktop': 'MOFEI DEVELOPMENT TOOLS.',
-    'footer.bigText.mobile1': '墨菲工具！',
-    'footer.bigText.mobile2': '开发工具！',
+    'footer.bigText.mobile1': 'Mpfei Tools',
+    'footer.bigText.mobile2': 'Development Tools!',
     'base64.title': 'Base64 编码解码工具',
     'base64.subtitle': '快速的 Base64 编码和解码转换',
     'base64.backToTools': '返回工具集',
@@ -66,7 +66,7 @@ const translations = {
     'base64.share': '分享',
     'base64.shareResult': '分享结果',
     'base64.shareCopied': '分享链接已复制！',
-    'footer.description': '我的博客是 mofei.life，这里收集了我在开发过程中常用的工具，希望对你也有帮助。'
+    'footer.description': '我的博客是 https://www.mofei.life，这里记录了我开发过程中常用的一些工具，也许你也会觉得有用。'
   },
   en: {
     'nav.tools': 'Tools',
@@ -120,7 +120,7 @@ const translations = {
     'base64.share': 'Share',
     'base64.shareResult': 'Share Result',
     'base64.shareCopied': 'Share link copied!',
-    'footer.description': 'My blog is mofei.life, and this collection features the tools I frequently use during development. Hope they help you too.'
+    'footer.description': 'My blog is https://www.mofei.life. This page collects tools I frequently use in development—hope you find them helpful too.'
   }
 };
 
