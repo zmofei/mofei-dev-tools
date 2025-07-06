@@ -113,7 +113,7 @@ function Nav() {
                     className="hover:text-[#a1c4fd] transition-colors duration-200 flex items-center gap-1" 
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
-                    href="https://github.com/zmofei/"
+                    href="https://github.com/zmofei/mofei-dev-tools/"
                     target="_blank"
                     rel="noopener noreferrer"
                 >
@@ -203,7 +203,7 @@ function Nav() {
                         <motion.a 
                             className="flex items-center gap-2 text-gray-900/90" 
                             whileHover={{ scale: 1.2, rotate: 3 }} 
-                            href="https://github.com/zmofei/"
+                            href="https://github.com/zmofei/mofei-dev-tools/"
                             target="_blank"
                             rel="noopener noreferrer"
                         >

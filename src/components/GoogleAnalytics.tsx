@@ -37,8 +37,8 @@ export const event = (action: string, category: string, label?: string, value?: 
   }
 };
 
-// 页面浏览追踪 Hook
-function usePageTracking() {
+// 页面浏览追踪组件 - 使用 Suspense 包装
+function PageTracker() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -48,11 +48,11 @@ function usePageTracking() {
       pageview(url);
     }
   }, [pathname, searchParams]);
+
+  return null;
 }
 
 export default function GoogleAnalytics() {
-  usePageTracking();
-
   // 如果没有配置 GA ID，则不渲染任何内容
   if (!GA_TRACKING_ID) {
     return null;
@@ -78,6 +78,7 @@ export default function GoogleAnalytics() {
           `,
         }}
       />
+      <PageTracker />
     </>
   );
 }

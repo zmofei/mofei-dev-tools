@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Suspense } from "react";
 import Nav from "@/components/Common/Nav";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
@@ -30,7 +31,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <GoogleAnalytics />
+        <Suspense>
+          <GoogleAnalytics />
+        </Suspense>
         <LanguageProvider>
           <Nav />
           {children}
