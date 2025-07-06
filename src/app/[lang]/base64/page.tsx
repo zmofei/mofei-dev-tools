@@ -1,12 +1,7 @@
 import Base64Page from '../../base64/page';
 
-interface PageProps {
-  params: {
-    lang: string;
-  };
-}
 
-export default function LangBase64Page({ params }: PageProps) {
+export default function LangBase64Page() {
   return <Base64Page />;
 }
 

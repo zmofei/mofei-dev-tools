@@ -1,12 +1,13 @@
 "use client"
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { motion } from "motion/react"
 import Link from 'next/link';
 import Foot from '@/components/Common/Foot';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSearchParams } from 'next/navigation';
+import { event } from '@/components/GoogleAnalytics';
 
-export default function Base64ToolPage() {
+function Base64ToolPageContent() {
   const { t, language } = useLanguage();
   const searchParams = useSearchParams();
   const [inputText, setInputText] = useState('');
@@ -71,7 +72,7 @@ export default function Base64ToolPage() {
               id: Date.now().toString(),
               input: decodedText.trim(),
               output: result,
-              mode: executeMode,
+              mode: executeMode as 'encode' | 'decode',
               timestamp: Date.now()
             };
 
@@ -111,10 +112,14 @@ export default function Base64ToolPage() {
         result = btoa(unescape(encodeURIComponent(inputText)));
         setOutputText(result);
         setError('');
+        // 追踪编码事件
+        event('base64_encode', 'Tool Usage', 'Base64 Encode', inputText.length);
       } else {
         result = decodeURIComponent(escape(atob(inputText)));
         setOutputText(result);
         setError('');
+        // 追踪解码事件
+        event('base64_decode', 'Tool Usage', 'Base64 Decode', inputText.length);
       }
 
       // Add to history if conversion is successful and input is substantial
@@ -123,7 +128,7 @@ export default function Base64ToolPage() {
           id: Date.now().toString(),
           input: inputText.trim(),
           output: result,
-          mode,
+          mode: mode as 'encode' | 'decode',
           timestamp: Date.now()
         };
 
@@ -145,7 +150,8 @@ export default function Base64ToolPage() {
   const handleCopy = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      // 这里可以添加一个成功提示
+      // 追踪复制事件
+      event('copy_result', 'Tool Usage', 'Copy Base64 Result', text.length);
     } catch {
       // 降级方案
       const textArea = document.createElement('textarea');
@@ -154,6 +160,8 @@ export default function Base64ToolPage() {
       textArea.select();
       document.execCommand('copy');
       document.body.removeChild(textArea);
+      // 追踪复制事件（降级方案）
+      event('copy_result_fallback', 'Tool Usage', 'Copy Base64 Result Fallback', text.length);
     }
   };
 
@@ -191,6 +199,9 @@ export default function Base64ToolPage() {
       await navigator.clipboard.writeText(shareUrl);
       setShareMessage(t('base64.shareCopied'));
       
+      // 追踪分享事件
+      event('share_result', 'Tool Usage', `Share Base64 ${mode}`, inputText.length);
+      
       // Clear message after 3 seconds
       setTimeout(() => setShareMessage(''), 3000);
     } catch {
@@ -208,6 +219,10 @@ export default function Base64ToolPage() {
       document.body.removeChild(tempInput);
       
       setShareMessage(t('base64.shareCopied'));
+      
+      // 追踪分享事件（降级方案）
+      event('share_result_fallback', 'Tool Usage', `Share Base64 ${mode} Fallback`, inputText.length);
+      
       setTimeout(() => setShareMessage(''), 3000);
     }
   };
@@ -512,5 +527,27 @@ export default function Base64ToolPage() {
         <Foot />
       </footer>
     </div>
+  );
+}
+
+function Base64ToolPageFallback() {
+  return (
+    <div className="min-h-screen flex flex-col bg-gray-900">
+      <main className="flex-1 pt-20 2xl:pt-22">
+        <div className="max-w-[2000px] mx-auto px-5 md:px-10 lg:px-16 py-6 md:py-8 lg:py-12">
+          <div className="flex justify-center items-center h-64">
+            <div className="text-white">Loading...</div>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
+
+export default function Base64ToolPage() {
+  return (
+    <Suspense fallback={<Base64ToolPageFallback />}>
+      <Base64ToolPageContent />
+    </Suspense>
   );
 }

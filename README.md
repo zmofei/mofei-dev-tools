@@ -81,14 +81,20 @@ npm install
 yarn install
 ```
 
-3. Run the development server:
+3. Configure environment variables (optional):
+```bash
+cp .env.example .env.local
+# Edit .env.local and add your Google Analytics tracking ID
+```
+
+4. Run the development server:
 ```bash
 npm run dev
 # or
 yarn dev
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 📦 Building for Production
 
@@ -109,6 +115,33 @@ npm start
 - **Mobile-First**: Optimized for mobile devices
 - **Breakpoint System**: Tailwind's responsive breakpoints
 - **Touch-Friendly**: Large tap targets and smooth interactions
+
+## 📊 Analytics
+
+The project includes Google Analytics integration for tracking user behavior and tool usage.
+
+### Configuration
+
+1. Get your Google Analytics tracking ID from [Google Analytics](https://analytics.google.com/)
+2. Create a `.env.local` file in the project root:
+```bash
+NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+```
+3. Replace `G-XXXXXXXXXX` with your actual tracking ID
+
+### Tracked Events
+
+The application automatically tracks:
+- **Page Views**: All page navigation
+- **Tool Usage**: Base64 encode/decode operations
+- **User Actions**: Copy, share, and other interactions
+- **Language Switching**: User language preferences
+
+### Privacy
+
+- All analytics data is anonymized
+- No personal information is collected
+- Users can disable analytics via browser settings
 
 ## 🔧 Development
 
@@ -134,6 +167,17 @@ const translations = {
     // ...
   }
 };
+```
+
+### Adding Analytics Events
+
+Import and use the event tracking function:
+
+```typescript
+import { event } from '@/components/GoogleAnalytics';
+
+// Track custom events
+event('action_name', 'Category', 'Label', value);
 ```
 
 ## 🤝 Contributing

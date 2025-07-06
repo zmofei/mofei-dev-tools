@@ -1,12 +1,7 @@
 import HomePage from '../page';
 
-interface PageProps {
-  params: {
-    lang: string;
-  };
-}
 
-export default function LangPage({ params }: PageProps) {
+export default function LangPage() {
   return <HomePage />;
 }
 
