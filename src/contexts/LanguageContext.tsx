@@ -66,7 +66,8 @@ const translations = {
     'base64.share': '分享',
     'base64.shareResult': '分享结果',
     'base64.shareCopied': '分享链接已复制！',
-    'footer.description': '我的博客是 https://www.mofei.life，这里记录了我开发过程中常用的一些工具，也许你也会觉得有用。'
+    'footer.descriptionBefore': '我的博客是 ',
+    'footer.descriptionAfter': '，这里记录了我开发过程中常用的一些工具，也许你也会觉得有用。'
   },
   en: {
     'nav.tools': 'Tools',
@@ -120,7 +121,8 @@ const translations = {
     'base64.share': 'Share',
     'base64.shareResult': 'Share Result',
     'base64.shareCopied': 'Share link copied!',
-    'footer.description': 'My blog is https://www.mofei.life. This page collects tools I frequently use in development—hope you find them helpful too.'
+    'footer.descriptionBefore': 'My blog is ',
+    'footer.descriptionAfter': '. This page collects tools I frequently use in development—hope you find them helpful too.'
   }
 };
 

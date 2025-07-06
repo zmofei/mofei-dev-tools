@@ -41,7 +41,16 @@ function Foot() {
                         transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
                     >
                         <p className="text-slate-700 font-medium text-sm md:text-base leading-relaxed">
-                            {t('footer.description')}
+                            {t('footer.descriptionBefore')}
+                            <a 
+                                href="https://www.mofei.life" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-slate-800 hover:text-slate-900 underline underline-offset-2 hover:underline-offset-4 transition-all duration-300"
+                            >
+                                https://www.mofei.life
+                            </a>
+                            {t('footer.descriptionAfter')}
                         </p>
                     </motion.div>
                     
