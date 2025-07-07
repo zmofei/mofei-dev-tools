@@ -60,7 +60,7 @@ function GeoJSONToolPageContent() {
   const [verificationUri, setVerificationUri] = useState('');
   const [showDeviceFlow, setShowDeviceFlow] = useState(false);
   const [pollInterval, setPollInterval] = useState<NodeJS.Timeout | null>(null);
-  const [currentInterval, setCurrentInterval] = useState(5); // Start with 5 seconds
+  const [currentInterval, setCurrentInterval] = useState(2); // Start with 5 seconds
   
   // History state
   interface HistoryItem {
@@ -85,7 +85,7 @@ function GeoJSONToolPageContent() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          client_id: 'Ov23lis975wrIv1ap1Wy',
+          client_id: process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID || 'Ov23lis975wrIv1ap1Wy',
           scope: 'gist'
         })
       });
@@ -145,7 +145,7 @@ function GeoJSONToolPageContent() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          client_id: 'Ov23lis975wrIv1ap1Wy',
+          client_id: process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID || 'Ov23lis975wrIv1ap1Wy',
           device_code: deviceCode,
           grant_type: 'urn:ietf:params:oauth:grant-type:device_code'
         })
@@ -172,7 +172,7 @@ function GeoJSONToolPageContent() {
             clearInterval(pollInterval);
           }
           
-          const newInterval = data.interval || (currentIntervalSeconds + 5); // Use GitHub's interval or add 5 seconds
+          const newInterval = data.interval || (currentIntervalSeconds + 2); // Use GitHub's interval or add 5 seconds
           setCurrentInterval(newInterval);
           
           const interval = setInterval(() => {
@@ -214,9 +214,12 @@ function GeoJSONToolPageContent() {
           localStorage.setItem('github_token', data.access_token);
           localStorage.setItem('github_user', JSON.stringify(userInfo));
           
-          // Show success message
-          setShareMessage(t('geojson.loginSaved'));
-          setTimeout(() => setShareMessage(''), 3000);
+          // Show success message only for new login (when user wasn't previously logged in)
+          const wasLoggedIn = !!githubUser;
+          if (!wasLoggedIn) {
+            setShareMessage(t('geojson.loginSaved'));
+            setTimeout(() => setShareMessage(''), 3000);
+          }
         }
 
         setShowDeviceFlow(false);
@@ -346,7 +349,7 @@ function GeoJSONToolPageContent() {
     setGithubUser(null);
     setGithubToken('');
     setShowDeviceFlow(false);
-    setCurrentInterval(5); // Reset to default
+    setCurrentInterval(2); // Reset to default
     if (pollInterval) {
       clearInterval(pollInterval);
       setPollInterval(null);
@@ -791,7 +794,7 @@ function GeoJSONToolPageContent() {
                                     {t('geojson.deviceFlow.waiting')}
                                   </p>
                                   <p className="text-xs text-gray-500 mt-1">
-                                    轮询间隔: {currentInterval}秒
+                                    {t('geojson.deviceFlow.pollingInterval')}: {currentInterval} {t('geojson.deviceFlow.seconds')}
                                   </p>
                                 </div>
                               </div>
@@ -881,7 +884,7 @@ function GeoJSONToolPageContent() {
           <div className="flex justify-center mb-6">
             <button
               onClick={generatePreviewUrl}
-              disabled={isUploading}
+              disabled={isUploading || !inputText.trim()}
               className="px-6 py-3 bg-gradient-to-r from-[#a1c4fd] to-[#c2e9fb] text-gray-900 font-medium rounded-lg hover:from-[#8fb3fc] hover:to-[#b1e1fa] transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
               {isUploading ? t('geojson.uploading') : t('geojson.generate')}
