@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect, Suspense, useCallback } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { motion } from "motion/react"
 import Link from 'next/link';
 import Image from 'next/image';
@@ -33,7 +33,7 @@ function GeoJSONToolPageContent() {
         const userData = JSON.parse(savedUser) as { login: string; avatar_url: string };
         setGithubToken(savedToken);
         setGithubUser(userData);
-      } catch (error) {
+      } catch {
         // Clear invalid data
         localStorage.removeItem('github_token');
         localStorage.removeItem('github_user');
@@ -44,7 +44,7 @@ function GeoJSONToolPageContent() {
       try {
         const historyData = JSON.parse(savedHistory) as HistoryItem[];
         setHistory(historyData);
-      } catch (error) {
+      } catch  {
         // Clear invalid history data
         localStorage.removeItem('geojson_history');
       }
@@ -55,7 +55,7 @@ function GeoJSONToolPageContent() {
   const subtitleText = t('geojson.subtitle');
 
   // Device flow state
-  const [deviceCode, setDeviceCode] = useState('');
+  // const [deviceCode, setDeviceCode] = useState('');
   const [userCode, setUserCode] = useState('');
   const [verificationUri, setVerificationUri] = useState('');
   const [showDeviceFlow, setShowDeviceFlow] = useState(false);
@@ -102,7 +102,7 @@ function GeoJSONToolPageContent() {
         interval: number;
       };
 
-      setDeviceCode(data.device_code);
+      // setDeviceCode(data.device_code);
       setUserCode(data.user_code);
       setVerificationUri(data.verification_uri);
       setShowDeviceFlow(true);
@@ -261,7 +261,7 @@ function GeoJSONToolPageContent() {
       const newHistory = [historyItem, ...history].slice(0, 20); // Keep only 20 recent items
       setHistory(newHistory);
       localStorage.setItem('geojson_history', JSON.stringify(newHistory));
-    } catch (error) {
+    } catch {
       // Ignore errors in adding to history
     }
   };
@@ -331,7 +331,6 @@ function GeoJSONToolPageContent() {
       document.body.appendChild(textArea);
       textArea.select();
       try {
-        // @ts-expect-error - execCommand is deprecated but still needed as fallback
         document.execCommand('copy');
         setShareMessage(t('geojson.shareCopied'));
         setTimeout(() => setShareMessage(''), 3000);
@@ -362,8 +361,10 @@ function GeoJSONToolPageContent() {
     // Try to get a meaningful filename from the GeoJSON data
     const getFileName = () => {
       if (typeof geoJSON === 'object' && geoJSON !== null) {
-        const obj = geoJSON as any;
-        const name = obj.name || obj.properties?.name || obj.features?.[0]?.properties?.name;
+        const obj = geoJSON as Record<string, unknown>;
+        const name = (obj as { name?: string })?.name 
+          || (obj as { properties?: { name?: string } })?.properties?.name 
+          || ((obj as { features?: Record<string, unknown>[] })?.features?.[0]?.properties as { name?: string } | undefined)?.name;
         if (name && typeof name === 'string') {
           // Clean the name and ensure it's a valid filename
           const cleanName = name.replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 50);
@@ -479,7 +480,6 @@ function GeoJSONToolPageContent() {
       document.body.appendChild(textArea);
       textArea.select();
       try {
-        // @ts-expect-error - execCommand is deprecated but still needed as fallback
         document.execCommand('copy');
       } catch {
         // Silent fail if execCommand is not supported
