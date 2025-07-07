@@ -6,6 +6,7 @@ import Foot from '@/components/Common/Foot';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSearchParams } from 'next/navigation';
 import { event } from '@/components/GoogleAnalytics';
+import StructuredData from '@/components/StructuredData';
 
 function Base64ToolPageContent() {
   const { t, language } = useLanguage();
@@ -246,6 +247,12 @@ function Base64ToolPageContent() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <StructuredData 
+        type="tool" 
+        toolName="Base64 Encoder Decoder" 
+        toolDescription="Free online Base64 encoder and decoder tool"
+        url="https://tools.mofei.life/base64"
+      />
       <main className="flex-1 pt-20 2xl:pt-22">
         <div className='max-w-[2000px] mx-auto'>
         <div className='overflow-hidden font-extrabold px-5 md:px-10 lg:px-16'>

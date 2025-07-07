@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <!-- English Homepage (only / is English) -->
+  <url>
+    <loc>https://tools.mofei.life/</loc>
+    <lastmod>2025-01-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://tools.mofei.life/zh"/>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://tools.mofei.life/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tools.mofei.life/"/>
+  </url>
+  
+  <!-- Chinese Homepage -->
+  <url>
+    <loc>https://tools.mofei.life/zh</loc>
+    <lastmod>2025-01-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://tools.mofei.life/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://tools.mofei.life/zh"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tools.mofei.life/"/>
+  </url>
+  
+  <!-- Base64 Tools -->
+  <url>
+    <loc>https://tools.mofei.life/en/base64</loc>
+    <lastmod>2025-01-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://tools.mofei.life/zh/base64"/>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://tools.mofei.life/en/base64"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tools.mofei.life/en/base64"/>
+  </url>
+  
+  <url>
+    <loc>https://tools.mofei.life/zh/base64</loc>
+    <lastmod>2025-01-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://tools.mofei.life/en/base64"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://tools.mofei.life/zh/base64"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tools.mofei.life/en/base64"/>
+  </url>
+  
+  <!-- GeoJSON Tools -->
+  <url>
+    <loc>https://tools.mofei.life/en/geojson</loc>
+    <lastmod>2025-01-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://tools.mofei.life/zh/geojson"/>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://tools.mofei.life/en/geojson"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tools.mofei.life/en/geojson"/>
+  </url>
+  
+  <url>
+    <loc>https://tools.mofei.life/zh/geojson</loc>
+    <lastmod>2025-01-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://tools.mofei.life/en/geojson"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://tools.mofei.life/zh/geojson"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tools.mofei.life/en/geojson"/>
+  </url>
+</urlset>

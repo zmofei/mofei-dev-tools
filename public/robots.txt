@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+
+# Main pages
+Allow: /zh
+Allow: /en
+Allow: /zh/base64
+Allow: /en/base64
+Allow: /zh/geojson
+Allow: /en/geojson
+Allow: /base64
+Allow: /geojson
+
+# Block API routes
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://tools.mofei.life/sitemap.xml

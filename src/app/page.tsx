@@ -4,6 +4,7 @@ import { motion } from "motion/react"
 import Link from 'next/link';
 import Foot from '@/components/Common/Foot';
 import { useLanguage } from '@/contexts/LanguageContext';
+import StructuredData from '@/components/StructuredData';
 
 interface Tool {
   name: string;
@@ -66,6 +67,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <StructuredData type="website" />
       <main className="flex-1 pt-20">
         <div className='max-w-[2000px] mx-auto'>
           <div className='overflow-hidden font-extrabold px-5 md:px-10 lg:px-16'>

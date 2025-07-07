@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Foot from '@/components/Common/Foot';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { event } from '@/components/GoogleAnalytics';
+import StructuredData from '@/components/StructuredData';
 
 function GeoJSONToolPageContent() {
   const { t, language } = useLanguage();
@@ -521,6 +522,12 @@ function GeoJSONToolPageContent() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <StructuredData 
+        type="tool" 
+        toolName="GeoJSON Preview Tool" 
+        toolDescription="Free GeoJSON preview tool to generate geojson.io preview links"
+        url="https://tools.mofei.life/geojson"
+      />
       <main className="flex-1 pt-20 2xl:pt-22">
         <div className='max-w-[2000px] mx-auto'>
         <div className='overflow-hidden font-extrabold px-5 md:px-10 lg:px-16'>
