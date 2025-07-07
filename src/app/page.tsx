@@ -20,6 +20,13 @@ const getToolsData = (language: string): Tool[] => [
     description: "Base64 encode/decode tool for text conversion",
     icon: "🔤",
     category: "text"
+  },
+  {
+    name: "GeoJSON Preview",
+    url: language === 'en' ? '/en/geojson' : '/zh/geojson', 
+    description: "Generate geojson.io preview links for GeoJSON data",
+    icon: "🗺️",
+    category: "dev"
   }
 ];
 
@@ -122,10 +129,10 @@ export default function Home() {
                         
                         <div className="flex-1 min-w-0">
                           <h3 className="font-semibold text-lg text-white mb-1">
-                            {t('tools.base64.name')}
+                            {tool.name === 'Base64' ? t('tools.base64.name') : t('tools.geojson.name')}
                           </h3>
                           <p className="text-sm text-gray-400">
-                            {t('tools.base64.category')}
+                            {tool.name === 'Base64' ? t('tools.base64.category') : t('tools.geojson.category')}
                           </p>
                         </div>
                         
@@ -137,7 +144,7 @@ export default function Home() {
                       </div>
                       
                       <p className="text-gray-300 text-sm leading-relaxed flex-1 text-center">
-                        {t('tools.base64.description')}
+                        {tool.name === 'Base64' ? t('tools.base64.description') : t('tools.geojson.description')}
                       </p>
                     </div>
                   </Link>

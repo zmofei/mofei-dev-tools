@@ -54,8 +54,8 @@ function Nav() {
             // Check for home page in any language
             return pathname === '/' || pathname === '/zh' || pathname === '/en';
         } else if (path === '/base64') {
-            // Check for base64 page in any language
-            return pathname.includes('/base64');
+            // Check for any tool page in any language
+            return pathname.includes('/base64') || pathname.includes('/geojson');
         }
         return false;
     };
