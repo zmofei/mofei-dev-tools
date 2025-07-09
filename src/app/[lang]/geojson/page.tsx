@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import GeoJSONPage from '../../geojson/page';
+import GeoJSONWithRedirect from './GeoJSONWithRedirect';
 
 type Props = {
   params: Promise<{ lang: string }>;
@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default function LangGeoJSONPage() {
-  return <GeoJSONPage />;
+  return <GeoJSONWithRedirect />;
 }
 
 export async function generateStaticParams() {

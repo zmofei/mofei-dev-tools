@@ -7,6 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useSearchParams } from 'next/navigation';
 import { event } from '@/components/GoogleAnalytics';
 import StructuredData from '@/components/StructuredData';
+import ContributeButton from '@/components/Common/ContributeButton';
 
 function Base64ToolPageContent() {
   const { t, language } = useLanguage();
@@ -288,13 +289,22 @@ function Base64ToolPageContent() {
           </motion.h1>
           
           <motion.p 
-            className="text-gray-300/90 text-base md:text-lg lg:text-xl font-medium leading-relaxed tracking-wide text-center"
+            className="text-gray-300/90 text-base md:text-lg lg:text-xl font-medium leading-relaxed tracking-wide text-center mb-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
           >
             {subtitleText}
           </motion.p>
+          
+          <motion.div
+            className="flex justify-center pb-2"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+          >
+            <ContributeButton variant="ghost" size="sm" />
+          </motion.div>
         </div>
       </div>
 

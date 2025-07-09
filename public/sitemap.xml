@@ -63,4 +63,68 @@
     <xhtml:link rel="alternate" hreflang="zh-CN" href="https://tools.mofei.life/zh/geojson"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tools.mofei.life/en/geojson"/>
   </url>
+  
+  <!-- JSON Extract Tools -->
+  <url>
+    <loc>https://tools.mofei.life/en/json-extract</loc>
+    <lastmod>2025-01-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://tools.mofei.life/zh/json-extract"/>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://tools.mofei.life/en/json-extract"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tools.mofei.life/en/json-extract"/>
+  </url>
+  
+  <url>
+    <loc>https://tools.mofei.life/zh/json-extract</loc>
+    <lastmod>2025-01-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://tools.mofei.life/en/json-extract"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://tools.mofei.life/zh/json-extract"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tools.mofei.life/en/json-extract"/>
+  </url>
+  
+  <!-- JSON Extract Tools (Default Routes) -->
+  <url>
+    <loc>https://tools.mofei.life/json-extract</loc>
+    <lastmod>2025-01-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://tools.mofei.life/zh/json-extract"/>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://tools.mofei.life/en/json-extract"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tools.mofei.life/json-extract"/>
+  </url>
+  
+  <!-- Coordinate Converter Tools -->
+  <url>
+    <loc>https://tools.mofei.life/en/coordinate-converter</loc>
+    <lastmod>2025-01-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://tools.mofei.life/zh/coordinate-converter"/>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://tools.mofei.life/en/coordinate-converter"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tools.mofei.life/en/coordinate-converter"/>
+  </url>
+  
+  <url>
+    <loc>https://tools.mofei.life/zh/coordinate-converter</loc>
+    <lastmod>2025-01-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://tools.mofei.life/en/coordinate-converter"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://tools.mofei.life/zh/coordinate-converter"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tools.mofei.life/en/coordinate-converter"/>
+  </url>
+  
+  <!-- Coordinate Converter Tools (Default Routes) -->
+  <url>
+    <loc>https://tools.mofei.life/coordinate-converter</loc>
+    <lastmod>2025-01-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://tools.mofei.life/zh/coordinate-converter"/>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://tools.mofei.life/en/coordinate-converter"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tools.mofei.life/coordinate-converter"/>
+  </url>
 </urlset>
