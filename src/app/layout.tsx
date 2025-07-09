@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   },
   description: "Collection of useful development tools including Base64 encoder/decoder, GeoJSON preview, JSON formatter and more. Free online tools, no registration required, bilingual interface (English/Chinese). Mofei开发工具集合：Base64编解码、GeoJSON预览、JSON格式化等实用开发工具。",
   keywords: ["开发工具", "development tools", "base64", "geojson", "json formatter", "在线工具", "online tools", "mofei", "前端工具", "web tools"],
-  authors: [{ name: "Mofei", url: "https://mofei.life" }],
+  authors: [{ name: "Mofei", url: "https://www.mofei.life" }],
   creator: "Mofei",
   publisher: "Mofei",
   robots: {

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Foot from '@/components/Common/Foot';
 import { useLanguage } from '@/contexts/LanguageContext';
 import StructuredData from '@/components/StructuredData';
+import ContributeButton from '@/components/Common/ContributeButton';
 
 interface Tool {
   name: string;
@@ -26,6 +27,20 @@ const getToolsData = (language: string): Tool[] => [
     name: "GeoJSON Preview",
     url: language === 'en' ? '/en/geojson' : '/zh/geojson', 
     description: "Generate geojson.io preview links for GeoJSON data",
+    icon: "🗺️",
+    category: "dev"
+  },
+  {
+    name: "JSON Path Extractor",
+    url: language === 'en' ? '/en/json-extract' : '/zh/json-extract', 
+    description: "Extract specific values from JSON data using JSONPath syntax",
+    icon: "📊",
+    category: "dev"
+  },
+  {
+    name: "GIS Coordinate Converter",
+    url: language === 'en' ? '/en/coordinate-converter' : '/zh/coordinate-converter', 
+    description: "Convert coordinates between different geographic coordinate systems",
     icon: "🗺️",
     category: "dev"
   }
@@ -86,13 +101,22 @@ export default function Home() {
             </motion.h1>
             
             <motion.p 
-              className="text-gray-300/90 text-lg md:text-xl lg:text-2xl font-medium leading-relaxed tracking-wide"
+              className="text-gray-300/90 text-lg md:text-xl lg:text-2xl font-medium leading-relaxed tracking-wide mb-8"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             >
               {subtitleText}
             </motion.p>
+            
+            <motion.div
+              className="flex justify-center pb-2"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+            >
+              <ContributeButton variant="primary" size="lg" />
+            </motion.div>
           </div>
         </div>
 
@@ -131,10 +155,16 @@ export default function Home() {
                         
                         <div className="flex-1 min-w-0">
                           <h3 className="font-semibold text-lg text-white mb-1">
-                            {tool.name === 'Base64' ? t('tools.base64.name') : t('tools.geojson.name')}
+                            {tool.name === 'Base64' ? t('tools.base64.name') : 
+                             tool.name === 'GeoJSON Preview' ? t('tools.geojson.name') : 
+                             tool.name === 'JSON Path Extractor' ? t('tools.json-extract.name') :
+                             t('tools.coordinate-converter.name')}
                           </h3>
                           <p className="text-sm text-gray-400">
-                            {tool.name === 'Base64' ? t('tools.base64.category') : t('tools.geojson.category')}
+                            {tool.name === 'Base64' ? t('tools.base64.category') : 
+                             tool.name === 'GeoJSON Preview' ? t('tools.geojson.category') :
+                             tool.name === 'JSON Path Extractor' ? t('tools.json-extract.category') :
+                             t('tools.coordinate-converter.category')}
                           </p>
                         </div>
                         
@@ -146,7 +176,10 @@ export default function Home() {
                       </div>
                       
                       <p className="text-gray-300 text-sm leading-relaxed flex-1 text-center">
-                        {tool.name === 'Base64' ? t('tools.base64.description') : t('tools.geojson.description')}
+                        {tool.name === 'Base64' ? t('tools.base64.description') : 
+                         tool.name === 'GeoJSON Preview' ? t('tools.geojson.description') :
+                         tool.name === 'JSON Path Extractor' ? t('tools.json-extract.description') :
+                         t('tools.coordinate-converter.description')}
                       </p>
                     </div>
                   </Link>
@@ -174,7 +207,7 @@ export default function Home() {
                 <h3 className="text-xl font-bold text-white mb-2">
                   {t('footer.moreTools')}
                 </h3>
-                <p className="text-gray-300 mb-4">
+                <p className="text-gray-300">
                   {t('footer.moreToolsDesc')}
                 </p>
               </div>

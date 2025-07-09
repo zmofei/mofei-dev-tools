@@ -1,0 +1,134 @@
+# 工具相关标签 | Tool-related labels
+tool-base64:
+  - title: '*base64*'
+  - title: '*Base64*'
+  - body: '*base64*'
+  - body: '*Base64*'
+
+tool-geojson:
+  - title: '*geojson*'
+  - title: '*GeoJSON*'
+  - body: '*geojson*'
+  - body: '*GeoJSON*'
+
+tool-json-extract:
+  - title: '*json*extract*'
+  - title: '*JSON*extract*'
+  - title: '*json*path*'
+  - title: '*JSONPath*'
+  - body: '*json*extract*'
+  - body: '*JSON*extract*'
+  - body: '*json*path*'
+  - body: '*JSONPath*'
+
+tool-coordinate:
+  - title: '*coordinate*'
+  - title: '*坐标*'
+  - title: '*WGS84*'
+  - title: '*GCJ*'
+  - title: '*BD-09*'
+  - title: '*UTM*'
+  - body: '*coordinate*'
+  - body: '*坐标*'
+  - body: '*WGS84*'
+  - body: '*GCJ*'
+  - body: '*BD-09*'
+  - body: '*UTM*'
+
+# 优先级标签 | Priority labels
+priority-high:
+  - title: '*urgent*'
+  - title: '*critical*'
+  - title: '*紧急*'
+  - title: '*严重*'
+  - body: '*urgent*'
+  - body: '*critical*'
+  - body: '*紧急*'
+  - body: '*严重*'
+
+priority-low:
+  - title: '*minor*'
+  - title: '*suggestion*'
+  - title: '*建议*'
+  - title: '*可有可无*'
+  - body: '*minor*'
+  - body: '*suggestion*'
+  - body: '*建议*'
+  - body: '*可有可无*'
+
+# 类型标签 | Type labels
+ui-ux:
+  - title: '*ui*'
+  - title: '*ux*'
+  - title: '*界面*'
+  - title: '*用户体验*'
+  - title: '*design*'
+  - title: '*设计*'
+  - body: '*ui*'
+  - body: '*ux*'
+  - body: '*界面*'
+  - body: '*用户体验*'
+  - body: '*design*'
+  - body: '*设计*'
+
+performance:
+  - title: '*performance*'
+  - title: '*speed*'
+  - title: '*slow*'
+  - title: '*性能*'
+  - title: '*速度*'
+  - title: '*慢*'
+  - body: '*performance*'
+  - body: '*speed*'
+  - body: '*slow*'
+  - body: '*性能*'
+  - body: '*速度*'
+  - body: '*慢*'
+
+mobile:
+  - title: '*mobile*'
+  - title: '*responsive*'
+  - title: '*手机*'
+  - title: '*移动*'
+  - title: '*响应式*'
+  - body: '*mobile*'
+  - body: '*responsive*'
+  - body: '*手机*'
+  - body: '*移动*'
+  - body: '*响应式*'
+
+accessibility:
+  - title: '*accessibility*'
+  - title: '*a11y*'
+  - title: '*无障碍*'
+  - title: '*可访问*'
+  - body: '*accessibility*'
+  - body: '*a11y*'
+  - body: '*无障碍*'
+  - body: '*可访问*'
+
+documentation:
+  - title: '*documentation*'
+  - title: '*docs*'
+  - title: '*readme*'
+  - title: '*文档*'
+  - title: '*说明*'
+  - body: '*documentation*'
+  - body: '*docs*'
+  - body: '*readme*'
+  - body: '*文档*'
+  - body: '*说明*'
+
+i18n:
+  - title: '*i18n*'
+  - title: '*internationalization*'
+  - title: '*translation*'
+  - title: '*语言*'
+  - title: '*翻译*'
+  - title: '*国际化*'
+  - body: '*i18n*'
+  - body: '*internationalization*'
+  - body: '*translation*'
+  - body: '*语言*'
+  - body: '*翻译*'
+  - body: '*国际化*'

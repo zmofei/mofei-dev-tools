@@ -8,8 +8,14 @@ Allow: /zh/base64
 Allow: /en/base64
 Allow: /zh/geojson
 Allow: /en/geojson
+Allow: /zh/json-extract
+Allow: /en/json-extract
+Allow: /zh/coordinate-converter
+Allow: /en/coordinate-converter
 Allow: /base64
 Allow: /geojson
+Allow: /json-extract
+Allow: /coordinate-converter
 
 # Block API routes
 Disallow: /api/

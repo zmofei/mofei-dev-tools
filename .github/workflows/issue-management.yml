@@ -1,0 +1,200 @@
+name: Issue and Discussion Management
+
+on:
+  issues:
+    types: [opened, labeled]
+  discussion:
+    types: [created]
+
+jobs:
+  auto-label-and-respond:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Auto-label new issues
+        if: github.event.action == 'opened' && github.event.issue
+        uses: github/issue-labeler@v3.0
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          configuration-path: .github/labeler.yml
+          
+      - name: Welcome new contributors
+        if: github.event.action == 'opened' && github.event.issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const isFirstIssue = issue.author_association === 'FIRST_TIME_CONTRIBUTOR';
+            
+            if (isFirstIssue) {
+              const welcomeMessage = `
+              🎉 感谢您的第一次贡献！Welcome to your first contribution!
+              
+              我们很高兴收到您的反馈。请给我们一些时间来审查您的提交。
+              We're excited to receive your feedback. Please give us some time to review your submission.
+              
+              在等待期间，您可以：
+              While waiting, you can:
+              - 📚 查看我们的[贡献指南](https://github.com/zmofei/mofei-dev-tools/blob/main/CONTRIBUTING.md)
+              - 💬 在[讨论区](https://github.com/zmofei/mofei-dev-tools/discussions)与社区交流
+              - 🔍 查看其他[开放的Issues](https://github.com/zmofei/mofei-dev-tools/issues)
+              
+              Thank you for helping us improve Mofei Dev Tools! 🚀
+              `;
+              
+              github.rest.issues.createComment({
+                issue_number: issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: welcomeMessage
+              });
+            }
+            
+      - name: Auto-assign priority labels
+        if: github.event.action == 'opened' && github.event.issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const title = issue.title.toLowerCase();
+            const body = issue.body.toLowerCase();
+            
+            // Auto-assign priority based on keywords
+            let priority = 'priority-medium'; // default
+            
+            if (title.includes('critical') || title.includes('urgent') || 
+                body.includes('critical') || body.includes('urgent') ||
+                title.includes('严重') || title.includes('紧急') ||
+                body.includes('严重') || body.includes('紧急')) {
+              priority = 'priority-high';
+            } else if (title.includes('minor') || title.includes('suggestion') ||
+                      body.includes('minor') || body.includes('suggestion') ||
+                      title.includes('建议') || title.includes('可有可无') ||
+                      body.includes('建议') || body.includes('可有可无')) {
+              priority = 'priority-low';
+            }
+            
+            // Add priority label
+            github.rest.issues.addLabels({
+              issue_number: issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: [priority]
+            });
+            
+      - name: Notify team for high priority issues
+        if: github.event.action == 'labeled' && contains(github.event.label.name, 'priority-high')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const notificationMessage = `
+            🚨 **高优先级问题通知 | High Priority Issue Alert**
+            
+            有一个高优先级的问题需要关注：
+            A high priority issue requires attention:
+            
+            **问题 | Issue**: ${issue.title}
+            **链接 | Link**: ${issue.html_url}
+            **提交者 | Reporter**: @${issue.user.login}
+            
+            请尽快处理此问题。
+            Please address this issue as soon as possible.
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: notificationMessage
+            });
+            
+  discussion-response:
+    runs-on: ubuntu-latest
+    if: github.event.discussion
+    steps:
+      - name: Welcome discussion creators
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const discussion = context.payload.discussion;
+            const category = discussion.category.name;
+            
+            let welcomeMessage = `
+            🎉 感谢您开始这个讨论！Thank you for starting this discussion!
+            
+            `;
+            
+            if (category === 'Ideas') {
+              welcomeMessage += `
+              💡 我们很兴奋听到您的创意想法！您的建议将帮助我们构建更好的工具。
+              We're excited to hear your creative ideas! Your suggestions will help us build better tools.
+              
+              接下来的步骤：
+              Next steps:
+              1. 社区成员可能会参与讨论并提供反馈
+              2. 如果想法得到足够支持，我们会考虑实现
+              3. 您可以提供更多详细信息来帮助我们理解需求
+              
+              1. Community members may join the discussion and provide feedback
+              2. If the idea gets enough support, we'll consider implementing it
+              3. You can provide more details to help us understand the requirements
+              `;
+            } else if (category === 'Q&A') {
+              welcomeMessage += `
+              🤔 感谢您的问题！我们会尽快回复。
+              Thank you for your question! We'll respond as soon as possible.
+              
+              同时，您也可以：
+              In the meantime, you can also:
+              - 📚 查看[项目文档](https://github.com/zmofei/mofei-dev-tools#readme)
+              - 🔍 搜索[已有讨论](https://github.com/zmofei/mofei-dev-tools/discussions)看是否有类似问题
+              `;
+            }
+            
+            // Note: GitHub API for discussions is still in beta
+            // This is a placeholder for when the API becomes stable
+            console.log('Discussion welcome message:', welcomeMessage);
+            
+  monthly-summary:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    steps:
+      - name: Generate monthly feedback summary
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const now = new Date();
+            const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+            
+            // Get issues from last month
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              since: lastMonth.toISOString(),
+              state: 'all'
+            });
+            
+            const bugReports = issues.data.filter(issue => 
+              issue.labels.some(label => label.name === 'bug')
+            ).length;
+            
+            const featureRequests = issues.data.filter(issue => 
+              issue.labels.some(label => label.name === 'enhancement')
+            ).length;
+            
+            const summary = `
+            # 📊 Monthly Feedback Summary - ${now.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long' })}
+            
+            ## 统计数据 | Statistics
+            - 🐛 Bug 报告 | Bug Reports: ${bugReports}
+            - ✨ 功能请求 | Feature Requests: ${featureRequests}
+            - 📝 总Issues | Total Issues: ${issues.data.length}
+            
+            ## 最活跃的贡献者 | Most Active Contributors
+            ${issues.data.slice(0, 5).map(issue => `- @${issue.user.login}`).join('\n')}
+            
+            感谢所有参与的用户！| Thank you to all participants!
+            `;
+            
+            console.log('Monthly summary:', summary);
+            // Can be extended to post to discussions or create an issue

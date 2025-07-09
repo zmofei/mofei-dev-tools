@@ -7,12 +7,15 @@ import Foot from '@/components/Common/Foot';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { event } from '@/components/GoogleAnalytics';
 import StructuredData from '@/components/StructuredData';
+import { useGeoJSONRedirect } from '@/hooks/useGeoJSONRedirect';
+import ContributeButton from '@/components/Common/ContributeButton';
 
 function GeoJSONToolPageContent() {
   const { t, language } = useLanguage();
   const [inputText, setInputText] = useState('');
   const [previewUrl, setPreviewUrl] = useState('');
   const [error, setError] = useState('');
+  const [warning, setWarning] = useState('');
   const [shareMessage, setShareMessage] = useState('');
   const [isLargeFile, setIsLargeFile] = useState(false);
   const [storageMethod, setStorageMethod] = useState<'url' | 'gist'>('url');
@@ -22,6 +25,9 @@ function GeoJSONToolPageContent() {
   const [githubUser, setGithubUser] = useState<{login: string, avatar_url: string} | null>(null);
   const [authMethod, setAuthMethod] = useState<'token' | 'oauth'>('oauth');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+
+  // Use the redirect hook
+  useGeoJSONRedirect();
 
   // Load saved login state and history on component mount
   useEffect(() => {
@@ -423,6 +429,7 @@ function GeoJSONToolPageContent() {
     if (!inputText.trim()) {
       setPreviewUrl('');
       setError('');
+      setWarning('');
       return;
     }
 
@@ -430,16 +437,19 @@ function GeoJSONToolPageContent() {
       const geoJSON = validateGeoJSON(inputText);
       const dataSize = new Blob([inputText]).size;
       
-      // Check if file is large (> 8KB, URL limit is ~2000 chars) or user chose gist
-      if (dataSize > 8000 || storageMethod === 'gist') {
+      // Check if user chose gist method
+      if (storageMethod === 'gist') {
         setIsUploading(true);
         
         try {
           const gistPath = await createGist(geoJSON);
-          const url = `https://geojson.io/#id=gist:${gistPath}`;
+          const currentPath = window.location.pathname;
+          const currentOrigin = window.location.origin;
+          const url = `${currentOrigin}${currentPath}?result=${encodeURIComponent(`gist:${gistPath}`)}`;
           
           setPreviewUrl(url);
           setError('');
+          setWarning('');
           
           // Add to history
           addToHistory(url, gistPath);
@@ -453,11 +463,20 @@ function GeoJSONToolPageContent() {
           setIsUploading(false);
         }
       } else {
-        // Use URL method for smaller files
+        // Use URL method - warn if file is too large but still generate
         const encodedGeoJSON = encodeURIComponent(JSON.stringify(geoJSON));
-        const url = `https://geojson.io/#data=data:application/json,${encodedGeoJSON}`;
+        const currentPath = window.location.pathname;
+        const currentOrigin = window.location.origin;
+        const url = `${currentOrigin}${currentPath}?result=${encodedGeoJSON}`;
         
         setPreviewUrl(url);
+        
+        // Show warning for large files but still generate the URL
+        if (dataSize > 8000) {
+          setWarning(t('geojson.fileTooLargeForUrl'));
+        } else {
+          setWarning('');
+        }
         setError('');
         
         // Add to history
@@ -469,6 +488,7 @@ function GeoJSONToolPageContent() {
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : t('geojson.validationError'));
       setPreviewUrl('');
+      setWarning('');
     }
   };
 
@@ -498,6 +518,7 @@ function GeoJSONToolPageContent() {
     setInputText('');
     setPreviewUrl('');
     setError('');
+    setWarning('');
   };
 
   const handleExampleLoad = () => {
@@ -563,13 +584,22 @@ function GeoJSONToolPageContent() {
           </motion.h1>
           
           <motion.p 
-            className="text-gray-300/90 text-base md:text-lg lg:text-xl font-medium leading-relaxed tracking-wide text-center"
+            className="text-gray-300/90 text-base md:text-lg lg:text-xl font-medium leading-relaxed tracking-wide text-center mb-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
           >
             {subtitleText}
           </motion.p>
+          
+          <motion.div
+            className="flex justify-center pb-2"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+          >
+            <ContributeButton variant="ghost" size="sm" />
+          </motion.div>
         </div>
       </div>
 
@@ -931,6 +961,14 @@ function GeoJSONToolPageContent() {
                 )}
               </div>
             </div>
+            
+            {/* Warning message */}
+            {warning && (
+              <div className="mb-3 p-3 bg-yellow-500/20 border border-yellow-500/50 rounded-lg text-yellow-300 text-sm">
+                {warning}
+              </div>
+            )}
+            
             <div className="relative">
               <textarea
                 value={error || previewUrl}

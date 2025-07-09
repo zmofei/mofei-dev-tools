@@ -27,12 +27,12 @@ export default function StructuredData({ type, toolName, toolDescription, url }:
       "author": {
         "@type": "Person",
         "name": "Mofei",
-        "url": "https://mofei.life"
+        "url": "https://www.mofei.life"
       },
       "publisher": {
         "@type": "Organization",
         "name": "Mofei",
-        "url": "https://mofei.life"
+        "url": "https://www.mofei.life"
       },
       "potentialAction": {
         "@type": "SearchAction",
@@ -42,6 +42,40 @@ export default function StructuredData({ type, toolName, toolDescription, url }:
     };
 
     if (type === 'tool') {
+      const toolFeatures = toolName === 'JSON Path Extractor' ? [
+        language === 'zh' ? "免费使用" : "Free to use",
+        language === 'zh' ? "无需注册" : "No registration required", 
+        language === 'zh' ? "支持中英文" : "Bilingual support",
+        language === 'zh' ? "在线处理" : "Online processing",
+        language === 'zh' ? "JSONPath语法支持" : "JSONPath syntax support",
+        language === 'zh' ? "多列提取" : "Multi-column extraction",
+        language === 'zh' ? "数组遍历" : "Array traversal",
+        language === 'zh' ? "CSV导出" : "CSV export",
+        language === 'zh' ? "对比模式" : "Comparison mode",
+        language === 'zh' ? "实时预览" : "Real-time preview"
+      ] : toolName === 'GIS Coordinate Converter' ? [
+        language === 'zh' ? "免费使用" : "Free to use",
+        language === 'zh' ? "无需注册" : "No registration required", 
+        language === 'zh' ? "支持中英文" : "Bilingual support",
+        language === 'zh' ? "在线处理" : "Online processing",
+        language === 'zh' ? "多坐标系支持" : "Multiple coordinate systems support",
+        language === 'zh' ? "WGS84坐标转换" : "WGS84 coordinate conversion",
+        language === 'zh' ? "GCJ-02火星坐标转换" : "GCJ-02 Mars coordinate conversion",
+        language === 'zh' ? "BD-09百度坐标转换" : "BD-09 Baidu coordinate conversion",
+        language === 'zh' ? "UTM投影转换" : "UTM projection conversion",
+        language === 'zh' ? "Web墨卡托转换" : "Web Mercator conversion",
+        language === 'zh' ? "十进制度格式" : "Decimal degrees format",
+        language === 'zh' ? "度分秒格式" : "Degrees minutes seconds format",
+        language === 'zh' ? "批量转换" : "Batch conversion",
+        language === 'zh' ? "结果分享" : "Result sharing",
+        language === 'zh' ? "数据导出" : "Data export"
+      ] : [
+        language === 'zh' ? "免费使用" : "Free to use",
+        language === 'zh' ? "无需注册" : "No registration required", 
+        language === 'zh' ? "支持中英文" : "Bilingual support",
+        language === 'zh' ? "在线处理" : "Online processing"
+      ];
+
       return {
         ...baseData,
         "applicationCategory": "DeveloperApplication",
@@ -51,12 +85,14 @@ export default function StructuredData({ type, toolName, toolDescription, url }:
           "price": "0",
           "priceCurrency": "USD"
         },
-        "featureList": [
-          language === 'zh' ? "免费使用" : "Free to use",
-          language === 'zh' ? "无需注册" : "No registration required", 
-          language === 'zh' ? "支持中英文" : "Bilingual support",
-          language === 'zh' ? "在线处理" : "Online processing"
-        ]
+        "featureList": toolFeatures,
+        "softwareRequirements": "Web Browser",
+        "permissions": "No special permissions required",
+        "applicationSubCategory": toolName === 'GIS Coordinate Converter' ? "GIS Tool" : "JSON Tool",
+        "downloadUrl": url,
+        "screenshot": toolName === 'JSON Path Extractor' ? 
+          `https://tools.mofei.life/screenshots/json-extract-${language}.png` : 
+          `https://tools.mofei.life/screenshots/${toolName?.toLowerCase().replace(/\s+/g, '-')}-${language}.png`
       };
     }
 
@@ -81,6 +117,24 @@ export default function StructuredData({ type, toolName, toolDescription, url }:
               "@type": "WebApplication",
               "name": "GeoJSON Preview Tool",
               "url": "https://tools.mofei.life/geojson"
+            }
+          },
+          {
+            "@type": "ListItem", 
+            "position": 3,
+            "item": {
+              "@type": "WebApplication",
+              "name": "JSON Path Extractor",
+              "url": "https://tools.mofei.life/json-extract"
+            }
+          },
+          {
+            "@type": "ListItem", 
+            "position": 4,
+            "item": {
+              "@type": "WebApplication",
+              "name": "GIS Coordinate Converter",
+              "url": "https://tools.mofei.life/coordinate-converter"
             }
           }
         ]
