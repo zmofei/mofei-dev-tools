@@ -73,31 +73,31 @@ export default function ContributeButton({
     
     const rect = buttonRef.current.getBoundingClientRect();
     
-    // For fixed positioning, we use viewport coordinates (no scroll offset needed)
+    // For absolute positioning, we need to add scroll offset
     const dropdownWidth = 320;
     const dropdownHeight = 350;
-    let leftPos = rect.right - dropdownWidth;
-    let topPos = rect.bottom + 8;
+    let leftPos = rect.right - dropdownWidth + window.scrollX;
+    let topPos = rect.bottom + 8 + window.scrollY;
     
     // Ensure dropdown doesn't go off the left edge
-    if (leftPos < 20) {
-      leftPos = rect.left;
+    if (leftPos < 20 + window.scrollX) {
+      leftPos = rect.left + window.scrollX;
     }
     
     // Ensure dropdown doesn't go off the right edge
-    if (leftPos + dropdownWidth > window.innerWidth) {
-      leftPos = window.innerWidth - dropdownWidth - 20;
+    if (leftPos + dropdownWidth > window.innerWidth + window.scrollX) {
+      leftPos = window.innerWidth + window.scrollX - dropdownWidth - 20;
     }
     
     // For footer buttons, show dropdown above the button if it would go off screen
-    if (topPos + dropdownHeight > window.innerHeight) {
+    if (topPos + dropdownHeight > window.innerHeight + window.scrollY) {
       // Position dropdown above button with proper spacing
-      topPos = rect.top - dropdownHeight - 8;
+      topPos = rect.top - dropdownHeight - 8 + window.scrollY;
     }
     
     return {
-      top: Math.max(10, topPos), // Ensure minimum top position
-      left: Math.max(10, leftPos) // Ensure minimum left position
+      top: Math.max(10 + window.scrollY, topPos), // Ensure minimum top position
+      left: Math.max(10 + window.scrollX, leftPos) // Ensure minimum left position
     };
   };
 
@@ -165,7 +165,7 @@ export default function ContributeButton({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed w-80 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl z-[9999] overflow-hidden"
+            className="absolute w-80 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl z-[9999] overflow-hidden"
             style={getDropdownPosition()}
           >
             <div className="p-4 bg-gradient-to-r from-[#a1c4fd]/10 to-[#c2e9fb]/10 border-b border-gray-700">

@@ -69,6 +69,22 @@ export default function StructuredData({ type, toolName, toolDescription, url }:
         language === 'zh' ? "批量转换" : "Batch conversion",
         language === 'zh' ? "结果分享" : "Result sharing",
         language === 'zh' ? "数据导出" : "Data export"
+      ] : toolName === 'BBox Drawing Tool' ? [
+        language === 'zh' ? "免费使用" : "Free to use",
+        language === 'zh' ? "无需注册" : "No registration required", 
+        language === 'zh' ? "支持中英文" : "Bilingual support",
+        language === 'zh' ? "在线处理" : "Online processing",
+        language === 'zh' ? "交互式地图绘制" : "Interactive map drawing",
+        language === 'zh' ? "矩形区域绘制" : "Rectangle area drawing",
+        language === 'zh' ? "WGS84坐标生成" : "WGS84 coordinate generation",
+        language === 'zh' ? "GeoJSON导出" : "GeoJSON export",
+        language === 'zh' ? "可视区域边界框" : "Viewport bounding box",
+        language === 'zh' ? "精确坐标显示" : "Precise coordinate display",
+        language === 'zh' ? "区域面积计算" : "Area calculation",
+        language === 'zh' ? "中心点计算" : "Center point calculation",
+        language === 'zh' ? "结果分享" : "Result sharing",
+        language === 'zh' ? "桌面浏览器支持" : "Desktop browser support",
+        language === 'zh' ? "移动端查看" : "Mobile viewing"
       ] : [
         language === 'zh' ? "免费使用" : "Free to use",
         language === 'zh' ? "无需注册" : "No registration required", 
@@ -88,7 +104,7 @@ export default function StructuredData({ type, toolName, toolDescription, url }:
         "featureList": toolFeatures,
         "softwareRequirements": "Web Browser",
         "permissions": "No special permissions required",
-        "applicationSubCategory": toolName === 'GIS Coordinate Converter' ? "GIS Tool" : "JSON Tool",
+        "applicationSubCategory": toolName === 'GIS Coordinate Converter' ? "GIS Tool" : toolName === 'BBox Drawing Tool' ? "GIS Tool" : "JSON Tool",
         "downloadUrl": url,
         "screenshot": toolName === 'JSON Path Extractor' ? 
           `https://tools.mofei.life/screenshots/json-extract-${language}.png` : 

@@ -21,13 +21,6 @@ const getToolsData = (language: string): Tool[] => [
     url: language === 'en' ? '/en/base64' : '/zh/base64', 
     description: "Base64 encode/decode tool for text conversion",
     icon: "🔤",
-    category: "text"
-  },
-  {
-    name: "GeoJSON Preview",
-    url: language === 'en' ? '/en/geojson' : '/zh/geojson', 
-    description: "Generate geojson.io preview links for GeoJSON data",
-    icon: "🗺️",
     category: "dev"
   },
   {
@@ -41,8 +34,22 @@ const getToolsData = (language: string): Tool[] => [
     name: "GIS Coordinate Converter",
     url: language === 'en' ? '/en/coordinate-converter' : '/zh/coordinate-converter', 
     description: "Convert coordinates between different geographic coordinate systems",
+    icon: "🌍",
+    category: "gis"
+  },
+  {
+    name: "BBox Drawing Tool",
+    url: language === 'en' ? '/en/bbox' : '/zh/bbox', 
+    description: "Draw and generate bounding boxes on interactive maps",
+    icon: "📦",
+    category: "gis"
+  },
+  {
+    name: "GeoJSON Preview",
+    url: language === 'en' ? '/en/geojson' : '/zh/geojson', 
+    description: "Generate geojson.io preview links for GeoJSON data",
     icon: "🗺️",
-    category: "dev"
+    category: "gis"
   }
 ];
 
@@ -55,6 +62,7 @@ export default function Home() {
   const categoryTexts = {
     text: t('categories.text'),
     dev: t('categories.dev'),
+    gis: t('categories.gis'),
     design: t('categories.design'), 
     util: t('categories.util'),
     other: t('categories.other')
@@ -75,6 +83,10 @@ export default function Home() {
     acc[category].push(tool);
     return acc;
   }, {} as Record<string, Tool[]>);
+
+  // Define category display order
+  const categoryOrder = ['dev', 'gis', 'design', 'util', 'other'];
+  const orderedCategories = categoryOrder.filter(cat => groupedTools[cat]);
 
   if (!mounted) {
     return null;
@@ -121,7 +133,9 @@ export default function Home() {
         </div>
 
         <div className='max-w-[2000px] mx-auto px-5 md:px-10 lg:px-16 py-6 md:py-8 lg:py-12'>
-        {Object.entries(groupedTools).map(([category, tools], categoryIndex) => (
+        {orderedCategories.map((category, categoryIndex) => {
+          const tools = groupedTools[category];
+          return (
           <motion.div 
             key={category}
             className="mb-12 md:mb-16"
@@ -158,13 +172,17 @@ export default function Home() {
                             {tool.name === 'Base64' ? t('tools.base64.name') : 
                              tool.name === 'GeoJSON Preview' ? t('tools.geojson.name') : 
                              tool.name === 'JSON Path Extractor' ? t('tools.json-extract.name') :
-                             t('tools.coordinate-converter.name')}
+                             tool.name === 'GIS Coordinate Converter' ? t('tools.coordinate-converter.name') :
+                             tool.name === 'BBox Drawing Tool' ? t('tools.bbox.name') || 'BBox Drawing Tool' :
+                             tool.name}
                           </h3>
                           <p className="text-sm text-gray-400">
                             {tool.name === 'Base64' ? t('tools.base64.category') : 
                              tool.name === 'GeoJSON Preview' ? t('tools.geojson.category') :
                              tool.name === 'JSON Path Extractor' ? t('tools.json-extract.category') :
-                             t('tools.coordinate-converter.category')}
+                             tool.name === 'GIS Coordinate Converter' ? t('tools.coordinate-converter.category') :
+                             tool.name === 'BBox Drawing Tool' ? t('tools.bbox.category') || 'Geographic Tools' :
+                             tool.category}
                           </p>
                         </div>
                         
@@ -179,7 +197,9 @@ export default function Home() {
                         {tool.name === 'Base64' ? t('tools.base64.description') : 
                          tool.name === 'GeoJSON Preview' ? t('tools.geojson.description') :
                          tool.name === 'JSON Path Extractor' ? t('tools.json-extract.description') :
-                         t('tools.coordinate-converter.description')}
+                         tool.name === 'GIS Coordinate Converter' ? t('tools.coordinate-converter.description') :
+                         tool.name === 'BBox Drawing Tool' ? t('tools.bbox.description') || 'Draw and generate bounding boxes on interactive maps' :
+                         tool.description}
                       </p>
                     </div>
                   </Link>
@@ -187,7 +207,8 @@ export default function Home() {
               ))}
             </div>
           </motion.div>
-        ))}
+          );
+        })}
 
         {/* Coming Soon section */}
         <motion.div 
