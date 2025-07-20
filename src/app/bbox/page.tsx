@@ -695,15 +695,26 @@ function BBoxDrawingToolContent() {
           mapInstanceRef.current.setCenter([centerCoords[0], centerCoords[1]]);
           mapInstanceRef.current.setZoom(zoom);
         }
-      } else if (bboxParam) {
-        // If we have bbox but no center/zoom, fit to bbox
+      }
+      
+      // Auto-center and zoom to bbox if bbox parameter exists
+      if (bboxParam) {
         const coords = bboxParam.split(',').map(Number);
         if (coords.length === 4) {
           const [minLng, minLat, maxLng, maxLat] = coords;
-          mapInstanceRef.current.fitBounds([
-            [minLng, minLat],
-            [maxLng, maxLat]
-          ], { padding: 50 });
+          
+          // Use setTimeout to ensure map is fully loaded before fitting bounds
+          setTimeout(() => {
+            if (mapInstanceRef.current) {
+              mapInstanceRef.current.fitBounds([
+                [minLng, minLat],
+                [maxLng, maxLat]
+              ], { 
+                padding: 50,
+                duration: 1000 // Smooth animation
+              });
+            }
+          }, 100);
         }
       }
     } catch (error) {
@@ -887,9 +898,27 @@ function BBoxDrawingToolContent() {
               <div className="lg:col-span-2">
                 <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-white text-lg font-semibold">
-                      {language === 'zh' ? '在地图上绘制边界框' : 'Draw Bounding Box on Map'}
-                    </h2>
+                    <div className="flex flex-col">
+                      <h2 className="text-white text-lg font-semibold">
+                        {language === 'zh' ? '在地图上绘制边界框' : 'Draw Bounding Box on Map'}
+                      </h2>
+                      <p className="text-gray-400 text-sm mt-1">
+                        {language === 'zh' 
+                          ? (
+                            <>
+                              <span className="hidden sm:inline">按住 Shift 键拖拽绘制</span>
+                              <span className="sm:hidden">触摸拖拽绘制</span>
+                            </>
+                          )
+                          : (
+                            <>
+                              <span className="hidden sm:inline">Hold Shift and drag to draw</span>
+                              <span className="sm:hidden">Touch and drag to draw</span>
+                            </>
+                          )
+                        }
+                      </p>
+                    </div>
                     <div className="flex items-center gap-2">
                       {customBbox && (
                         <button
@@ -911,10 +940,11 @@ function BBoxDrawingToolContent() {
                   {/* Map Container */}
                   <div 
                     ref={mapContainerRef}
-                    className="w-full h-96 bg-gray-700 rounded-lg border border-gray-600"
-                    style={{ minHeight: '400px' }}
+                    className="w-full h-[614px] bg-gray-700 rounded-lg border border-gray-600"
+                    style={{ minHeight: '614px' }}
                   />
                   
+                  {/* Tool Instructions - Inside map container */}
                   <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
                     <p className="text-blue-300 text-sm">
                       💡 {language === 'zh' 
@@ -932,6 +962,62 @@ function BBoxDrawingToolContent() {
                         )}
                     </p>
                   </div>
+
+                  {/* About BBox Drawing Tool Section - In left column */}
+                  <motion.div 
+                    className="mt-6"
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.5 }}
+                  >
+                    <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl border border-gray-700 p-6">
+                      <h2 className="text-lg font-bold text-white mb-4">
+                        {language === 'zh' ? '关于BBox绘制工具' : 'About BBox Drawing Tool'}
+                      </h2>
+                      
+                      <div className="space-y-4">
+                        <div>
+                          <h3 className="text-sm font-semibold text-[#a1c4fd] mb-2">
+                            {language === 'zh' ? '什么是边界框？' : 'What is a Bounding Box?'}
+                          </h3>
+                          <p className="text-gray-300 text-xs leading-relaxed">
+                            {language === 'zh' 
+                              ? '边界框（Bounding Box，简称BBox）是GIS和地图应用中的重要概念，用于定义地理区域的最小矩形范围。它通过四个坐标值（最小经度、最小纬度、最大经度、最大纬度）来精确描述一个地理区域的边界。'
+                              : 'A bounding box (BBox) is a fundamental concept in GIS and mapping applications, used to define the minimum rectangular extent of a geographic area. It precisely describes the boundaries of a geographic region using four coordinate values: minimum longitude, minimum latitude, maximum longitude, and maximum latitude.'
+                            }
+                          </p>
+                        </div>
+                        
+                        <div>
+                          <h3 className="text-sm font-semibold text-[#a1c4fd] mb-2">
+                            {language === 'zh' ? '工具特性' : 'Tool Features'}
+                          </h3>
+                          <ul className="text-gray-300 text-xs space-y-1">
+                            <li>• {language === 'zh' ? '交互式地图绘制界面' : 'Interactive map drawing interface'}</li>
+                            <li>• {language === 'zh' ? '精确的WGS84坐标生成' : 'Precise WGS84 coordinate generation'}</li>
+                            <li>• {language === 'zh' ? '实时面积和中心点计算' : 'Real-time area and center point calculation'}</li>
+                            <li>• {language === 'zh' ? 'GeoJSON格式导出' : 'GeoJSON format export'}</li>
+                            <li>• {language === 'zh' ? '可视区域边界框查看' : 'Viewport bounding box viewing'}</li>
+                            <li>• {language === 'zh' ? 'BBox数据预览和验证' : 'BBox data preview and validation'}</li>
+                          </ul>
+                        </div>
+                        
+                        <div>
+                          <h3 className="text-sm font-semibold text-[#a1c4fd] mb-2">
+                            {language === 'zh' ? '使用场景' : 'Use Cases'}
+                          </h3>
+                          <ul className="text-gray-300 text-xs space-y-1">
+                            <li>• {language === 'zh' ? 'GIS数据处理和分析' : 'GIS data processing and analysis'}</li>
+                            <li>• {language === 'zh' ? '地图API边界参数设置' : 'Map API boundary parameter setting'}</li>
+                            <li>• {language === 'zh' ? '地理数据查询范围定义' : 'Geographic data query range definition'}</li>
+                            <li>• {language === 'zh' ? '空间数据库查询优化' : 'Spatial database query optimization'}</li>
+                            <li>• {language === 'zh' ? '地图瓦片范围计算' : 'Map tile range calculation'}</li>
+                            <li>• {language === 'zh' ? '现有BBox数据的可视化验证' : 'Visual validation of existing BBox data'}</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
                 </div>
               </div>
 
@@ -946,27 +1032,34 @@ function BBoxDrawingToolContent() {
                 >
                   <button
                     onClick={() => setIsPreviewExpanded(!isPreviewExpanded)}
-                    className="w-full p-4 flex items-center justify-between hover:bg-gray-700/30 transition-colors duration-200"
+                    className="w-full p-4 flex items-center justify-between hover:bg-gray-700/30 transition-colors duration-200 group"
                   >
-                    <div className="flex items-center gap-2">
-                      <svg className="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
-                        <path d="M14 2v6h6"/>
-                        <path d="M16 13H8"/>
-                        <path d="M16 17H8"/>
-                        <path d="M10 9H8"/>
+                    <div className="flex items-center gap-3">
+                      <svg className="w-5 h-5 text-purple-400 group-hover:text-purple-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                       </svg>
-                      <h3 className="text-white font-medium">
-                        {language === 'zh' ? '输入BBox预览' : 'Input BBox Preview'}
-                      </h3>
+                      <div className="flex flex-col items-start">
+                        <h3 className="text-white font-medium group-hover:text-purple-300 transition-colors">
+                          {language === 'zh' ? '点击输入BBox数据' : 'Click to Input BBox Data'}
+                        </h3>
+                        <p className="text-gray-400 text-xs mt-0.5">
+                          {language === 'zh' 
+                            ? (previewBbox ? '已加载数据，点击编辑' : '支持GeoJSON、数组等格式') 
+                            : (previewBbox ? 'Data loaded, click to edit' : 'Supports GeoJSON, array formats')
+                          }
+                        </p>
+                      </div>
                       {previewBbox && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-purple-500/20 text-purple-400 border border-purple-500/30 ml-auto">
+                          <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                          </svg>
                           {language === 'zh' ? '已加载' : 'Loaded'}
                         </span>
                       )}
                     </div>
                     <motion.svg
-                      className="w-5 h-5 text-gray-400"
+                      className="w-4 h-4 text-gray-400 group-hover:text-gray-300 transition-colors"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -987,31 +1080,50 @@ function BBoxDrawingToolContent() {
                     className="overflow-hidden"
                   >
                     <div className="p-4 pt-0 border-t border-gray-700/50">
-                      <p className="text-gray-400 text-sm mb-3">
+                      <div className="flex items-center gap-2 mb-3">
+                        <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <h4 className="text-white font-medium text-sm">
+                          {language === 'zh' ? '输入BBox数据' : 'Input BBox Data'}
+                        </h4>
+                      </div>
+                      <p className="text-gray-400 text-xs mb-3">
                         {language === 'zh' 
-                          ? '粘贴 GeoJSON 或数组格式的边界框数据进行预览' 
-                          : 'Paste GeoJSON or array format bbox data for preview'
+                          ? '在下方输入边界框数据进行验证和可视化预览' 
+                          : 'Enter bounding box data below for validation and visual preview'
                         }
                       </p>
                       
                       <div className="space-y-3">
-                        <textarea
-                          value={previewInput}
-                          onChange={(e) => handlePreviewInputChange(e.target.value)}
-                          placeholder={language === 'zh' 
-                            ? `支持格式：
-[116.3, 39.9, 116.4, 40.0]
-116.3, 39.9, 116.4, 40.0
-{"bbox": [116.3, 39.9, 116.4, 40.0]}
-{"type": "Feature", "geometry": {...}}`
-                            : `Supported formats:
-[116.3, 39.9, 116.4, 40.0]
-116.3, 39.9, 116.4, 40.0
-{"bbox": [116.3, 39.9, 116.4, 40.0]}
-{"type": "Feature", "geometry": {...}}`
-                          }
-                          className="w-full h-24 px-3 py-2 bg-gray-900/50 border border-gray-600 rounded-lg text-white text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none font-mono"
-                        />
+                        <div className="relative">
+                          <textarea
+                            value={previewInput}
+                            onChange={(e) => handlePreviewInputChange(e.target.value)}
+                            placeholder={language === 'zh' 
+                              ? `在此输入BBox数据进行验证和预览...
+
+支持的数据格式：
+数组格式: [116.3, 39.9, 116.4, 40.0]
+逗号分隔: 116.3, 39.9, 116.4, 40.0
+GeoJSON: {"bbox": [116.3, 39.9, 116.4, 40.0]}`
+                              : `Enter BBox data for validation and preview...
+
+Supported data formats:
+Array format: [116.3, 39.9, 116.4, 40.0]
+Comma-separated: 116.3, 39.9, 116.4, 40.0
+GeoJSON: {"bbox": [116.3, 39.9, 116.4, 40.0]}`
+                            }
+                            className="w-full h-32 px-3 py-3 bg-gray-900/70 border border-gray-600 rounded-lg text-white text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-none font-mono transition-colors"
+                          />
+                          {!previewInput && (
+                            <div className="absolute top-3 right-3 text-gray-500 text-xs">
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                              </svg>
+                            </div>
+                          )}
+                        </div>
                         
                         {previewError && (
                           <div className="p-2 bg-red-500/20 border border-red-500/50 rounded text-red-400 text-sm">
@@ -1020,16 +1132,43 @@ function BBoxDrawingToolContent() {
                         )}
                         
                         {previewInput && !previewError && !previewBbox && (
-                          <div className="p-2 bg-yellow-500/20 border border-yellow-500/50 rounded text-yellow-400 text-sm">
-                            {language === 'zh' ? '正在解析...' : 'Parsing...'}
+                          <div className="flex items-center gap-2 p-2 bg-yellow-500/20 border border-yellow-500/50 rounded text-yellow-400 text-sm">
+                            <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            {language === 'zh' ? '正在解析BBox数据...' : 'Parsing BBox data...'}
                           </div>
                         )}
                         
-                        <div className="flex items-center gap-2 text-xs text-gray-400">
-                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                          </svg>
-                          {language === 'zh' ? '支持：数组、GeoJSON、逗号分隔值' : 'Supports: Array, GeoJSON, comma-separated values'}
+                        {previewBbox && (
+                          <div className="flex items-center gap-2 p-2 bg-green-500/20 border border-green-500/50 rounded text-green-400 text-sm">
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                            {language === 'zh' ? 'BBox数据解析成功，已在地图上显示' : 'BBox data parsed successfully, displayed on map'}
+                          </div>
+                        )}
+                        
+                        <div className="flex items-center justify-between pt-2 border-t border-gray-700/50">
+                          <div className="flex items-center gap-2 text-xs text-gray-400">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            {language === 'zh' ? '自动识别：数组格式、GeoJSON、逗号分隔值' : 'Auto-detect: Array format, GeoJSON, comma-separated values'}
+                          </div>
+                          {previewInput && (
+                            <button
+                              onClick={() => {
+                                setPreviewInput('');
+                                setPreviewBbox(null);
+                                setPreviewError('');
+                              }}
+                              className="text-xs text-gray-400 hover:text-red-400 transition-colors"
+                            >
+                              {language === 'zh' ? '清空' : 'Clear'}
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -1327,70 +1466,7 @@ function BBoxDrawingToolContent() {
             </div>
           </motion.div>
 
-          {/* About BBox Drawing Tool Section - Moved below map */}
-          <motion.div 
-            className="max-w-4xl mx-auto mt-12"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-          >
-            <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl border border-gray-700 p-8">
-              <h2 className="text-xl font-bold text-white mb-6 text-center">
-                {language === 'zh' ? '关于BBox绘制工具' : 'About BBox Drawing Tool'}
-              </h2>
-              
-              <div className="grid md:grid-cols-2 gap-8">
-                <div>
-                  <h3 className="text-lg font-semibold text-[#a1c4fd] mb-3">
-                    {language === 'zh' ? '什么是边界框？' : 'What is a Bounding Box?'}
-                  </h3>
-                  <p className="text-gray-300 text-sm leading-relaxed mb-4">
-                    {language === 'zh' 
-                      ? '边界框（Bounding Box，简称BBox）是GIS和地图应用中的重要概念，用于定义地理区域的最小矩形范围。它通过四个坐标值（最小经度、最小纬度、最大经度、最大纬度）来精确描述一个地理区域的边界。'
-                      : 'A bounding box (BBox) is a fundamental concept in GIS and mapping applications, used to define the minimum rectangular extent of a geographic area. It precisely describes the boundaries of a geographic region using four coordinate values: minimum longitude, minimum latitude, maximum longitude, and maximum latitude.'
-                    }
-                  </p>
-                  
-                  <h3 className="text-lg font-semibold text-[#a1c4fd] mb-3">
-                    {language === 'zh' ? '工具特性' : 'Tool Features'}
-                  </h3>
-                  <ul className="text-gray-300 text-sm space-y-2">
-                    <li>• {language === 'zh' ? '交互式地图绘制界面' : 'Interactive map drawing interface'}</li>
-                    <li>• {language === 'zh' ? '精确的WGS84坐标生成' : 'Precise WGS84 coordinate generation'}</li>
-                    <li>• {language === 'zh' ? '实时面积和中心点计算' : 'Real-time area and center point calculation'}</li>
-                    <li>• {language === 'zh' ? 'GeoJSON格式导出' : 'GeoJSON format export'}</li>
-                    <li>• {language === 'zh' ? '可视区域边界框查看' : 'Viewport bounding box viewing'}</li>
-                    <li>• {language === 'zh' ? 'BBox数据预览和验证' : 'BBox data preview and validation'}</li>
-                  </ul>
-                </div>
-                
-                <div>
-                  <h3 className="text-lg font-semibold text-[#a1c4fd] mb-3">
-                    {language === 'zh' ? '使用场景' : 'Use Cases'}
-                  </h3>
-                  <ul className="text-gray-300 text-sm space-y-2 mb-4">
-                    <li>• {language === 'zh' ? 'GIS数据处理和分析' : 'GIS data processing and analysis'}</li>
-                    <li>• {language === 'zh' ? '地图API边界参数设置' : 'Map API boundary parameter setting'}</li>
-                    <li>• {language === 'zh' ? '地理数据查询范围定义' : 'Geographic data query range definition'}</li>
-                    <li>• {language === 'zh' ? '空间数据库查询优化' : 'Spatial database query optimization'}</li>
-                    <li>• {language === 'zh' ? '地图瓦片范围计算' : 'Map tile range calculation'}</li>
-                    <li>• {language === 'zh' ? '现有BBox数据的可视化验证' : 'Visual validation of existing BBox data'}</li>
-                  </ul>
-                  
-                  <h3 className="text-lg font-semibold text-[#a1c4fd] mb-3">
-                    {language === 'zh' ? '支持格式' : 'Supported Formats'}
-                  </h3>
-                  <ul className="text-gray-300 text-sm space-y-2">
-                    <li>• {language === 'zh' ? 'WGS84十进制度格式' : 'WGS84 decimal degrees format'}</li>
-                    <li>• {language === 'zh' ? 'GeoJSON边界框格式' : 'GeoJSON bounding box format'}</li>
-                    <li>• {language === 'zh' ? '标准[minLng, minLat, maxLng, maxLat]格式' : 'Standard [minLng, minLat, maxLng, maxLat] format'}</li>
-                    <li>• {language === 'zh' ? '可分享的URL参数格式' : 'Shareable URL parameter format'}</li>
-                    <li>• {language === 'zh' ? '逗号/空格分隔的坐标值' : 'Comma/space-separated coordinate values'}</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </motion.div>
+
         </div>
       </main>
 
