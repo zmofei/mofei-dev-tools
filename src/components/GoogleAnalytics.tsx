@@ -4,7 +4,7 @@ import Script from 'next/script';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 
-const GA_TRACKING_ID = "G-N7P75W40JD";
+const GA_TRACKING_ID = "G-2PX1GR8P3Z";
 
 // 声明 gtag 函数
 declare global {
