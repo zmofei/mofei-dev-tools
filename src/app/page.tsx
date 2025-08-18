@@ -50,6 +50,13 @@ const getToolsData = (language: string): Tool[] => [
     description: "Generate geojson.io preview links for GeoJSON data",
     icon: "🗺️",
     category: "gis"
+  },
+  {
+    name: "ObjectID Generator",
+    url: language === 'en' ? '/en/objectid' : '/zh/objectid', 
+    description: "Generate MongoDB ObjectID with optional custom timestamp",
+    icon: "🆔",
+    category: "dev"
   }
 ];
 
@@ -174,6 +181,7 @@ export default function Home() {
                              tool.name === 'JSON Path Extractor' ? t('tools.json-extract.name') :
                              tool.name === 'GIS Coordinate Converter' ? t('tools.coordinate-converter.name') :
                              tool.name === 'BBox Drawing Tool' ? t('tools.bbox.name') || 'BBox Drawing Tool' :
+                             tool.name === 'ObjectID Generator' ? (language === 'zh' ? 'ObjectID 生成器' : 'ObjectID Generator') :
                              tool.name}
                           </h3>
                           <p className="text-sm text-gray-400">
@@ -182,6 +190,7 @@ export default function Home() {
                              tool.name === 'JSON Path Extractor' ? t('tools.json-extract.category') :
                              tool.name === 'GIS Coordinate Converter' ? t('tools.coordinate-converter.category') :
                              tool.name === 'BBox Drawing Tool' ? t('tools.bbox.category') || 'Geographic Tools' :
+                             tool.name === 'ObjectID Generator' ? (language === 'zh' ? '开发工具' : 'Development Tools') :
                              tool.category}
                           </p>
                         </div>
@@ -199,6 +208,7 @@ export default function Home() {
                          tool.name === 'JSON Path Extractor' ? t('tools.json-extract.description') :
                          tool.name === 'GIS Coordinate Converter' ? t('tools.coordinate-converter.description') :
                          tool.name === 'BBox Drawing Tool' ? t('tools.bbox.description') || 'Draw and generate bounding boxes on interactive maps' :
+                         tool.name === 'ObjectID Generator' ? (language === 'zh' ? '生成 MongoDB ObjectID，支持自定义时间戳' : 'Generate MongoDB ObjectID with optional custom timestamp') :
                          tool.description}
                       </p>
                     </div>

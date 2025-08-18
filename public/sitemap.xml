@@ -127,4 +127,36 @@
     <xhtml:link rel="alternate" hreflang="en-US" href="https://tools.mofei.life/en/coordinate-converter"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tools.mofei.life/coordinate-converter"/>
   </url>
+
+  <!-- ObjectID Generator Tools -->
+  <url>
+    <loc>https://tools.mofei.life/en/objectid</loc>
+    <lastmod>2025-01-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://tools.mofei.life/zh/objectid"/>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://tools.mofei.life/en/objectid"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tools.mofei.life/en/objectid"/>
+  </url>
+  
+  <url>
+    <loc>https://tools.mofei.life/zh/objectid</loc>
+    <lastmod>2025-01-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://tools.mofei.life/en/objectid"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://tools.mofei.life/zh/objectid"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tools.mofei.life/en/objectid"/>
+  </url>
+  
+  <!-- ObjectID Generator Tools (Default Routes) -->
+  <url>
+    <loc>https://tools.mofei.life/objectid</loc>
+    <lastmod>2025-01-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://tools.mofei.life/zh/objectid"/>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://tools.mofei.life/en/objectid"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://tools.mofei.life/objectid"/>
+  </url>
 </urlset>
