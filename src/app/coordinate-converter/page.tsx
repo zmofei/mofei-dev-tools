@@ -113,120 +113,11 @@ const coordinateSystems: CoordinateSystem[] = [
   }
 ];
 
+const hiddenCoordinateSystemIds = new Set(['gcj02', 'bd09']);
+const visibleCoordinateSystems = coordinateSystems.filter(system => !hiddenCoordinateSystemIds.has(system.id));
+
 // Constants for coordinate conversions
 const pi = Math.PI;
-const a = 6378245.0; // WGS84 semi-major axis
-const ee = 0.00669342162296594323; // WGS84 eccentricity squared
-
-/**
- * GCJ-02 Coordinate Conversion Algorithm
- * 
- * Algorithm Source: Based on publicly available GCJ-02 offset algorithms
- * References:
- * - GCJ-02 coordinate system standards from China's Bureau of Surveying and Mapping
- * - Open source GIS community algorithms
- * - Industry-standard mathematical models widely used in map applications
- * 
- * Description:
- * - GCJ-02 is the coordinate system established by China's National Administration of Surveying
- * - Algorithm implements mutual conversion between WGS84 and GCJ-02
- * - Conversion accuracy meets practical application requirements
- * - Only applies offset processing to coordinates within China's borders
- */
-
-// Helper functions for coordinate transformations
-const transformLat = (lng: number, lat: number): number => {
-  let ret = -100.0 + 2.0 * lng + 3.0 * lat + 0.2 * lat * lat + 0.1 * lng * lat + 0.2 * Math.sqrt(Math.abs(lng));
-  ret += (20.0 * Math.sin(6.0 * lng * pi) + 20.0 * Math.sin(2.0 * lng * pi)) * 2.0 / 3.0;
-  ret += (20.0 * Math.sin(lat * pi) + 40.0 * Math.sin(lat / 3.0 * pi)) * 2.0 / 3.0;
-  ret += (160.0 * Math.sin(lat / 12.0 * pi) + 320 * Math.sin(lat * pi / 30.0)) * 2.0 / 3.0;
-  return ret;
-};
-
-const transformLng = (lng: number, lat: number): number => {
-  let ret = 300.0 + lng + 2.0 * lat + 0.1 * lng * lng + 0.1 * lng * lat + 0.1 * Math.sqrt(Math.abs(lng));
-  ret += (20.0 * Math.sin(6.0 * lng * pi) + 20.0 * Math.sin(2.0 * lng * pi)) * 2.0 / 3.0;
-  ret += (20.0 * Math.sin(lng * pi) + 40.0 * Math.sin(lng / 3.0 * pi)) * 2.0 / 3.0;
-  ret += (150.0 * Math.sin(lng / 12.0 * pi) + 300.0 * Math.sin(lng / 30.0 * pi)) * 2.0 / 3.0;
-  return ret;
-};
-
-const isOutOfChina = (lng: number, lat: number): boolean => {
-  return (lng < 72.004 || lng > 137.8347) || (lat < 0.8293 || lat > 55.8271);
-};
-
-// Coordinate conversion functions
-const wgs84ToGcj02 = (lng: number, lat: number): [number, number] => {
-  if (isOutOfChina(lng, lat)) {
-    return [lng, lat];
-  }
-  
-  let dlat = transformLat(lng - 105.0, lat - 35.0);
-  let dlng = transformLng(lng - 105.0, lat - 35.0);
-  
-  const radlat = lat / 180.0 * pi;
-  let magic = Math.sin(radlat);
-  magic = 1 - ee * magic * magic;
-  const sqrtmagic = Math.sqrt(magic);
-  
-  dlat = (dlat * 180.0) / ((a * (1 - ee)) / (magic * sqrtmagic) * pi);
-  dlng = (dlng * 180.0) / (a / sqrtmagic * Math.cos(radlat) * pi);
-  
-  return [lng + dlng, lat + dlat];
-};
-
-const gcj02ToWgs84 = (lng: number, lat: number): [number, number] => {
-  if (isOutOfChina(lng, lat)) {
-    return [lng, lat];
-  }
-  
-  let dlat = transformLat(lng - 105.0, lat - 35.0);
-  let dlng = transformLng(lng - 105.0, lat - 35.0);
-  
-  const radlat = lat / 180.0 * pi;
-  let magic = Math.sin(radlat);
-  magic = 1 - ee * magic * magic;
-  const sqrtmagic = Math.sqrt(magic);
-  
-  dlat = (dlat * 180.0) / ((a * (1 - ee)) / (magic * sqrtmagic) * pi);
-  dlng = (dlng * 180.0) / (a / sqrtmagic * Math.cos(radlat) * pi);
-  
-  return [lng - dlng, lat - dlat];
-};
-
-/**
- * BD-09 Coordinate Conversion Algorithm
- * 
- * Algorithm Source: Based on publicly available BD-09 conversion algorithms
- * Description: BD-09 is the coordinate system used by Baidu Maps, with secondary encryption based on GCJ-02
- */
-const gcj02ToBd09 = (lng: number, lat: number): [number, number] => {
-  const z = Math.sqrt(lng * lng + lat * lat) + 0.00002 * Math.sin(lat * pi * 3000.0 / 180.0);
-  const theta = Math.atan2(lat, lng) + 0.000003 * Math.cos(lng * pi * 3000.0 / 180.0);
-  const bd_lng = z * Math.cos(theta) + 0.0065;
-  const bd_lat = z * Math.sin(theta) + 0.006;
-  return [bd_lng, bd_lat];
-};
-
-const bd09ToGcj02 = (lng: number, lat: number): [number, number] => {
-  const x = lng - 0.0065;
-  const y = lat - 0.006;
-  const z = Math.sqrt(x * x + y * y) - 0.00002 * Math.sin(y * pi * 3000.0 / 180.0);
-  const theta = Math.atan2(y, x) - 0.000003 * Math.cos(x * pi * 3000.0 / 180.0);
-  const gcj_lng = z * Math.cos(theta);
-  const gcj_lat = z * Math.sin(theta);
-  return [gcj_lng, gcj_lat];
-};
-
-const wgs84ToBd09 = (lng: number, lat: number): [number, number] => {
-  const [gcj_lng, gcj_lat] = wgs84ToGcj02(lng, lat);
-  return gcj02ToBd09(gcj_lng, gcj_lat);
-};
-
-const bd09ToWgs84 = (lng: number, lat: number): [number, number] => {
-  const [gcj_lng, gcj_lat] = bd09ToGcj02(lng, lat);
-  return gcj02ToWgs84(gcj_lng, gcj_lat);
-};
 
 // Web Mercator conversions
 const wgs84ToWebMercator = (lng: number, lat: number): [number, number] => {
@@ -357,16 +248,12 @@ function CoordinateConverterPageContent() {
     let wgs84Lng = lng;
     let wgs84Lat = lat;
     
-    if (fromSystem === 'gcj02') {
-      [wgs84Lng, wgs84Lat] = gcj02ToWgs84(lng, lat);
-    } else if (fromSystem === 'bd09') {
-      [wgs84Lng, wgs84Lat] = bd09ToWgs84(lng, lat);
-    } else if (fromSystem === 'web_mercator') {
+    if (fromSystem === 'web_mercator') {
       [wgs84Lng, wgs84Lat] = webMercatorToWgs84(lng, lat);
     }
     
     // Generate results for all coordinate systems
-    coordinateSystems.forEach(system => {
+    visibleCoordinateSystems.forEach(system => {
       try {
         let convertedLng = wgs84Lng;
         let convertedLat = wgs84Lat;
@@ -378,12 +265,6 @@ function CoordinateConverterPageContent() {
           const latDms = ddToDms(convertedLat, true);
           const lngDms = ddToDms(convertedLng, false);
           formatted = `${latDms}, ${lngDms}`;
-        } else if (system.id === 'gcj02') {
-          [convertedLng, convertedLat] = wgs84ToGcj02(wgs84Lng, wgs84Lat);
-          formatted = `${convertedLat.toFixed(6)}, ${convertedLng.toFixed(6)}`;
-        } else if (system.id === 'bd09') {
-          [convertedLng, convertedLat] = wgs84ToBd09(wgs84Lng, wgs84Lat);
-          formatted = `${convertedLat.toFixed(6)}, ${convertedLng.toFixed(6)}`;
         } else if (system.id === 'utm') {
           // Simplified UTM representation
           const zone = Math.floor((wgs84Lng + 180) / 6) + 1;
@@ -419,7 +300,7 @@ function CoordinateConverterPageContent() {
     const coords = searchParams.get('coords');
     const system = searchParams.get('system');
     
-    if (coords && system) {
+    if (coords && system && visibleCoordinateSystems.some(visibleSystem => visibleSystem.id === system)) {
       setIsLoadingFromUrl(true);
       setInputCoords(decodeURIComponent(coords));
       setSourceSystem(system);
@@ -518,7 +399,7 @@ function CoordinateConverterPageContent() {
 
   // Load example coordinates
   const loadExample = () => {
-    const system = coordinateSystems.find(s => s.id === sourceSystem);
+    const system = visibleCoordinateSystems.find(s => s.id === sourceSystem);
     if (system) {
       setInputCoords(system.example);
       setError('');
@@ -768,7 +649,7 @@ function CoordinateConverterPageContent() {
                       onChange={(e) => setSourceSystem(e.target.value)}
                       className="w-full px-3 py-2 bg-gray-700/50 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-[#a1c4fd] focus:border-transparent"
                     >
-                      {coordinateSystems.map(system => (
+                      {visibleCoordinateSystems.map(system => (
                         <option key={system.id} value={system.id}>
                           {language === 'zh' ? system.nameZh : system.name}
                         </option>
@@ -785,13 +666,13 @@ function CoordinateConverterPageContent() {
                       <textarea
                         value={inputCoords}
                         onChange={(e) => setInputCoords(e.target.value)}
-                        placeholder={`${coordinateSystems.find(s => s.id === sourceSystem)?.example}\n${language === 'zh' ? '支持多行批量转换，每行一个坐标' : 'Supports multi-line batch conversion, one coordinate per line'}`}
+                        placeholder={`${visibleCoordinateSystems.find(s => s.id === sourceSystem)?.example}\n${language === 'zh' ? '支持多行批量转换，每行一个坐标' : 'Supports multi-line batch conversion, one coordinate per line'}`}
                         className="w-full px-3 py-2 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-[#a1c4fd] focus:border-transparent resize-none"
                         rows={4}
                       />
                     </div>
                     <p className="text-gray-400 text-xs mt-1">
-                      {t('coordinate-converter.example')}: {coordinateSystems.find(s => s.id === sourceSystem)?.example}
+                      {t('coordinate-converter.example')}: {visibleCoordinateSystems.find(s => s.id === sourceSystem)?.example}
                       <br />
                       {language === 'zh' ? '💡 支持批量转换：每行输入一个坐标' : '💡 Supports batch conversion: one coordinate per line'}
                     </p>
@@ -836,8 +717,6 @@ function CoordinateConverterPageContent() {
                   </h2>
                   <ul className="text-gray-300 text-sm space-y-1">
                     <li>• <strong>WGS84:</strong> {t('coordinate-converter.usage1')}</li>
-                    <li>• <strong>GCJ-02:</strong> {t('coordinate-converter.usage2')}</li>
-                    <li>• <strong>BD-09:</strong> {t('coordinate-converter.usage3')}</li>
                     <li>• <strong>UTM:</strong> {t('coordinate-converter.usage4')}</li>
                     <li>• <strong>Web Mercator:</strong> {t('coordinate-converter.usage5')}</li>
                     <li>• <strong>{language === 'zh' ? '批量转换' : 'Batch Conversion'}:</strong> {language === 'zh' ? '支持多行输入，每行一个坐标进行批量转换' : 'Supports multi-line input, one coordinate per line for batch conversion'}</li>
@@ -1007,7 +886,7 @@ function CoordinateConverterPageContent() {
                     </div>
                     
                     <div className="space-y-3">
-                      {coordinateSystems.map(system => (
+                      {visibleCoordinateSystems.map(system => (
                         <div key={system.id} className="border border-gray-600 rounded-lg p-3">
                           <div className="flex items-center justify-between mb-2">
                             <h3 className="text-white font-medium text-sm">
