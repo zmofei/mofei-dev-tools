@@ -1,0 +1,136 @@
+title: "💡 工具需求建议 | Tool Feature Request"
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢您提出工具需求建议！我们很乐意听取您的想法。
+        Thank you for suggesting a new tool or feature! We'd love to hear your ideas.
+
+  - type: dropdown
+    id: language
+    attributes:
+      label: 语言 | Language
+      description: 请选择您希望用什么语言交流 | Please choose your preferred language
+      options:
+        - 中文 | Chinese
+        - English
+    validations:
+      required: true
+
+  - type: input
+    id: tool-name
+    attributes:
+      label: 工具名称 | Tool Name
+      description: 您希望的工具名称 | What would you like to call this tool?
+      placeholder: 例如：JSON格式化器 | e.g., JSON Formatter
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 工具描述 | Tool Description
+      description: 详细描述这个工具应该做什么 | Describe in detail what this tool should do
+      placeholder: |
+        请描述：
+        - 这个工具的主要功能
+        - 你希望它解决什么问题
+        - 任何特殊要求或功能
+        
+        Please describe:
+        - The main functionality of this tool
+        - What problem you want it to solve  
+        - Any special requirements or features
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: 工具类别 | Tool Category
+      description: 这个工具属于哪个类别？| What category does this tool belong to?
+      options:
+        - 文本处理 | Text Processing
+        - 开发工具 | Development Tools
+        - 数据转换 | Data Conversion
+        - 设计工具 | Design Tools
+        - 实用工具 | Utilities
+        - 其他 | Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 优先级 | Priority
+      description: 这个功能对您有多重要？| How important is this feature to you?
+      options:
+        - 非常需要 | Critical - I really need this
+        - 比较有用 | High - This would be very useful
+        - 一般 | Medium - Nice to have
+        - 可有可无 | Low - Just a suggestion
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: 使用场景 | Use Case
+      description: 您在什么情况下会使用这个工具？| When and how would you use this tool?
+      placeholder: |
+        例如：
+        - 日常开发工作中需要快速转换数据格式
+        - 设计工作中需要处理颜色值
+        - 学习过程中需要某种计算器
+        
+        For example:
+        - Need to quickly convert data formats in daily development
+        - Need to process color values in design work
+        - Need a specific calculator for learning
+    validations:
+      required: true
+
+  - type: textarea
+    id: similar-tools
+    attributes:
+      label: 类似工具参考 | Similar Tools Reference
+      description: 您知道类似的工具吗？它们有什么不足？| Are you aware of similar tools? What are their limitations?
+      placeholder: |
+        请提供：
+        - 类似工具的名称或链接
+        - 它们的优缺点
+        - 您希望改进的地方
+        
+        Please provide:
+        - Names or links of similar tools
+        - Their pros and cons
+        - What you'd like to improve
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: 贡献意愿 | Contribution Interest
+      description: 您是否愿意参与这个工具的开发？| Would you be interested in contributing to this tool's development?
+      options:
+        - label: 我可以提供更详细的需求说明 | I can provide more detailed requirements
+        - label: 我可以帮助测试功能 | I can help test the functionality
+        - label: 我可以提供设计建议 | I can provide design suggestions
+        - label: 我可以参与代码开发 | I can contribute to coding
+        - label: 我只是提出建议 | I'm just making a suggestion
+
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: 其他信息 | Additional Information
+      description: 还有什么想补充的吗？| Anything else you'd like to add?
+      placeholder: |
+        例如：
+        - 特殊的技术要求
+        - 参考资料或灵感来源
+        - 预期的使用频率
+        
+        For example:
+        - Special technical requirements
+        - Reference materials or inspiration
+        - Expected usage frequency

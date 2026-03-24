@@ -1,0 +1,17 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💡 工具需求讨论 | Tool Request Discussion
+    url: https://github.com/zmofei/mofei-dev-tools/discussions/new?category=ideas
+    about: 想要新工具或有创意想法？在这里讨论！| Want a new tool or have creative ideas? Discuss here!
+  
+  - name: 🤔 使用帮助 | Usage Help
+    url: https://github.com/zmofei/mofei-dev-tools/discussions/new?category=q-a
+    about: 不知道如何使用某个工具？在这里提问！| Don't know how to use a tool? Ask here!
+  
+  - name: 💬 反馈和建议 | Feedback & Suggestions
+    url: https://github.com/zmofei/mofei-dev-tools/discussions/new?category=general
+    about: 想要分享使用体验或提供建议？欢迎在这里交流！| Want to share your experience or provide suggestions? Welcome to discuss here!
+  
+  - name: 📚 查看文档 | View Documentation
+    url: https://github.com/zmofei/mofei-dev-tools#readme
+    about: 查看项目文档和使用指南 | Check project documentation and usage guide

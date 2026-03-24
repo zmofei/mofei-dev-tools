@@ -1,0 +1,80 @@
+name: 🐛 Bug报告 | Bug Report
+description: 报告工具中的问题 | Report a problem with the tools
+title: "[Bug] "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢您报告问题！这有助于我们改进工具。
+        Thanks for reporting an issue! This helps us improve our tools.
+
+  - type: input
+    id: tool
+    attributes:
+      label: 工具名称 | Tool Name
+      description: 哪个工具出现了问题？| Which tool has the issue?
+      placeholder: 例如：Base64编码器、GIS坐标转换器等 | e.g., Base64 Encoder, GIS Coordinate Converter, etc.
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 问题描述 | What happened?
+      description: 详细描述遇到的问题 | Describe the issue you encountered
+      placeholder: 请详细描述问题... | Please describe the issue in detail...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 重现步骤 | Steps to reproduce
+      description: 如何重现这个问题？| How can we reproduce this issue?
+      placeholder: |
+        1. 进入某个工具页面...
+        2. 输入特定数据...
+        3. 点击某个按钮...
+        4. 看到错误...
+        
+        1. Go to a tool page...
+        2. Enter specific data...
+        3. Click a button...
+        4. See error...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 预期行为 | Expected behavior
+      description: 您期望发生什么？| What did you expect to happen?
+      placeholder: 我期望... | I expected...
+    validations:
+      required: true
+
+  - type: input
+    id: browser
+    attributes:
+      label: 浏览器 | Browser
+      description: 您使用的浏览器和版本 | Browser and version you're using
+      placeholder: 例如：Chrome 120, Firefox 121, Safari 17 | e.g., Chrome 120, Firefox 121, Safari 17
+    validations:
+      required: true
+
+  - type: input
+    id: device
+    attributes:
+      label: 设备 | Device
+      description: 您使用的设备类型 | Device type you're using
+      placeholder: 例如：Windows 11, macOS 14, iPhone 15, Android 14 | e.g., Windows 11, macOS 14, iPhone 15, Android 14
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: 额外信息 | Additional context
+      description: 还有其他相关信息吗？| Any other relevant information?
+      placeholder: 截图、错误消息等... | Screenshots, error messages, etc...
