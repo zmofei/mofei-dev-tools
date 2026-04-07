@@ -43,3 +43,6 @@ next-env.d.ts
 .dev.vars*
 
 certificates
+
+# oh-my-claudecode
+.omc
