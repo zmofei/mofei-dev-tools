@@ -1,5 +1,8 @@
 import type { Metadata } from 'next';
-import HomePage from '../page';
+import Foot from '@/components/Common/Foot';
+import StructuredData from '@/components/StructuredData';
+import HomePageContent from '@/components/HomePageContent';
+import { homeUrl } from '@/lib/site';
 
 type Props = {
   params: Promise<{ lang: string }>;
@@ -19,9 +22,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         locale: 'zh_CN',
       },
       alternates: {
-        canonical: 'https://tools.mofei.life/zh',
+        canonical: homeUrl('zh'),
         languages: {
-          'en-US': 'https://tools.mofei.life/',
+          'en-US': homeUrl('en'),
         },
       },
     };
@@ -38,16 +41,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       locale: 'en_US',
     },
     alternates: {
-      canonical: 'https://tools.mofei.life/',
+      canonical: homeUrl('en'),
       languages: {
-        'zh-CN': 'https://tools.mofei.life/zh',
+        'zh-CN': homeUrl('zh'),
       },
     },
   };
 }
 
-export default function LangPage() {
-  return <HomePage />;
+export default async function LangPage({ params }: Props) {
+  const { lang } = await params;
+  const language = lang === 'zh' ? 'zh' : 'en';
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <StructuredData type="website" language={language} />
+      <HomePageContent lang={language} />
+      <footer>
+        <Foot />
+      </footer>
+    </div>
+  );
 }
 
 export async function generateStaticParams() {

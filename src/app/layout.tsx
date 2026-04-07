@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import Nav from "@/components/Common/Nav";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import { SITE_URL, homeUrl } from "@/lib/site";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -17,6 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     template: '%s | Mofei Dev Tools',
     default: 'Mofei Dev Tools - Free Online Development Tools',
@@ -51,14 +53,12 @@ export const metadata: Metadata = {
     description: 'Collection of useful development tools: Base64 encoder/decoder, GeoJSON preview, JSON formatter and more.',
     creator: '@mofei',
   },
-  verification: {
-    google: 'google-site-verification-code-here',
-  },
+
   alternates: {
-    canonical: 'https://tools.mofei.life',
+    canonical: homeUrl('en'),
     languages: {
-      'en-US': 'https://tools.mofei.life/',
-      'zh-CN': 'https://tools.mofei.life/zh',
+      'en-US': homeUrl('en'),
+      'zh-CN': homeUrl('zh'),
     },
   },
 };
