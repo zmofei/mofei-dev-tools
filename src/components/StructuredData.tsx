@@ -42,12 +42,12 @@ function getToolStructuredDataConfig(
       return {
         name: isZh ? 'Base64 编码解码器' : 'Base64 Encoder Decoder',
         description: isZh
-          ? '免费在线 Base64 编码解码工具，支持文本转换、批量处理和历史记录。'
-          : 'Free online Base64 encoder and decoder tool for text conversion, batch processing, and history tracking.',
+          ? '免费在线 Base64 编码解码工具，支持文本转换、智能图片 Base64 提取预览、批量处理和历史记录。'
+          : 'Free online Base64 encoder and decoder with smart image Base64 extraction/preview, text conversion, batch processing, and history tracking.',
         applicationSubCategory: isZh ? '文本处理工具' : 'Text Processing Tool',
         featureList: isZh
-          ? ['免费使用', '无需注册', '支持中英文', '在线处理', '文本编码', '文本解码', '历史记录', '结果分享']
-          : ['Free to use', 'No registration required', 'Bilingual support', 'Online processing', 'Text encoding', 'Text decoding', 'History tracking', 'Result sharing'],
+          ? ['免费使用', '无需注册', '支持中英文', '在线处理', '文本编码', '文本解码', '图片 Base64 智能提取', '图片实时预览', '历史记录', '结果分享']
+          : ['Free to use', 'No registration required', 'Bilingual support', 'Online processing', 'Text encoding', 'Text decoding', 'Smart Base64 image extraction', 'Real-time image preview', 'History tracking', 'Result sharing'],
         screenshot: `/screenshots/base64-${language}.png`,
       };
     case 'bbox':

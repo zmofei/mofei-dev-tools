@@ -2,11 +2,99 @@
 import { useState, useEffect, Suspense } from 'react';
 import { motion } from "motion/react"
 import Link from 'next/link';
+import Image from 'next/image';
 import Foot from '@/components/Common/Foot';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSearchParams } from 'next/navigation';
 import { event } from '@/components/GoogleAnalytics';
 import ContributeButton from '@/components/Common/ContributeButton';
+
+type ImagePreviewResult = {
+  dataUrl: string;
+  mimeType: string;
+  base64Length: number;
+  extractedFromDataUrl: boolean;
+};
+
+const IMAGE_DATA_URL_REGEX = /data:(image\/[a-zA-Z0-9.+-]+);base64,([A-Za-z0-9+/=\s_-]+)/gi;
+const BASE64_CANDIDATE_REGEX = /[A-Za-z0-9+/_-]{32,}={0,2}/g;
+
+function normalizeBase64(value: string) {
+  const cleaned = value.replace(/\s+/g, '').replace(/-/g, '+').replace(/_/g, '/');
+  const padLength = (4 - (cleaned.length % 4)) % 4;
+  return `${cleaned}${'='.repeat(padLength)}`;
+}
+
+function detectImageMimeTypeFromBinary(base64: string) {
+  const binary = atob(base64);
+
+  if (binary.startsWith('\x89PNG\r\n\x1A\n')) return 'image/png';
+  if (binary.startsWith('\xFF\xD8\xFF')) return 'image/jpeg';
+  if (binary.startsWith('GIF87a') || binary.startsWith('GIF89a')) return 'image/gif';
+  if (binary.startsWith('BM')) return 'image/bmp';
+  if (binary.startsWith('RIFF') && binary.slice(8, 12) === 'WEBP') return 'image/webp';
+  if (binary.startsWith('II*\x00') || binary.startsWith('MM\x00*')) return 'image/tiff';
+
+  const textPrefix = binary.slice(0, 512).trim().toLowerCase();
+  if (textPrefix.startsWith('<svg') || textPrefix.includes('<svg')) return 'image/svg+xml';
+
+  return null;
+}
+
+function extractImagePreviewFromText(rawText: string): ImagePreviewResult | null {
+  if (!rawText.trim()) return null;
+
+  let matchedDataUrl: RegExpExecArray | null = null;
+  let longestDataPayload = '';
+  let declaredMimeType = '';
+
+  const dataUrlMatches = rawText.matchAll(IMAGE_DATA_URL_REGEX);
+  for (const match of dataUrlMatches) {
+    const payload = match[2].replace(/\s+/g, '');
+    if (payload.length > longestDataPayload.length) {
+      matchedDataUrl = match;
+      longestDataPayload = payload;
+      declaredMimeType = match[1].toLowerCase();
+    }
+  }
+
+  let candidate = '';
+  let extractedFromDataUrl = false;
+
+  if (matchedDataUrl && longestDataPayload) {
+    candidate = longestDataPayload;
+    extractedFromDataUrl = true;
+  } else {
+    const compactText = rawText.replace(/\s+/g, '');
+    const candidates = compactText.match(BASE64_CANDIDATE_REGEX) || [];
+    if (candidates.length === 0) return null;
+    candidate = candidates.reduce((longest, current) => (
+      current.length > longest.length ? current : longest
+    ), '');
+  }
+
+  const normalized = normalizeBase64(candidate);
+  let mimeType = declaredMimeType;
+
+  try {
+    if (!mimeType) {
+      mimeType = detectImageMimeTypeFromBinary(normalized) || '';
+    } else {
+      atob(normalized);
+    }
+  } catch {
+    return null;
+  }
+
+  if (!mimeType.startsWith('image/')) return null;
+
+  return {
+    dataUrl: `data:${mimeType};base64,${normalized}`,
+    mimeType,
+    base64Length: normalized.length,
+    extractedFromDataUrl,
+  };
+}
 
 function Base64ToolPageContent() {
   const { t, language } = useLanguage();
@@ -16,6 +104,7 @@ function Base64ToolPageContent() {
   const [mode, setMode] = useState<'encode' | 'decode'>('encode');
   const [error, setError] = useState('');
   const [shareMessage, setShareMessage] = useState('');
+  const [imagePreview, setImagePreview] = useState<ImagePreviewResult | null>(null);
   const [history, setHistory] = useState<Array<{
     id: string;
     input: string;
@@ -99,6 +188,15 @@ function Base64ToolPageContent() {
       setMode(sharedMode);
     }
   }, [searchParams, t]);
+
+  useEffect(() => {
+    if (mode !== 'decode') {
+      setImagePreview(null);
+      return;
+    }
+
+    setImagePreview(extractImagePreviewFromText(inputText));
+  }, [inputText, mode]);
 
   const handleConvert = () => {
     if (!inputText.trim()) {
@@ -443,6 +541,46 @@ function Base64ToolPageContent() {
               />
             </div>
           </div>
+
+          {/* Smart image preview for decoded Base64 input */}
+          {mode === 'decode' && inputText.trim() && (
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <label className="text-white font-medium">
+                  {t('base64.imagePreview')}
+                </label>
+                {imagePreview && (
+                  <span className="text-xs text-gray-400">
+                    {imagePreview.mimeType} · {imagePreview.base64Length} chars
+                  </span>
+                )}
+              </div>
+
+              <div className="bg-gray-800/30 border border-gray-700 rounded-lg p-4">
+                {imagePreview ? (
+                  <>
+                    <Image
+                      src={imagePreview.dataUrl}
+                      alt={t('base64.imagePreviewAlt')}
+                      width={800}
+                      height={480}
+                      unoptimized
+                      className="max-h-80 w-auto rounded-lg border border-gray-700 bg-gray-900/40 object-contain mx-auto"
+                    />
+                    <p className="text-xs text-gray-400 mt-3 text-center">
+                      {imagePreview.extractedFromDataUrl
+                        ? t('base64.imagePreviewHintDataUrl')
+                        : t('base64.imagePreviewHintExtracted')}
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-sm text-gray-400">
+                    {t('base64.imagePreviewNoMatch')}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* History */}
           {history.length > 0 && (

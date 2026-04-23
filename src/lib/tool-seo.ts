@@ -29,28 +29,37 @@ export const TOOL_SEO: Record<ToolSlug, Record<SiteLanguage, ToolSeoEntry>> = {
   base64: {
     zh: {
       title: '免费 Base64 编码解码器 - 在线文本转换工具 | Mofei 工具',
-      description: '使用我们的免费在线 Base64 编码解码工具快速转换文本。支持批量处理、历史记录、分享功能，完美适合开发者、网页设计师和数据分析师使用。',
-      keywords: ['Base64 编码', 'Base64 解码', 'Base64 转换器', '在线 Base64', 'Base64 编码器', 'Base64 解码器', '文本编码', '数据编码', 'Base64 工具', 'URL 编码', '免费 Base64', '在线编码工具', 'Base64 转换', '编码解码器', 'Base64 在线工具'],
+      description: '使用我们的免费在线 Base64 编码解码工具快速转换文本。支持智能图片 Base64 提取预览、批量处理、历史记录与分享功能，适合开发者、网页设计师和数据分析师。',
+      keywords: ['Base64 编码', 'Base64 解码', 'Base64 转换器', '在线 Base64', 'Base64 编码器', 'Base64 解码器', '文本编码', '数据编码', 'Base64 工具', 'URL 编码', '免费 Base64', '在线编码工具', 'Base64 转换', '编码解码器', 'Base64 在线工具', 'Base64 图片预览', 'data URL 解析', '图片 Base64 提取'],
       category: '开发工具',
       classification: '文本处理工具',
       locale: 'zh_CN',
       openGraph: {
         title: '免费 Base64 编码解码器 - 在线文本转换工具',
-        description: '快速转换 Base64 编码，支持批量处理和历史记录。为开发者提供的免费在线工具。',
+        description: '快速转换 Base64，支持智能图片预览、批量处理和历史记录。为开发者提供的免费在线工具。',
       },
       twitter: {
         card: 'summary_large_image',
         title: '免费 Base64 编码解码器 - 在线文本转换工具',
-        description: '快速转换 Base64 编码，支持批量处理和历史记录。为开发者提供的免费在线工具。',
+        description: '快速转换 Base64，支持智能图片预览、批量处理和历史记录。为开发者提供的免费在线工具。',
       },
     },
     en: {
       title: "Free Base64 Encoder Decoder - Online Text Conversion Tool | Mofei's Tools",
-      description: 'Convert text to Base64 encoding and decode Base64 strings with our free online tool. Features batch processing, history, and sharing capabilities for developers and designers.',
-      keywords: ['Base64 encoder', 'Base64 decoder', 'Base64 converter', 'online Base64', 'text encoding', 'data encoding', 'Base64 tool', 'URL encoding', 'free Base64', 'encoding tool', 'Base64 conversion', 'encode decode', 'Base64 online'],
+      description: 'Convert text to Base64 and decode Base64 strings with our free online tool. Includes smart image Base64 extraction and preview, history, and sharing for developers and designers.',
+      keywords: ['Base64 encoder', 'Base64 decoder', 'Base64 converter', 'online Base64', 'text encoding', 'data encoding', 'Base64 tool', 'URL encoding', 'free Base64', 'encoding tool', 'Base64 conversion', 'encode decode', 'Base64 online', 'Base64 image preview', 'data URL parser', 'extract Base64 image'],
       category: 'Developer Tools',
       classification: 'Text Processing Tool',
       locale: 'en_US',
+      openGraph: {
+        title: 'Free Base64 Encoder Decoder - Online Text Conversion Tool',
+        description: 'Encode/decode Base64 with smart image preview from data URLs or noisy copied content.',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: 'Free Base64 Encoder Decoder - Online Text Conversion Tool',
+        description: 'Encode/decode Base64 with smart image preview from data URLs or noisy copied content.',
+      },
     },
   },
   bbox: {
