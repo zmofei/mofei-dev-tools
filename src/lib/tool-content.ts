@@ -44,12 +44,12 @@ export const TOOL_CONTENT: Record<ToolSlug, ToolEntry> = {
     copy: {
       en: {
         name: 'Base64',
-        description: 'Base64 encode/decode tool for text conversion',
+        description: 'Base64 encode/decode tool with smart image Base64 extraction and preview',
         categoryLabel: 'Development Tools',
       },
       zh: {
         name: 'Base64',
-        description: 'Base64 编码解码工具，用于文本转换',
+        description: 'Base64 编码解码工具，支持智能图片 Base64 提取与预览',
         categoryLabel: '开发工具',
       },
     },

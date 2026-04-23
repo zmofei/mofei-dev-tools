@@ -159,13 +159,14 @@ function getWebsiteStructuredData(language: SiteLanguage) {
 
 function getToolStructuredData(slug: ToolSlug, language: SiteLanguage) {
   const config = getToolStructuredDataConfig(slug, language);
+  const localizedUrl = toolUrl(slug, language);
 
   return {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
     name: config.name,
     description: config.description,
-    url: toolUrl(slug, language),
+    url: localizedUrl,
     inLanguage: language === 'zh' ? 'zh-CN' : 'en-US',
     applicationCategory: 'DeveloperApplication',
     applicationSubCategory: config.applicationSubCategory,
@@ -178,8 +179,9 @@ function getToolStructuredData(slug: ToolSlug, language: SiteLanguage) {
       priceCurrency: 'USD',
     },
     featureList: config.featureList,
-    downloadUrl: toolUrl(slug, language),
+    downloadUrl: localizedUrl,
     screenshot: `${SITE_URL}${config.screenshot}`,
+    sameAs: [toolUrl(slug, 'en'), toolUrl(slug, 'zh')],
   };
 }
 
