@@ -18,6 +18,8 @@ export const HOME_COPY = {
   en: {
     title: 'Tools Collection',
     subtitle: 'These are the handy tools Mofei frequently uses during development. Sharing them with you, hoping to make your work a bit easier.',
+    base64PreviewCta: 'Image Base64 Preview',
+    base64PreviewHint: 'New: jump directly to decode mode for smart image Base64 extraction and preview.',
     moreTools: 'More Tools Coming Soon',
     moreToolsDesc: 'More useful tools are in development, including JSON formatting, color helpers, regex testing, and more.',
     categories: {
@@ -28,6 +30,8 @@ export const HOME_COPY = {
   zh: {
     title: '工具合集',
     subtitle: '这些是 Mofei 在开发过程中经常使用的便捷工具。分享给大家，希望能让你的工作更轻松一些。',
+    base64PreviewCta: '图片 Base64 预览入口',
+    base64PreviewHint: '新增：可直接进入解码模式，智能提取并预览图片 Base64 内容。',
     moreTools: '更多工具即将推出',
     moreToolsDesc: '更多实用工具正在开发中，包括 JSON 格式化、颜色工具、正则测试等。',
     categories: {

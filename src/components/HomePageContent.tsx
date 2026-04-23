@@ -6,6 +6,7 @@ import type { SiteLanguage } from '@/lib/site';
 export default function HomePageContent({ lang }: { lang: SiteLanguage }) {
   const content = HOME_COPY[lang];
   const tools = getHomeTools(lang);
+  const base64PreviewPath = lang === 'zh' ? '/zh/base64?mode=decode' : '/base64?mode=decode';
   const categories = [
     { key: 'dev', title: content.categories.dev, tools: tools.filter((tool) => tool.category === 'dev') },
     { key: 'gis', title: content.categories.gis, tools: tools.filter((tool) => tool.category === 'gis') },
@@ -26,6 +27,21 @@ export default function HomePageContent({ lang }: { lang: SiteLanguage }) {
           <div className="flex justify-center pb-2">
             <ContributeButton variant="primary" size="lg" />
           </div>
+
+          <div className="flex justify-center mt-4 md:mt-6">
+            <Link
+              href={base64PreviewPath}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#a1c4fd]/60 text-[#cfe4ff] hover:text-white hover:bg-[#a1c4fd]/15 transition-colors duration-200 text-sm md:text-base"
+            >
+              <span>{content.base64PreviewCta}</span>
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+              </svg>
+            </Link>
+          </div>
+          <p className="text-center text-xs md:text-sm text-gray-400 mt-2">
+            {content.base64PreviewHint}
+          </p>
         </div>
       </div>
 
