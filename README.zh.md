@@ -120,6 +120,8 @@ NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
 GOOGLE_SITE_VERIFICATION=your-verification-token
 ```
 
+Cloudflare 构建时，需要把 `NEXT_PUBLIC_GA_ID` 设置为 Build environment variable，这样 `next build` 生成客户端 bundle 时才能读到。
+
 ### 本地开发
 
 ```bash
@@ -176,7 +178,7 @@ BBox 的语言配置比较特殊。它支持 `en`、`zh`、`de`、`es`、`fr`，
 
 ## 分析与隐私
 
-配置 `NEXT_PUBLIC_GA_ID` 后，Google Analytics 会通过 `src/components/GoogleAnalytics.tsx` 加载。工具处理主要在浏览器本地完成。`/api/` 下的接口用于 GitHub device/token 代理，并在 robots 中禁止索引。
+配置 `NEXT_PUBLIC_GA_ID` 后，Google Analytics 会通过 `src/components/GoogleAnalytics.tsx` 加载。因为这是 `NEXT_PUBLIC_*` 变量，它必须在构建时可用，包括 Cloudflare 的构建环境。工具处理主要在浏览器本地完成。`/api/` 下的接口用于 GitHub device/token 代理，并在 robots 中禁止索引。
 
 隐私页面位于 `/privacy` 和 `/zh/privacy`。
 

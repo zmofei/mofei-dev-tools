@@ -120,6 +120,8 @@ NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
 GOOGLE_SITE_VERIFICATION=your-verification-token
 ```
 
+For Cloudflare builds, set `NEXT_PUBLIC_GA_ID` as a Build environment variable so the client bundle receives the value during `next build`.
+
 ### Develop
 
 ```bash
@@ -176,7 +178,7 @@ For BBox-specific language work, update `src/lib/bbox-i18n.ts` first because BBo
 
 ## Analytics And Privacy
 
-Google Analytics is loaded from `src/components/GoogleAnalytics.tsx` when `NEXT_PUBLIC_GA_ID` is configured. Tool processing is primarily client-side. API routes under `/api/` are used for GitHub device/token proxying and are disallowed in robots.
+Google Analytics is loaded from `src/components/GoogleAnalytics.tsx` when `NEXT_PUBLIC_GA_ID` is configured. Because this is a `NEXT_PUBLIC_*` variable, it must be available at build time, including in the Cloudflare build environment. Tool processing is primarily client-side. API routes under `/api/` are used for GitHub device/token proxying and are disallowed in robots.
 
 See the privacy page at `/privacy` or `/zh/privacy`.
 

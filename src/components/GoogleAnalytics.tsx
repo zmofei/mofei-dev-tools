@@ -4,7 +4,7 @@ import Script from 'next/script';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 
-const GA_TRACKING_ID = "G-CEZ9C69XZ2";
+const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_ID;
 
 // 声明 gtag 函数
 declare global {
@@ -78,7 +78,7 @@ export default function GoogleAnalytics() {
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
             gtag('config', '${GA_TRACKING_ID}', {
-              page_path: window.location.pathname,
+              send_page_view: false,
             });
           `,
         }}
