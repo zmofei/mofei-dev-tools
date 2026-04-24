@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
-import { SITE_URL, TOOL_SLUGS } from '@/lib/site';
+import { SITE_URL, TOOL_SLUGS, privacyUrl } from '@/lib/site';
+import { BBOX_HREFLANG, BBOX_LANGUAGES, bboxUrl } from '@/lib/bbox-i18n';
 
 const TODAY = '2026-04-07';
 
@@ -13,6 +14,15 @@ const TOOL_CONFIG: Record<(typeof TOOL_SLUGS)[number], { changeFrequency: Metada
 };
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  const bboxLanguageAlternates = {
+    [BBOX_HREFLANG.en]: bboxUrl('en'),
+    [BBOX_HREFLANG.zh]: bboxUrl('zh'),
+    [BBOX_HREFLANG.de]: bboxUrl('de'),
+    [BBOX_HREFLANG.es]: bboxUrl('es'),
+    [BBOX_HREFLANG.fr]: bboxUrl('fr'),
+    'x-default': bboxUrl('en'),
+  };
+
   const pages: MetadataRoute.Sitemap = [
     {
       url: `${SITE_URL}/`,
@@ -40,10 +50,52 @@ export default function sitemap(): MetadataRoute.Sitemap {
         },
       },
     },
+    {
+      url: privacyUrl('en'),
+      lastModified: TODAY,
+      changeFrequency: 'yearly',
+      priority: 0.3,
+      alternates: {
+        languages: {
+          'en-US': privacyUrl('en'),
+          'zh-CN': privacyUrl('zh'),
+          'x-default': privacyUrl('en'),
+        },
+      },
+    },
+    {
+      url: privacyUrl('zh'),
+      lastModified: TODAY,
+      changeFrequency: 'yearly',
+      priority: 0.3,
+      alternates: {
+        languages: {
+          'en-US': privacyUrl('en'),
+          'zh-CN': privacyUrl('zh'),
+          'x-default': privacyUrl('en'),
+        },
+      },
+    },
   ];
 
   for (const slug of TOOL_SLUGS) {
     const config = TOOL_CONFIG[slug];
+    if (slug === 'bbox') {
+      for (const language of BBOX_LANGUAGES) {
+        pages.push({
+          url: bboxUrl(language),
+          lastModified: TODAY,
+          changeFrequency: config.changeFrequency,
+          priority: config.priority,
+          alternates: {
+            languages: bboxLanguageAlternates,
+          },
+        });
+      }
+
+      continue;
+    }
+
     pages.push({
       url: `${SITE_URL}/${slug}`,
       lastModified: TODAY,

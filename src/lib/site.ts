@@ -9,8 +9,14 @@ export const TOOL_SLUGS = [
   'objectid',
 ] as const;
 
-export type SiteLanguage = 'en' | 'zh';
+export const SITE_LANGUAGES = ['en', 'zh'] as const;
+
+export type SiteLanguage = (typeof SITE_LANGUAGES)[number];
 export type ToolSlug = (typeof TOOL_SLUGS)[number];
+
+export function isSiteLanguage(language: string): language is SiteLanguage {
+  return (SITE_LANGUAGES as readonly string[]).includes(language);
+}
 
 export function absoluteUrl(path: string = '/') {
   if (path.startsWith('http://') || path.startsWith('https://')) {
@@ -25,6 +31,10 @@ export function homePath(language: SiteLanguage = 'en') {
   return language === 'zh' ? '/zh' : '/';
 }
 
+export function privacyPath(language: SiteLanguage = 'en') {
+  return language === 'zh' ? '/zh/privacy' : '/privacy';
+}
+
 export function toolPath(slug: ToolSlug, language: SiteLanguage = 'en') {
   return language === 'zh' ? `/zh/${slug}` : `/${slug}`;
 }
@@ -33,16 +43,20 @@ export function homeUrl(language: SiteLanguage = 'en') {
   return absoluteUrl(homePath(language));
 }
 
+export function privacyUrl(language: SiteLanguage = 'en') {
+  return absoluteUrl(privacyPath(language));
+}
+
 export function toolUrl(slug: ToolSlug, language: SiteLanguage = 'en') {
   return absoluteUrl(toolPath(slug, language));
 }
 
-export function toolAlternates(slug: ToolSlug) {
+export function toolAlternates(slug: ToolSlug, canonicalLanguage: SiteLanguage = 'en') {
   return {
-    canonical: toolUrl(slug),
+    canonical: toolUrl(slug, canonicalLanguage),
     languages: {
-      en: toolUrl(slug),
-      zh: toolUrl(slug, 'zh'),
+      'en-US': toolUrl(slug),
+      'zh-CN': toolUrl(slug, 'zh'),
       'x-default': toolUrl(slug),
     },
   };

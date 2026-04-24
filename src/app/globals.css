@@ -1,7 +1,8 @@
 @import "tailwindcss";
+@source "../../node_modules/@mofei-dev/ui/dist";
 
 :root {
-  --background: #111827;
+  --background: #0b1120;
   --foreground: #ffffff;
 }
 
@@ -15,7 +16,7 @@
 html {
   scroll-behavior: smooth;
   height: 100%;
-  background: #111827;
+  background: #0b1120;
 }
 
 body {
@@ -24,6 +25,37 @@ body {
   font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   overflow-x: hidden;
   min-height: 100%;
+}
+
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]) {
+  cursor: pointer;
+}
+
+button:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) opacity(0.65);
+}
+
+.url-source-hint {
+  animation: url-source-hint 1.8s ease-out 0.25s 1;
+}
+
+@keyframes url-source-hint {
+  0%,
+  100% {
+    box-shadow: none;
+    border-left-color: rgb(253 230 138 / 0.3);
+  }
+
+  35% {
+    box-shadow: inset 0 0 0 1px rgb(253 230 138 / 0.08), 0 0 22px rgb(253 230 138 / 0.08);
+    border-left-color: rgb(253 230 138 / 0.55);
+  }
 }
 
 /* 防止在移动设备上过度滚动 */

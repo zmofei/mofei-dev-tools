@@ -82,6 +82,7 @@ function GeoJSONToolPageContent() {
   const initiateDeviceFlow = async () => {
     setIsLoggingIn(true);
     setError('');
+    event('geojson_github_login_start', 'Tool Usage', `method:oauth|scope:gist`, inputText.length);
     
     try {
       const response = await fetch('/api/github-device', {
@@ -113,6 +114,7 @@ function GeoJSONToolPageContent() {
       setVerificationUri(data.verification_uri);
       setShowDeviceFlow(true);
       setCurrentInterval(data.interval); // Use GitHub's recommended interval
+      event('geojson_github_device_flow_start', 'Tool Usage', `interval:${data.interval}|expires:${data.expires_in}`, data.expires_in);
 
       // Start polling for token with GitHub's recommended interval
       const startPolling = (intervalSeconds: number) => {
@@ -132,6 +134,7 @@ function GeoJSONToolPageContent() {
           setPollInterval(null);
           setShowDeviceFlow(false);
           setIsLoggingIn(false);
+          event('geojson_github_login_expired', 'Tool Usage', `method:oauth|expires:${data.expires_in}`, data.expires_in);
         }
       }, data.expires_in * 1000);
 
@@ -139,6 +142,7 @@ function GeoJSONToolPageContent() {
       console.error('Device flow error:', error);
       setError(error instanceof Error ? error.message : t('geojson.oauthError'));
       setIsLoggingIn(false);
+      event('geojson_github_login_failure', 'Tool Usage', `method:oauth|stage:init|error:${error instanceof Error ? error.message : 'unknown'}`, inputText.length);
     }
   };
 
@@ -180,6 +184,7 @@ function GeoJSONToolPageContent() {
           
           const newInterval = data.interval || (currentIntervalSeconds + 2); // Use GitHub's interval or add 5 seconds
           setCurrentInterval(newInterval);
+          event('geojson_github_poll_slow_down', 'Tool Usage', `interval:${newInterval}`, newInterval);
           
           const interval = setInterval(() => {
             pollForToken(deviceCode, newInterval);
@@ -219,6 +224,7 @@ function GeoJSONToolPageContent() {
           // Save login state to localStorage
           localStorage.setItem('github_token', data.access_token);
           localStorage.setItem('github_user', JSON.stringify(userInfo));
+          event('geojson_github_login_success', 'Tool Usage', `method:oauth|user:${userInfo.login}`, data.access_token.length);
           
           // Show success message only for new login (when user wasn't previously logged in)
           const wasLoggedIn = !!githubUser;
@@ -240,6 +246,7 @@ function GeoJSONToolPageContent() {
       }
       setShowDeviceFlow(false);
       setIsLoggingIn(false);
+      event('geojson_github_login_failure', 'Tool Usage', `method:oauth|stage:poll|error:${error instanceof Error ? error.message : 'unknown'}`, inputText.length);
     }
   };
 
@@ -270,12 +277,14 @@ function GeoJSONToolPageContent() {
       const newHistory = [historyItem, ...history].slice(0, 20); // Keep only 20 recent items
       setHistory(newHistory);
       localStorage.setItem('geojson_history', JSON.stringify(newHistory));
+      event('geojson_history_add', 'Tool Usage', `method:${gistPath ? 'gist' : 'url'}|history_count:${newHistory.length}`, size);
     } catch {
       // Ignore errors in adding to history
     }
   };
 
   const clearHistory = () => {
+    event('geojson_history_clear', 'Tool Usage', `history_count:${history.length}`, history.length);
     setHistory([]);
     localStorage.removeItem('geojson_history');
   };
@@ -333,6 +342,7 @@ function GeoJSONToolPageContent() {
       await navigator.clipboard.writeText(userCode);
       setShareMessage(t('geojson.shareCopied'));
       setTimeout(() => setShareMessage(''), 3000);
+      event('geojson_copy_device_code_success', 'Tool Usage', `code_length:${userCode.length}`, userCode.length);
     } catch {
       // Fallback method
       const textArea = document.createElement('textarea');
@@ -343,8 +353,9 @@ function GeoJSONToolPageContent() {
         document.execCommand('copy');
         setShareMessage(t('geojson.shareCopied'));
         setTimeout(() => setShareMessage(''), 3000);
+        event('geojson_copy_device_code_fallback', 'Tool Usage', `code_length:${userCode.length}`, userCode.length);
       } catch {
-        // Silent fail
+        event('geojson_copy_device_code_failure', 'Tool Usage', `code_length:${userCode.length}`, userCode.length);
       }
       document.body.removeChild(textArea);
     }
@@ -352,6 +363,7 @@ function GeoJSONToolPageContent() {
 
 
   const logout = () => {
+    event('geojson_github_logout', 'Tool Usage', githubUser ? `user:${githubUser.login}` : 'user:unknown', githubToken.length);
     setGithubUser(null);
     setGithubToken('');
     setShowDeviceFlow(false);
@@ -411,6 +423,7 @@ function GeoJSONToolPageContent() {
     });
 
     if (!response.ok) {
+      event('geojson_generate_gist_failure', 'Tool Usage', `status:${response.status}|auth:${githubToken.trim() ? 'token' : 'anonymous'}`, inputText.length);
       if (response.status === 401) {
         throw new Error('Invalid GitHub token');
       } else if (response.status === 403) {
@@ -420,6 +433,7 @@ function GeoJSONToolPageContent() {
     }
 
     const result = await response.json() as { id: string; owner: { login: string }; files: Record<string, { raw_url: string }> };
+    event('geojson_generate_gist_success', 'Tool Usage', `owner:${result.owner.login}|auth:${githubToken.trim() ? 'token' : 'anonymous'}`, inputText.length);
     return `${result.owner.login}/${result.id}`;
   };
 
@@ -435,6 +449,7 @@ function GeoJSONToolPageContent() {
     try {
       const geoJSON = validateGeoJSON(inputText);
       const dataSize = new Blob([inputText]).size;
+      event('geojson_validate_success', 'Tool Usage', `method:${storageMethod}|size:${dataSize}`, dataSize);
       
       // Check if user chose gist method
       if (storageMethod === 'gist') {
@@ -453,11 +468,11 @@ function GeoJSONToolPageContent() {
           // Add to history
           addToHistory(url, gistPath);
           
-          // Track generation event
-          event('geojson_generate_gist', 'Tool Usage', 'GeoJSON Gist Generate', inputText.length);
+          event('geojson_url_generate_success', 'Tool Usage', `method:gist|size:${dataSize}`, inputText.length);
         } catch (gistError: unknown) {
           setError(gistError instanceof Error ? gistError.message : t('geojson.gistError'));
           setPreviewUrl('');
+          event('geojson_url_generate_failure', 'Tool Usage', `method:gist|size:${dataSize}`, inputText.length);
         } finally {
           setIsUploading(false);
         }
@@ -481,21 +496,21 @@ function GeoJSONToolPageContent() {
         // Add to history
         addToHistory(url);
         
-        // Track generation event
-        event('geojson_generate_url', 'Tool Usage', 'GeoJSON URL Generate', inputText.length);
+        event('geojson_url_generate_success', 'Tool Usage', `method:url|size:${dataSize}|large:${dataSize > 8000}`, inputText.length);
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : t('geojson.validationError'));
       setPreviewUrl('');
       setWarning('');
+      event('geojson_validate_failure', 'Tool Usage', `method:${storageMethod}|error:${err instanceof Error ? err.message : 'unknown'}`, inputText.length);
+      event('geojson_url_generate_failure', 'Tool Usage', `method:${storageMethod}|reason:validation`, inputText.length);
     }
   };
 
   const handleCopy = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      // Track copy event
-      event('copy_result', 'Tool Usage', 'Copy GeoJSON URL', text.length);
+      event('geojson_copy_preview_url_success', 'Tool Usage', `method:${text.includes('gist%3A') || text.includes('gist:') ? 'gist' : 'url'}`, text.length);
     } catch {
       // Fallback method
       const textArea = document.createElement('textarea');
@@ -504,16 +519,16 @@ function GeoJSONToolPageContent() {
       textArea.select();
       try {
         document.execCommand('copy');
+        event('geojson_copy_preview_url_fallback', 'Tool Usage', `method:${text.includes('gist%3A') || text.includes('gist:') ? 'gist' : 'url'}`, text.length);
       } catch {
-        // Silent fail if execCommand is not supported
+        event('geojson_copy_preview_url_failure', 'Tool Usage', `method:${text.includes('gist%3A') || text.includes('gist:') ? 'gist' : 'url'}`, text.length);
       }
       document.body.removeChild(textArea);
-      // Track copy event (fallback)
-      event('copy_result_fallback', 'Tool Usage', 'Copy GeoJSON URL Fallback', text.length);
     }
   };
 
   const handleClear = () => {
+    event('geojson_clear', 'Tool Usage', `input_length:${inputText.length}|has_preview:${Boolean(previewUrl)}`, inputText.length);
     setInputText('');
     setPreviewUrl('');
     setError('');
@@ -538,6 +553,7 @@ function GeoJSONToolPageContent() {
     };
     
     setInputText(JSON.stringify(exampleGeoJSON, null, 2));
+    event('geojson_example_load', 'Tool Usage', 'example:feature_collection', 1);
   };
 
   return (
@@ -685,7 +701,10 @@ function GeoJSONToolPageContent() {
                       name="storageMethod"
                       value="url"
                       checked={storageMethod === 'url'}
-                      onChange={(e) => setStorageMethod(e.target.value as 'url' | 'gist')}
+                      onChange={(e) => {
+                        setStorageMethod(e.target.value as 'url' | 'gist');
+                        event('geojson_storage_method_change', 'Tool Usage', `method:${e.target.value}|size:${new Blob([inputText]).size}`, inputText.length);
+                      }}
                       className="text-[#a1c4fd] focus:ring-[#a1c4fd]"
                     />
                     <span className="text-gray-300">{t('geojson.urlMethod')}</span>
@@ -698,7 +717,10 @@ function GeoJSONToolPageContent() {
                       name="storageMethod"
                       value="gist"
                       checked={storageMethod === 'gist'}
-                      onChange={(e) => setStorageMethod(e.target.value as 'url' | 'gist')}
+                      onChange={(e) => {
+                        setStorageMethod(e.target.value as 'url' | 'gist');
+                        event('geojson_storage_method_change', 'Tool Usage', `method:${e.target.value}|size:${new Blob([inputText]).size}`, inputText.length);
+                      }}
                       className="text-[#a1c4fd] focus:ring-[#a1c4fd]"
                     />
                     <span className="text-gray-300">{t('geojson.gistMethod')}</span>
@@ -745,7 +767,10 @@ function GeoJSONToolPageContent() {
                               name="authMethod"
                               value="oauth"
                               checked={authMethod === 'oauth'}
-                              onChange={(e) => setAuthMethod(e.target.value as 'token' | 'oauth')}
+                              onChange={(e) => {
+                                setAuthMethod(e.target.value as 'token' | 'oauth');
+                                event('geojson_github_auth_method_change', 'Tool Usage', `method:${e.target.value}`, inputText.length);
+                              }}
                               className="text-[#a1c4fd] focus:ring-[#a1c4fd]"
                             />
                             <span className="text-blue-300 text-sm">{t('geojson.loginWithGitHub')}</span>
@@ -757,7 +782,10 @@ function GeoJSONToolPageContent() {
                               name="authMethod"
                               value="token"
                               checked={authMethod === 'token'}
-                              onChange={(e) => setAuthMethod(e.target.value as 'token' | 'oauth')}
+                              onChange={(e) => {
+                                setAuthMethod(e.target.value as 'token' | 'oauth');
+                                event('geojson_github_auth_method_change', 'Tool Usage', `method:${e.target.value}`, inputText.length);
+                              }}
                               className="text-[#a1c4fd] focus:ring-[#a1c4fd]"
                             />
                             <span className="text-blue-300 text-sm">{t('geojson.useToken')}</span>
@@ -886,6 +914,12 @@ function GeoJSONToolPageContent() {
                                 } else {
                                   localStorage.removeItem('github_token');
                                   localStorage.removeItem('github_user');
+                                  event('geojson_github_token_clear', 'Tool Usage', 'method:manual', 0);
+                                }
+                              }}
+                              onBlur={() => {
+                                if (githubToken.trim()) {
+                                  event('geojson_github_token_enter', 'Tool Usage', `method:manual|length:${githubToken.trim().length}`, githubToken.trim().length);
                                 }
                               }}
                               placeholder={t('geojson.tokenPlaceholder')}
@@ -915,7 +949,7 @@ function GeoJSONToolPageContent() {
             <button
               onClick={generatePreviewUrl}
               disabled={isUploading || !inputText.trim()}
-              className="px-6 py-3 bg-gradient-to-r from-[#a1c4fd] to-[#c2e9fb] text-gray-900 font-medium rounded-lg hover:from-[#8fb3fc] hover:to-[#b1e1fa] transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              className="px-6 py-3 bg-gradient-to-r from-[#a1c4fd] to-[#c2e9fb] text-gray-900 font-medium rounded-lg hover:from-[#8fb3fc] hover:to-[#b1e1fa] transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isUploading ? t('geojson.uploading') : t('geojson.generate')}
             </button>
@@ -943,7 +977,8 @@ function GeoJSONToolPageContent() {
                       href={previewUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="bg-gradient-to-r from-[#a1c4fd] to-[#c2e9fb] hover:from-[#8fb3fc] hover:to-[#b1e1fa] text-gray-900 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg transform hover:scale-105"
+                      onClick={() => event('geojson_open_preview', 'Tool Usage', `method:${previewUrl.includes('gist%3A') || previewUrl.includes('gist:') ? 'gist' : 'url'}`, previewUrl.length)}
+                      className="bg-gradient-to-r from-[#a1c4fd] to-[#c2e9fb] hover:from-[#8fb3fc] hover:to-[#b1e1fa] text-gray-900 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg"
                     >
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
@@ -1014,6 +1049,7 @@ function GeoJSONToolPageContent() {
                           href={`https://gist.github.com/${item.gistId}`}
                           target="_blank"
                           rel="noopener noreferrer"
+                          onClick={() => event('geojson_history_open_gist', 'Tool Usage', `gist:${item.gistId}|size:${item.size}`, item.size)}
                           className="text-blue-400 hover:text-blue-300 text-xs flex items-center gap-1 transition-colors"
                           title={t('geojson.viewGist')}
                         >
@@ -1027,6 +1063,7 @@ function GeoJSONToolPageContent() {
                         href={item.url}
                         target="_blank"
                         rel="noopener noreferrer"
+                        onClick={() => event('geojson_history_open_preview', 'Tool Usage', `method:${item.gistId ? 'gist' : 'url'}|size:${item.size}`, item.size)}
                         className="text-[#a1c4fd] hover:text-[#c2e9fb] text-xs flex items-center gap-1 transition-colors"
                         title={t('geojson.openPreviewNew')}
                       >

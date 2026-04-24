@@ -16,7 +16,7 @@
 		"directory": ".open-next/assets"
 	},
 	"build": {
-		"command": "npm run cf:build"
+		"command": "pnpm run cf:build"
 	},
 	"observability": {
 		"enabled": true

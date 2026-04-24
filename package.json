@@ -2,35 +2,39 @@
 	"name": "mofei-dev-tools",
 	"version": "0.1.0",
 	"private": true,
+	"packageManager": "pnpm@10.10.0",
 	"scripts": {
 		"dev": "next dev -H local.mofei.life --turbopack --experimental-https",
 		"build": "next build",
+		"test": "node --test",
 		"cf:build": "opennextjs-cloudflare build",
 		"start": "next start",
 		"lint": "next lint",
-		"deploy": "npm run cf:build && opennextjs-cloudflare deploy",
-		"preview": "npm run cf:build && opennextjs-cloudflare preview",
+		"deploy": "pnpm run cf:build && opennextjs-cloudflare deploy",
+		"preview": "pnpm run cf:build && opennextjs-cloudflare preview",
 		"cf-typegen": "wrangler types --env-interface CloudflareEnv ./cloudflare-env.d.ts"
 	},
 	"dependencies": {
-		"@opennextjs/cloudflare": "^1.4.0",
-		"mapbox-gl": "^3.13.0",
-		"motion": "^12.23.0",
+		"@mofei-dev/ui": "0.1.0",
+		"@opennextjs/cloudflare": "1.4.0",
+		"mapbox-gl": "3.13.0",
+		"motion": "12.23.0",
 		"next": "15.3.4",
-		"react": "^19.0.0",
-		"react-dom": "^19.0.0"
+		"proj4": "^2.20.8",
+		"react": "19.1.0",
+		"react-dom": "19.1.0"
 	},
 	"devDependencies": {
-		"@eslint/eslintrc": "^3",
-		"@tailwindcss/postcss": "^4",
-		"@types/mapbox-gl": "^3.4.1",
-		"@types/node": "^20.19.4",
-		"@types/react": "^19",
-		"@types/react-dom": "^19",
-		"eslint": "^9",
+		"@eslint/eslintrc": "3.3.1",
+		"@tailwindcss/postcss": "4.1.11",
+		"@types/mapbox-gl": "3.4.1",
+		"@types/node": "20.19.4",
+		"@types/react": "19.1.8",
+		"@types/react-dom": "19.1.6",
+		"eslint": "9.30.1",
 		"eslint-config-next": "15.3.4",
-		"tailwindcss": "^4",
-		"typescript": "^5",
-		"wrangler": "^4.23.0"
+		"tailwindcss": "4.1.11",
+		"typescript": "5.8.3",
+		"wrangler": "4.23.0"
 	}
 }

@@ -1,6 +1,10 @@
 import type { Metadata } from 'next'
+import { notFound } from 'next/navigation';
 import { createToolMetadata } from '@/lib/metadata';
 import { TOOL_SEO } from '@/lib/tool-seo';
+import { isSiteLanguage } from '@/lib/site';
+
+export const dynamicParams = false;
 
 export async function generateMetadata({ 
   params 
@@ -8,7 +12,11 @@ export async function generateMetadata({
   params: Promise<{ lang: string }> 
 }): Promise<Metadata> {
   const { lang } = await params
-  return createToolMetadata({ slug: 'base64', ...TOOL_SEO.base64[lang === 'zh' ? 'zh' : 'en'] })
+  if (!isSiteLanguage(lang)) {
+    notFound();
+  }
+
+  return createToolMetadata({ slug: 'base64', ...TOOL_SEO.base64[lang] })
 }
 
 export default function Base64Layout({

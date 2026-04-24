@@ -37,6 +37,11 @@ export const event = (action: string, category: string, label?: string, value?: 
   }
 };
 
+function pagePathWithSearch(pathname: string, searchParams: URLSearchParams) {
+  const queryString = searchParams.toString();
+  return queryString ? `${pathname}?${queryString}` : pathname;
+}
+
 // 页面浏览追踪组件 - 使用 Suspense 包装
 function PageTracker() {
   const pathname = usePathname();
@@ -44,7 +49,7 @@ function PageTracker() {
 
   useEffect(() => {
     if (GA_TRACKING_ID) {
-      const url = pathname + searchParams.toString();
+      const url = pagePathWithSearch(pathname, searchParams);
       pageview(url);
     }
   }, [pathname, searchParams]);

@@ -18,8 +18,9 @@ export const HOME_COPY = {
   en: {
     title: 'Tools Collection',
     subtitle: 'These are the handy tools Mofei frequently uses during development. Sharing them with you, hoping to make your work a bit easier.',
-    moreTools: 'More Tools Coming Soon',
-    moreToolsDesc: 'More useful tools are in development, including JSON formatting, color helpers, regex testing, and more.',
+    moreTools: 'Tools Being Considered',
+    moreToolsDesc: 'Planned additions focus on everyday development chores: JSON formatting, color conversion, regex testing, and small data cleanup tasks.',
+    submitIdea: 'Submit a tool idea',
     categories: {
       dev: 'Development Tools',
       gis: 'GIS & Mapping Tools',
@@ -28,8 +29,9 @@ export const HOME_COPY = {
   zh: {
     title: '工具合集',
     subtitle: '这些是 Mofei 在开发过程中经常使用的便捷工具。分享给大家，希望能让你的工作更轻松一些。',
-    moreTools: '更多工具即将推出',
-    moreToolsDesc: '更多实用工具正在开发中，包括 JSON 格式化、颜色工具、正则测试等。',
+    moreTools: '正在整理更多常用工具',
+    moreToolsDesc: '后续会优先补齐日常开发里高频但零散的小工具，比如 JSON 格式化、颜色转换、正则测试和数据清理。',
+    submitIdea: '提交工具想法',
     categories: {
       dev: '开发工具',
       gis: 'GIS 地理工具',
@@ -43,13 +45,13 @@ export const TOOL_CONTENT: Record<ToolSlug, ToolEntry> = {
     category: 'dev',
     copy: {
       en: {
-        name: 'Base64',
-        description: 'Base64 encode/decode tool for text conversion',
+        name: 'Text Base64 Converter',
+        description: 'Encode plain text to Base64 or decode Base64 back to readable text',
         categoryLabel: 'Development Tools',
       },
       zh: {
-        name: 'Base64',
-        description: 'Base64 编码解码工具，用于文本转换',
+        name: '文本 Base64 转换',
+        description: '将普通文本编码为 Base64，或把 Base64 解码回可读文本',
         categoryLabel: '开发工具',
       },
     },

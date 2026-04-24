@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { absoluteUrl, type SiteLanguage, type ToolSlug } from '@/lib/site';
+import { BBOX_SEO } from '@/lib/bbox-i18n';
 
 type SeoLocale = 'en_US' | 'zh_CN';
 
@@ -25,59 +26,58 @@ type ToolSeoEntry = {
   other?: Metadata['other'];
 };
 
+function bboxToolSeo(language: SiteLanguage): ToolSeoEntry {
+  const seo = BBOX_SEO[language];
+
+  return {
+    title: seo.title,
+    description: seo.description,
+    keywords: seo.keywords,
+    category: seo.category,
+    classification: seo.classification,
+    locale: seo.locale as SeoLocale,
+    openGraph: {
+      title: seo.openGraphTitle,
+      description: seo.openGraphDescription,
+    },
+    twitter: {
+      title: seo.openGraphTitle,
+      description: seo.openGraphDescription,
+    },
+  };
+}
+
 export const TOOL_SEO: Record<ToolSlug, Record<SiteLanguage, ToolSeoEntry>> = {
   base64: {
     zh: {
-      title: '免费 Base64 编码解码器 - 在线文本转换工具 | Mofei 工具',
-      description: '使用我们的免费在线 Base64 编码解码工具快速转换文本。支持批量处理、历史记录、分享功能，完美适合开发者、网页设计师和数据分析师使用。',
-      keywords: ['Base64 编码', 'Base64 解码', 'Base64 转换器', '在线 Base64', 'Base64 编码器', 'Base64 解码器', '文本编码', '数据编码', 'Base64 工具', 'URL 编码', '免费 Base64', '在线编码工具', 'Base64 转换', '编码解码器', 'Base64 在线工具'],
+      title: '免费文本 Base64 转换器 - 在线编码解码工具 | Mofei 工具',
+      description: '使用免费的在线文本 Base64 转换器，在普通文本和 Base64 字符串之间快速转换。支持历史记录、分享功能，适合开发、调试和数据处理场景。',
+      keywords: ['文本 Base64 转换', 'Base64 编码', 'Base64 解码', 'Base64 转换器', '在线 Base64', 'Base64 编码器', 'Base64 解码器', '文本编码', '数据编码', 'Base64 工具', '免费 Base64', '在线编码工具', 'Base64 转换', '编码解码器', 'Base64 在线工具'],
       category: '开发工具',
       classification: '文本处理工具',
       locale: 'zh_CN',
       openGraph: {
-        title: '免费 Base64 编码解码器 - 在线文本转换工具',
-        description: '快速转换 Base64 编码，支持批量处理和历史记录。为开发者提供的免费在线工具。',
+        title: '免费文本 Base64 转换器 - 在线编码解码工具',
+        description: '在普通文本和 Base64 字符串之间快速转换，支持历史记录和结果分享。',
       },
       twitter: {
         card: 'summary_large_image',
-        title: '免费 Base64 编码解码器 - 在线文本转换工具',
-        description: '快速转换 Base64 编码，支持批量处理和历史记录。为开发者提供的免费在线工具。',
+        title: '免费文本 Base64 转换器 - 在线编码解码工具',
+        description: '在普通文本和 Base64 字符串之间快速转换，支持历史记录和结果分享。',
       },
     },
     en: {
-      title: "Free Base64 Encoder Decoder - Online Text Conversion Tool | Mofei's Tools",
-      description: 'Convert text to Base64 encoding and decode Base64 strings with our free online tool. Features batch processing, history, and sharing capabilities for developers and designers.',
-      keywords: ['Base64 encoder', 'Base64 decoder', 'Base64 converter', 'online Base64', 'text encoding', 'data encoding', 'Base64 tool', 'URL encoding', 'free Base64', 'encoding tool', 'Base64 conversion', 'encode decode', 'Base64 online'],
+      title: "Free Text Base64 Converter - Online Encode Decode Tool | Mofei's Tools",
+      description: 'Convert plain text to Base64 and decode Base64 strings back to readable text with a free online tool. Includes history and sharing for development and debugging.',
+      keywords: ['text Base64 converter', 'Base64 encoder', 'Base64 decoder', 'Base64 converter', 'online Base64', 'text encoding', 'data encoding', 'Base64 tool', 'free Base64', 'encoding tool', 'Base64 conversion', 'encode decode', 'Base64 online'],
       category: 'Developer Tools',
       classification: 'Text Processing Tool',
       locale: 'en_US',
     },
   },
   bbox: {
-    zh: {
-      title: '免费边界框绘制工具 - 交互式地图边界框生成器 | Mofei 工具',
-      description: '在交互式地图上绘制和生成边界框（BBox）。支持多种格式输出、坐标系统转换，完美适用于 GIS 开发、地理数据分析和地图应用开发。',
-      keywords: ['边界框工具', 'BBox 绘制', '地理边界框', '坐标边界', 'GIS 工具', '地图工具', '边界框生成器', '地理数据工具', 'BBox 生成', '地图边界', '坐标范围', 'GIS 边界框', '地理信息工具', '免费 GIS 工具', '在线地图工具'],
-      category: 'GIS 工具',
-      classification: '地理信息工具',
-      locale: 'zh_CN',
-      openGraph: {
-        title: '免费边界框绘制工具 - 交互式地图边界框生成器',
-        description: '在交互式地图上绘制边界框，支持多种格式输出。为 GIS 开发者提供的免费在线工具。',
-      },
-      twitter: {
-        title: '免费边界框绘制工具 - 交互式地图边界框生成器',
-        description: '在交互式地图上绘制边界框，支持多种格式输出。为 GIS 开发者提供的免费在线工具。',
-      },
-    },
-    en: {
-      title: "Free BBox Drawing Tool - Interactive Map Bounding Box Generator | Mofei's Tools",
-      description: 'Draw and generate bounding boxes on interactive maps. Support multiple output formats and coordinate systems for GIS development and geographic data analysis.',
-      keywords: ['bbox tool', 'bounding box', 'GIS tool', 'map tool', 'bbox generator', 'geographic bounds', 'coordinate bounds', 'map bounds', 'GIS bbox', 'geographic tool', 'free GIS', 'online map tool'],
-      category: 'GIS Tools',
-      classification: 'Geographic Information Tool',
-      locale: 'en_US',
-    },
+    zh: bboxToolSeo('zh'),
+    en: bboxToolSeo('en'),
   },
   'coordinate-converter': {
     zh: {
@@ -103,6 +103,14 @@ export const TOOL_SEO: Record<ToolSlug, Record<SiteLanguage, ToolSeoEntry>> = {
       category: 'GIS Tools',
       classification: 'Coordinate Conversion Tool',
       locale: 'en_US',
+      openGraph: {
+        title: 'Free Coordinate Converter - GIS Coordinate System Transformation',
+        description: 'Convert WGS84, Web Mercator, UTM, GCJ-02, and BD-09 coordinates online for GIS, mapping, and surveying workflows.',
+      },
+      twitter: {
+        title: 'Free Coordinate Converter - GIS Coordinate System Transformation',
+        description: 'Convert WGS84, Web Mercator, UTM, GCJ-02, and BD-09 coordinates online for GIS, mapping, and surveying workflows.',
+      },
     },
   },
   geojson: {
@@ -155,6 +163,14 @@ export const TOOL_SEO: Record<ToolSlug, Record<SiteLanguage, ToolSeoEntry>> = {
       category: 'Developer Tools',
       classification: 'JSON Processing Tool',
       locale: 'en_US',
+      openGraph: {
+        title: 'Free JSON Path Extractor - JSONPath Data Extraction Tool',
+        description: 'Extract fields from JSON with JSONPath, preview results instantly, compare data, and export clean CSV or JSON.',
+      },
+      twitter: {
+        title: 'Free JSON Path Extractor - JSONPath Data Extraction Tool',
+        description: 'Extract fields from JSON with JSONPath, preview results instantly, compare data, and export clean CSV or JSON.',
+      },
     },
   },
   objectid: {

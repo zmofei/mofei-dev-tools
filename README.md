@@ -1,298 +1,202 @@
 # Mofei Dev Tools
 
-A collection of handy development tools built with Next.js 15, featuring internationalization and modern UI design.
+A collection of browser-based developer and GIS utilities built with Next.js 15, React 19, TypeScript, Tailwind CSS, and Cloudflare/OpenNext.
 
 **[中文文档](README.zh.md) | [English](README.md)**
 
-## 🌟 Features
+## Live Site
 
-- **🌍 Internationalization**: Full Chinese/English language support with dynamic routing
-- **🔤 Base64 Tool**: Encode/decode with history tracking and sharing functionality
-- **🗺️ GeoJSON Preview**: Generate geojson.io preview links for geographic data visualization
-- **📊 JSON Path Extractor**: Extract values from JSON using JSONPath with comparison mode
-- **🧭 GIS Coordinate Converter**: Convert between WGS84, GCJ-02, BD-09, UTM, Web Mercator coordinate systems
-- **📱 Responsive Design**: Mobile-first design with beautiful animations
-- **⚡ Modern Stack**: Built with Next.js 15, TypeScript, and Tailwind CSS
-- **🎨 Beautiful UI**: Gradient effects, smooth animations, and polished design
+Production: [https://tools.mofei.life](https://tools.mofei.life)
 
-## 🚀 Live Demo
+## Tools
 
-Visit the tools at your deployed URL to see them in action.
+- **Text Base64 Converter** (`/base64`): encode plain text to Base64 or decode Base64 back to readable UTF-8 text.
+- **BBox Drawing Tool** (`/bbox`): draw, preview, parse, share, and copy bounding boxes on an interactive map.
+- **GeoJSON Preview** (`/geojson`): generate geojson.io preview links for GeoJSON data, including GitHub device-flow support for larger Gist-backed previews.
+- **JSON Path Extractor** (`/json-extract`): extract values from JSON with JSONPath-style expressions, compare JSON objects, and export results.
+- **GIS Coordinate Converter** (`/coordinate-converter`): convert WGS84, GCJ-02, BD-09, UTM, and Web Mercator coordinates.
+- **MongoDB ObjectID Generator** (`/objectid`): generate ObjectIDs, inspect timestamps, and create IDs with custom timestamps.
 
-## 📋 Available Tools
+## Tech Stack
 
-### 🔤 Base64 Encoder/Decoder
-- **Encode/Decode**: Convert text to Base64 and vice versa
-- **History Tracking**: Keep track of your conversions with timestamps
-- **Share Results**: Generate shareable URLs with auto-execution
-- **UTF-8 Support**: Full support for Chinese and Unicode characters
-- **Local Processing**: All conversions happen in your browser
+- **Framework**: Next.js 15 App Router
+- **Runtime/UI**: React 19, TypeScript, `@mofei-dev/ui`
+- **Styling**: Tailwind CSS 4
+- **Maps/GIS**: Mapbox GL, Proj4
+- **Animation**: Motion
+- **Deployment**: Cloudflare via `@opennextjs/cloudflare`
+- **Package manager**: pnpm
 
-### 🗺️ GeoJSON Preview Tool
-- **Generate Preview Links**: Create geojson.io preview URLs for GeoJSON data
-- **Multiple Storage Methods**: URL method for small files, GitHub Gist for large files
-- **GitHub Integration**: OAuth login and personal access token support
-- **History Management**: Track and manage your generated preview links
-- **Format Validation**: Automatic GeoJSON format validation
-- **Large File Support**: Automatic handling of complex geographic data
+## Routing And SEO
 
-### 📊 JSON Path Extractor
-- **JSONPath Support**: Extract data using standard JSONPath expressions
-- **Multi-Column Extraction**: Create multiple extraction columns simultaneously
-- **Comparison Mode**: Compare two JSON objects side by side
-- **Export Options**: Export results as CSV or Markdown tables
-- **Suggested Paths**: Intelligent path suggestions based on JSON structure
-- **Array Traversal**: Handle complex nested arrays and objects
-- **Real-time Preview**: Live preview of extraction results
+English canonical routes are unprefixed:
 
-### 🧭 GIS Coordinate Converter
-- **Multiple Coordinate Systems**: Support for WGS84, GCJ-02, BD-09, UTM, Web Mercator
-- **Batch Conversion**: Convert multiple coordinates (one per line)
-- **Format Support**: Decimal degrees, degrees-minutes-seconds, UTM zones
-- **China-Specific**: Proper handling of Chinese encrypted coordinate systems
-- **Share Results**: Generate shareable URLs with coordinate parameters
-- **Export Options**: Export conversion results as JSON or CSV
-- **Algorithm Transparency**: Uses publicly available conversion algorithms
-- **Real-time Conversion**: Instant conversion between all supported systems
-
-## 🛠️ Tech Stack
-
-- **Framework**: Next.js 15 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Animations**: Framer Motion
-- **Deployment**: Vercel
-- **Icons**: Custom SVG icons
-
-## 🌐 Internationalization
-
-The application supports two languages with intelligent routing:
-
-- **English**: `/` (homepage) and `/en/*` (other pages)
-- **Chinese**: `/zh` (homepage) and `/zh/*` (other pages)
-
-## 🏗️ Project Structure
-
+```text
+/
+/base64
+/bbox
+/geojson
+/json-extract
+/coordinate-converter
+/objectid
+/privacy
 ```
+
+Chinese canonical routes use `/zh`:
+
+```text
+/zh
+/zh/base64
+/zh/bbox
+/zh/geojson
+/zh/json-extract
+/zh/coordinate-converter
+/zh/objectid
+/zh/privacy
+```
+
+BBox also has additional localized routes:
+
+```text
+/de/bbox
+/es/bbox
+/fr/bbox
+```
+
+Shared URL, canonical, and alternate-link helpers live in `src/lib/site.ts`. BBox-specific multilingual routing and hreflang configuration live in `src/lib/bbox-i18n.ts`. Sitemap and robots are generated by `src/app/sitemap.ts` and `src/app/robots.ts`; do not add static `public/sitemap.xml` or `public/robots.txt`.
+
+## Project Structure
+
+```text
 src/
 ├── app/
-│   ├── [lang]/                    # Dynamic language routing
-│   │   ├── page.tsx               # Localized homepage
-│   │   ├── base64/                # Base64 tool pages
-│   │   ├── geojson/               # GeoJSON preview tool
-│   │   ├── json-extract/          # JSON path extractor
-│   │   └── coordinate-converter/  # GIS coordinate converter
-│   ├── base64/                    # English Base64 tool
-│   ├── geojson/                   # English GeoJSON tool
-│   ├── json-extract/              # English JSON extractor
-│   ├── coordinate-converter/      # English coordinate converter
-│   ├── globals.css                # Global styles
-│   ├── layout.tsx                 # Root layout
-│   └── page.tsx                   # English homepage
+│   ├── [lang]/                    # Localized routes
+│   ├── api/                       # GitHub device/token proxy routes
+│   ├── base64/                    # English canonical tool route
+│   ├── bbox/
+│   ├── coordinate-converter/
+│   ├── geojson/
+│   ├── json-extract/
+│   ├── objectid/
+│   ├── privacy/
+│   ├── layout.tsx                 # Root metadata, html lang, nav, analytics
+│   ├── robots.ts                  # Generated robots.txt
+│   └── sitemap.ts                 # Generated sitemap.xml
 ├── components/
-│   ├── Common/
-│   │   ├── Nav.tsx                # Navigation component
-│   │   └── Foot.tsx               # Footer component
-│   ├── GoogleAnalytics.tsx        # Analytics integration
-│   └── StructuredData.tsx         # SEO structured data
-└── contexts/
-    └── LanguageContext.tsx        # Language management
+│   ├── Common/                    # Shared nav, footer, controls
+│   ├── HomePageContent.tsx
+│   ├── PrivacyPageContent.tsx
+│   └── StructuredData.tsx
+├── contexts/
+│   └── LanguageContext.tsx
+└── lib/
+    ├── bbox-i18n.ts               # BBox language text, SEO, URLs
+    ├── metadata.ts                # Shared tool metadata builder
+    ├── site.ts                    # Site URL, route helpers, tool slugs
+    ├── tool-content.ts            # Homepage/tool-card copy
+    └── tool-seo.ts                # Tool SEO copy
 ```
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+ 
-- npm or yarn
+- Node.js 20+ is recommended.
+- pnpm 10.10.0, as declared in `package.json`.
+- For local HTTPS development, make sure `local.mofei.life` resolves to your machine.
 
-### Installation
-
-1. Clone the repository:
-```bash
-git clone git@github.com:zmofei/mofei-dev-tools.git
-cd mofei-dev-tools
-```
-
-2. Install dependencies:
-```bash
-npm install
-# or
-yarn install
-```
-
-3. Configure environment variables (optional):
-```bash
-cp .env.example .env.local
-# Edit .env.local and add your Google Analytics tracking ID
-```
-
-4. Run the development server:
-```bash
-npm run dev
-# or
-yarn dev
-```
-
-5. Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## 📦 Building for Production
+### Install
 
 ```bash
-npm run build
-npm start
+pnpm install
 ```
 
-## 🎨 Design Features
+### Environment
 
-### Visual Effects
-- **Gradient Backgrounds**: Beautiful gradient overlays throughout the UI
-- **Dot Pattern**: Animated dot pattern in the footer
-- **Smooth Animations**: Framer Motion powered animations
-- **Hover Effects**: Interactive hover states for better UX
+Optional analytics and verification variables can be placed in `.env.local`:
 
-### Responsive Design
-- **Mobile-First**: Optimized for mobile devices
-- **Breakpoint System**: Tailwind's responsive breakpoints
-- **Touch-Friendly**: Large tap targets and smooth interactions
-
-## 📊 Analytics
-
-The project includes Google Analytics integration for tracking user behavior and tool usage.
-
-### Configuration
-
-1. Get your Google Analytics tracking ID from [Google Analytics](https://analytics.google.com/)
-2. Create a `.env.local` file in the project root:
 ```bash
 NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
-```
-3. Replace `G-XXXXXXXXXX` with your actual tracking ID
-
-### Tracked Events
-
-The application automatically tracks:
-- **Page Views**: All page navigation
-- **Tool Usage**: All tool operations (Base64, GeoJSON, JSON extraction, coordinate conversion)
-- **User Actions**: Copy, share, export, and other interactions
-- **Language Switching**: User language preferences
-- **Feature Usage**: GitHub integration, batch operations, format conversions
-
-### Privacy
-
-- All analytics data is anonymized
-- No personal information is collected
-- Users can disable analytics via browser settings
-
-## 🔧 Development
-
-### Adding New Tools
-
-1. Create a new tool directory in `src/app/` for the main implementation
-2. Add localized routes in `src/app/[lang]/` for internationalization
-3. Update translations in `src/contexts/LanguageContext.tsx`
-4. Add tool metadata to the homepage tool list in `src/app/page.tsx`
-5. Update SEO metadata and structured data
-6. Add the tool to sitemap.xml and robots.txt
-
-### Adding Translations
-
-Update the translations object in `src/contexts/LanguageContext.tsx`:
-
-```typescript
-const translations = {
-  zh: {
-    'your.key': '中文翻译',
-    // ...
-  },
-  en: {
-    'your.key': 'English Translation',
-    // ...
-  }
-};
+GOOGLE_SITE_VERIFICATION=your-verification-token
 ```
 
-### Adding Analytics Events
+### Develop
 
-Import and use the event tracking function:
-
-```typescript
-import { event } from '@/components/GoogleAnalytics';
-
-// Track custom events
-event('action_name', 'Category', 'Label', value);
+```bash
+pnpm dev
 ```
 
-## 💬 User Feedback & Tool Requests
+The dev script runs:
 
-We highly value your feedback and suggestions! Here's how you can help us improve:
+```bash
+next dev -H local.mofei.life --turbopack --experimental-https
+```
 
-### 🎯 How to Provide Feedback
+Open the HTTPS local URL printed by Next.js.
 
-- **🐛 Found a bug?** → [Report an issue](https://github.com/zmofei/mofei-dev-tools/issues/new?template=bug_report.yml)
-- **✨ Want a new feature?** → [Request a feature](https://github.com/zmofei/mofei-dev-tools/issues/new?template=feature_request.yml)  
-- **💡 Have an idea for a new tool?** → [Start a discussion](https://github.com/zmofei/mofei-dev-tools/discussions/new?category=ideas)
-- **🤔 Need help using a tool?** → [Ask in Q&A](https://github.com/zmofei/mofei-dev-tools/discussions/new?category=q-a)
-- **💬 Want to share feedback?** → [General discussion](https://github.com/zmofei/mofei-dev-tools/discussions/new?category=general)
+## Verification
 
-### 🚀 Tool Request Process
+```bash
+pnpm test
+pnpm run build
+pnpm run cf:build
+```
 
-1. **Share your idea** in [Discussions](https://github.com/zmofei/mofei-dev-tools/discussions)
-2. **Community discussion** and feedback
-3. **Feasibility assessment** by maintainers
-4. **Development prioritization** based on demand and complexity
-5. **Implementation** and testing
-6. **Release** and user notification
+The Node test suite checks SEO config, canonical URL rules, localized route contracts, BBox multilingual routing, and sitemap/hreflang behavior.
 
-### 📊 What We're Looking For
+## Deployment
 
-- **Developer tools** that save time and effort
-- **Data conversion** and processing utilities
-- **Text manipulation** and formatting tools
-- **Design helpers** and calculators
-- **Productivity boosters** for common tasks
+Cloudflare/OpenNext commands:
 
-## 🤝 Contributing
+```bash
+pnpm run cf:build
+pnpm run preview
+pnpm run deploy
+pnpm run cf-typegen
+```
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Relevant deployment files:
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+- `open-next.config.ts`
+- `wrangler.jsonc`
+- `next.config.ts`
+- `cloudflare-env.d.ts`
 
-📖 **Read our [Contributing Guide](CONTRIBUTING.md) for detailed instructions.**
+## Adding Or Updating Tools
 
-## 📝 License
+1. Add the route and shared `PageComponent` under `src/app/<slug>/`.
+2. Add localized thin wrappers under `src/app/[lang]/<slug>/`.
+3. Update `TOOL_SLUGS` and route helpers in `src/lib/site.ts` when adding a public tool.
+4. Add homepage/tool-card copy in `src/lib/tool-content.ts`.
+5. Add SEO copy in `src/lib/tool-seo.ts`; use `src/lib/metadata.ts` for route metadata.
+6. Update generated sitemap and robots behavior in `src/app/sitemap.ts` and `src/app/robots.ts`.
+7. Add or update tests under `tests/`.
+
+For BBox-specific language work, update `src/lib/bbox-i18n.ts` first because BBox supports `en`, `zh`, `de`, `es`, and `fr`.
+
+## Analytics And Privacy
+
+Google Analytics is loaded from `src/components/GoogleAnalytics.tsx` when `NEXT_PUBLIC_GA_ID` is configured. Tool processing is primarily client-side. API routes under `/api/` are used for GitHub device/token proxying and are disallowed in robots.
+
+See the privacy page at `/privacy` or `/zh/privacy`.
+
+## Contributing
+
+Contributions are welcome. Please keep routing, metadata, sitemap, robots, and shared tool content in sync when changing public pages.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the broader contribution workflow.
+
+## Algorithm Declaration
+
+The GIS Coordinate Converter uses public, widely used GIS conversion formulas for WGS84, GCJ-02, BD-09, UTM, and Web Mercator transformations. These are intended for developer tooling, debugging, and data-preparation workflows.
+
+## License
 
 This project is open source and available under the [MIT License](LICENSE).
 
-## 👨‍💻 Author
+## Author
 
 **Mofei**
+
 - Website: [mofei.life](https://mofei.life)
 - GitHub: [@zmofei](https://github.com/zmofei)
-
-## 📝 Algorithm Declaration
-
-The coordinate conversion algorithms used in the GIS Coordinate Converter are based on publicly available resources from the internet and open source GIS community:
-
-- **WGS84 to GCJ-02 conversion**: Based on standard algorithms published by China's Bureau of Surveying and Mapping
-- **GCJ-02 to BD-09 conversion**: Based on open source community algorithms  
-- **UTM projection conversion**: Based on standard map projection mathematical models
-- **Web Mercator conversion**: Based on EPSG:3857 standard
-
-These algorithms are industry-standard mathematical models widely used in various GIS applications.
-
-## 🙏 Acknowledgments
-
-- Built with [Next.js](https://nextjs.org/)
-- Styled with [Tailwind CSS](https://tailwindcss.com/)
-- Animated with [Framer Motion](https://www.framer.com/motion/)
-- Icons from custom SVG designs
-- Coordinate conversion algorithms from open source GIS community
-
----
-
-*More tools coming soon! 🚀*

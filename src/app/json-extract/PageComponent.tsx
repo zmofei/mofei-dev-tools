@@ -1,8 +1,13 @@
 "use client"
 import { useState, useEffect, useCallback } from 'react';
-import { motion } from "motion/react"
-import Link from 'next/link';
+import type { ReactNode } from 'react';
+import {
+  GlassPanel,
+  PrimaryPillLink,
+  SectionLabel,
+} from '@mofei-dev/ui';
 import Foot from '@/components/Common/Foot';
+import ResizableTextarea from '@/components/Common/ResizableTextarea';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { event } from '@/components/GoogleAnalytics';
 import ContributeButton from '@/components/Common/ContributeButton';
@@ -17,19 +22,154 @@ interface ExtractedRow {
   [key: string]: unknown;
 }
 
+const DEFAULT_COLUMN: Column = { id: '1', name: 'Column 1', path: '$.properties.title' };
+const MAX_AUTO_COLUMNS = 8;
+
+function createColumnNameFromPath(path: string, index: number) {
+  const segment = path
+    .replace(/\[\*\]/g, '')
+    .split('.')
+    .filter(Boolean)
+    .pop();
+
+  if (!segment || segment === '$') {
+    return `Column ${index + 1}`;
+  }
+
+  return segment
+    .replace(/[_-]+/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function createAutoColumns(paths: string[]) {
+  const leafPaths = paths.filter((path) => !path.endsWith('[*]'));
+  const selectedPaths = (leafPaths.length > 0 ? leafPaths : paths).slice(0, MAX_AUTO_COLUMNS);
+
+  if (selectedPaths.length === 0) {
+    return [DEFAULT_COLUMN];
+  }
+
+  return selectedPaths.map((path, index) => ({
+    id: String(index + 1),
+    name: createColumnNameFromPath(path, index),
+    path,
+  }));
+}
+
+function LabelIcon({ children, tone = 'neutral' }: { children: ReactNode; tone?: 'neutral' | 'cyan' | 'emerald' }) {
+  const toneClass = {
+    neutral: 'border-white/[0.08] bg-white/[0.045] text-white/58',
+    cyan: 'border-cyan-200/15 bg-cyan-300/[0.08] text-cyan-50/80',
+    emerald: 'border-emerald-200/15 bg-emerald-300/[0.08] text-emerald-50/80',
+  }[tone];
+
+  return (
+    <span className={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border ${toneClass}`}>
+      {children}
+    </span>
+  );
+}
+
+function JsonIcon() {
+  return (
+    <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M8.5 8.5L5 12l3.5 3.5M15.5 8.5L19 12l-3.5 3.5M13.25 6.75l-2.5 10.5" />
+    </svg>
+  );
+}
+
+function ColumnsIcon() {
+  return (
+    <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M5 6.75h14M5 12h14M5 17.25h14M8.5 5v14M15.5 5v14" />
+    </svg>
+  );
+}
+
+function ResultIcon() {
+  return (
+    <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M5.5 6.5h13M5.5 11h13M5.5 15.5h8M16.5 15.25l1.75 1.75 3-3" />
+    </svg>
+  );
+}
+
+function InfoIcon() {
+  return (
+    <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="7.25" strokeWidth={1.75} />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 10.75v4.75M12 8.25h.01" />
+    </svg>
+  );
+}
+
+function ExampleIcon() {
+  return (
+    <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M7 4.75h7.25L18.75 9v8A2.25 2.25 0 0116.5 19.25h-9A2.25 2.25 0 015.25 17V7A2.25 2.25 0 017 4.75z" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M14.25 5v4.25h4.25M8.75 13h6.5M8.75 16h4" />
+    </svg>
+  );
+}
+
+function ClearIcon() {
+  return (
+    <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M8.25 8.25l7.5 7.5M15.75 8.25l-7.5 7.5" />
+      <circle cx="12" cy="12" r="7.25" strokeWidth={1.75} />
+    </svg>
+  );
+}
+
+function UsageGuide({ language }: { language: string }) {
+  const steps = language === 'zh'
+    ? [
+        '把完整的 JSON 文本粘贴到下面的输入框里。',
+        '如果 JSON 格式正确，系统会自动分析结构，并尽量选择最多 8 个常用字段作为结果列。',
+        '下方出现结果表格后，可以直接查看每一行提取出来的数据。',
+        '如果想换字段，打开“详细调整”，点击建议的列路径，或手动修改列名和 JSONPath。',
+        '修改输入内容或列路径后，不需要再点提取按钮，结果会自动刷新。',
+        '需要带走结果时，使用结果区域里的复制 Markdown、复制 JSON、下载 CSV 或下载 JSON。',
+      ]
+    : [
+        'Paste the complete JSON text into the input box below.',
+        'When the JSON is valid, the tool analyzes the structure and picks up to 8 useful fields as result columns.',
+        'After the result table appears, review the extracted rows directly.',
+        'To change fields, open Advanced Options, click a suggested path, or edit the column name and JSONPath manually.',
+        'After changing input or column paths, you do not need to click an extract button. Results refresh automatically.',
+        'Use Copy Markdown, Copy JSON, Download CSV, or Download JSON in the result area when you need to take the data away.',
+      ];
+
+  return (
+    <div className="mb-4 rounded-[18px] border border-white/[0.08] bg-white/[0.035] p-4">
+      <h4 className="mb-3 inline-flex items-center gap-2 text-sm font-medium text-white/84">
+        <LabelIcon>
+          <InfoIcon />
+        </LabelIcon>
+        {language === 'zh' ? '使用说明' : 'How To Use'}
+      </h4>
+      <ol className="space-y-2 text-sm leading-6 text-white/62">
+        {steps.map((step, index) => (
+          <li key={step} className="flex gap-3">
+            <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.045] text-xs text-white/62">
+              {index + 1}
+            </span>
+            <span>{step}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
 function JSONExtractToolPageContent() {
   const { language, t } = useLanguage();
   const [inputText, setInputText] = useState('');
-  const [columns, setColumns] = useState<Column[]>([
-    { id: '1', name: 'Column 1', path: '$.properties.title' }
-  ]);
-  const [columns2, setColumns2] = useState<Column[]>([
-    { id: '1', name: 'Column 1', path: '$.properties.title' }
-  ]);
+  const [columns, setColumns] = useState<Column[]>([DEFAULT_COLUMN]);
+  const [columns2, setColumns2] = useState<Column[]>([DEFAULT_COLUMN]);
   const [results, setResults] = useState<ExtractedRow[]>([]);
   const [sortedResults, setSortedResults] = useState<ExtractedRow[]>([]);
   const [error, setError] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
   const [jsonError, setJsonError] = useState('');
   const [jsonError2, setJsonError2] = useState('');
   const [isValidJson, setIsValidJson] = useState(true);
@@ -51,7 +191,11 @@ function JSONExtractToolPageContent() {
     key: string;
     direction: 'asc' | 'desc';
   } | null>(null);
-  
+  const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [usageGuideOpen, setUsageGuideOpen] = useState(false);
+  const [autoColumnsEnabled, setAutoColumnsEnabled] = useState(true);
+  const [autoColumns2Enabled, setAutoColumns2Enabled] = useState(true);
+
   // Cache keys for localStorage
   const CACHE_KEYS = {
     SINGLE_MODE: 'json-extract-single-mode-cache',
@@ -61,43 +205,43 @@ function JSONExtractToolPageContent() {
   // Default cache values
   const defaultSingleCache = {
     inputText: '',
-    columns: [{ id: '1', name: 'Column 1', path: '$.properties.title' }] as Column[]
+    columns: [DEFAULT_COLUMN] as Column[]
   };
-  
+
   const defaultCompareCache = {
     inputText1: '',
     inputText2: '',
-    columns1: [{ id: '1', name: 'Column 1', path: '$.properties.title' }] as Column[],
-    columns2: [{ id: '1', name: 'Column 1', path: '$.properties.title' }] as Column[]
+    columns1: [DEFAULT_COLUMN] as Column[],
+    columns2: [DEFAULT_COLUMN] as Column[]
   };
 
   // Load cache from localStorage
   const loadFromLocalStorage = () => {
     if (typeof window === 'undefined') return { defaultSingleCache, defaultCompareCache };
-    
+
     try {
       const singleCache = localStorage.getItem(CACHE_KEYS.SINGLE_MODE);
       const compareCache = localStorage.getItem(CACHE_KEYS.COMPARE_MODE);
-      
+
       return {
         singleCache: singleCache ? JSON.parse(singleCache) : defaultSingleCache,
         compareCache: compareCache ? JSON.parse(compareCache) : defaultCompareCache
       };
     } catch (error) {
       console.error('Error loading cache from localStorage:', error);
-      return { 
-        singleCache: defaultSingleCache, 
-        compareCache: defaultCompareCache 
+      return {
+        singleCache: defaultSingleCache,
+        compareCache: defaultCompareCache
       };
     }
   };
 
   // Initialize cache from localStorage
   const { singleCache: initialSingleCache, compareCache: initialCompareCache } = loadFromLocalStorage();
-  
+
   // Cache for single mode
   const [singleModeCache, setSingleModeCache] = useState(initialSingleCache);
-  
+
   // Cache for compare mode
   const [compareModeCache, setCompareModeCache] = useState(initialCompareCache);
 
@@ -107,7 +251,7 @@ function JSONExtractToolPageContent() {
   // Save cache to localStorage
   const saveToLocalStorage = (key: string, data: unknown) => {
     if (typeof window === 'undefined') return;
-    
+
     try {
       localStorage.setItem(key, JSON.stringify(data));
     } catch (error) {
@@ -118,11 +262,11 @@ function JSONExtractToolPageContent() {
   // Load initial cache data on mount
   useEffect(() => {
     const { singleCache, compareCache } = loadFromLocalStorage();
-    
+
     // Always restore the cache data to state first
     setSingleModeCache(singleCache);
     setCompareModeCache(compareCache);
-    
+
     // Then set the current UI based on the current mode
     if (!compareMode) {
       // In single mode, load single mode cache
@@ -169,13 +313,13 @@ function JSONExtractToolPageContent() {
   // Generate suggested column paths from arrays
   const generateSuggestedPaths = (obj: unknown): string[] => {
     const suggestions: string[] = [];
-    
+
     // Helper function to recursively explore object and generate path suggestions
     const exploreObject = (item: unknown, basePath: string, maxDepth: number = 4) => {
       if (maxDepth <= 0 || !item || typeof item !== 'object') {
         return;
       }
-      
+
       if (Array.isArray(item)) {
         // For arrays, suggest the array itself and explore the first item
         suggestions.push(`${basePath}[*]`);
@@ -188,7 +332,7 @@ function JSONExtractToolPageContent() {
         Object.keys(itemObj).forEach(key => {
           const value = itemObj[key];
           const newPath = `${basePath}.${key}`;
-          
+
           if (Array.isArray(value)) {
             // If it's an array, suggest the array path and explore first item
             suggestions.push(`${newPath}[*]`);
@@ -205,76 +349,76 @@ function JSONExtractToolPageContent() {
         });
       }
     };
-    
+
     // Start exploration from the root
     exploreObject(obj, '$', 4);
-    
+
     // Remove duplicates and sort by usefulness
     const uniqueSuggestions = [...new Set(suggestions)];
-    
+
     // Sort suggestions to prioritize useful paths
     return uniqueSuggestions.sort((a, b) => {
       // Prioritize paths that don't end with array indices
       const aEndsWithIndex = /\.\d+$/.test(a);
       const bEndsWithIndex = /\.\d+$/.test(b);
-      
+
       if (aEndsWithIndex && !bEndsWithIndex) return 1;
       if (!aEndsWithIndex && bEndsWithIndex) return -1;
-      
+
       // Prioritize shorter paths
       const aDepth = a.split('.').length;
       const bDepth = b.split('.').length;
-      
+
       if (aDepth !== bDepth) return aDepth - bDepth;
-      
+
       // Alphabetical order for same depth
       return a.localeCompare(b);
     });
   };
 
   // JSONPath implementation
-  const extractPath = (obj: unknown, path: string): unknown[] => {
+  const extractPath = useCallback((obj: unknown, path: string): unknown[] => {
     try {
       console.log('Extracting path:', path, 'from object:', obj);
-      
+
       // Remove leading $ if present
       let cleanPath = path.startsWith('$') ? path.slice(1) : path;
-      
+
       if (cleanPath === '' || cleanPath === '.') {
         return [obj];
       }
-      
+
       // Remove leading dot if present
       if (cleanPath.startsWith('.')) {
         cleanPath = cleanPath.slice(1);
       }
-      
+
       const results: unknown[] = [];
-      
+
       const traverse = (current: unknown, pathRemaining: string) => {
         console.log('Traversing:', pathRemaining, 'on:', current);
-        
+
         if (!pathRemaining) {
           results.push(current);
           return;
         }
-        
+
         // Handle array wildcard like features[*]
         if (pathRemaining.includes('[*]')) {
           const beforeBracket = pathRemaining.split('[*]')[0];
           const afterBracket = pathRemaining.split('[*]')[1];
-          
+
           if (beforeBracket) {
             // Get the array first
             const arrayPath = beforeBracket.split('.');
             let target = current;
-            
+
             for (const prop of arrayPath) {
               if (prop && target && typeof target === 'object') {
                 target = (target as Record<string, unknown>)[prop];
               }
             }
-            
+
             if (Array.isArray(target)) {
               target.forEach(item => {
                 if (afterBracket) {
@@ -287,7 +431,7 @@ function JSONExtractToolPageContent() {
           }
           return;
         }
-        
+
         // Handle specific array index like [0]
         if (pathRemaining.includes('[') && pathRemaining.includes(']')) {
           const beforeBracket = pathRemaining.split('[')[0];
@@ -295,7 +439,7 @@ function JSONExtractToolPageContent() {
           if (indexMatch) {
             const index = parseInt(indexMatch[1]);
             const afterBracket = pathRemaining.split(']')[1];
-            
+
             let target = current;
             if (beforeBracket) {
               const arrayPath = beforeBracket.split('.');
@@ -305,7 +449,7 @@ function JSONExtractToolPageContent() {
                 }
               }
             }
-            
+
             if (Array.isArray(target) && target[index] !== undefined) {
               if (afterBracket) {
                 traverse(target[index], afterBracket.startsWith('.') ? afterBracket.slice(1) : afterBracket);
@@ -316,12 +460,12 @@ function JSONExtractToolPageContent() {
           }
           return;
         }
-        
+
         // Handle regular property access
         const parts = pathRemaining.split('.');
         const firstPart = parts[0];
         const remainingPath = parts.slice(1).join('.');
-        
+
         if (current && typeof current === 'object' && current !== null) {
           const currentObj = current as Record<string, unknown>;
           if (currentObj[firstPart] !== undefined) {
@@ -333,7 +477,7 @@ function JSONExtractToolPageContent() {
           }
         }
       };
-      
+
       traverse(obj, cleanPath);
       console.log('Extraction results:', results);
       return results;
@@ -341,12 +485,14 @@ function JSONExtractToolPageContent() {
       console.error('Path extraction error:', error);
       return [];
     }
-  };
+  }, []);
 
   const addColumn = () => {
+    setAutoColumnsEnabled(false);
     const newId = (columns.length + 1).toString();
     const newColumns = [...columns, { id: newId, name: `Column ${newId}`, path: '$.' }];
     setColumns(newColumns);
+    event('json_extract_column_add', 'Tool Usage', `target:json1|mode:${compareMode ? 'compare' : 'single'}|columns:${newColumns.length}`, newColumns.length);
     // Update cache
     if (compareMode) {
       setCompareModeCache((prev: typeof defaultCompareCache) => ({ ...prev, columns1: newColumns }));
@@ -357,8 +503,10 @@ function JSONExtractToolPageContent() {
 
   const removeColumn = (id: string) => {
     if (columns.length > 1) {
+      setAutoColumnsEnabled(false);
       const newColumns = columns.filter(col => col.id !== id);
       setColumns(newColumns);
+      event('json_extract_column_remove', 'Tool Usage', `target:json1|mode:${compareMode ? 'compare' : 'single'}|columns:${newColumns.length}`, newColumns.length);
       // Update cache
       if (compareMode) {
         setCompareModeCache((prev: typeof defaultCompareCache) => ({ ...prev, columns1: newColumns }));
@@ -369,11 +517,12 @@ function JSONExtractToolPageContent() {
   };
 
   const updateColumn = (id: string, field: 'name' | 'path', value: string) => {
-    const newColumns = columns.map(col => 
+    setAutoColumnsEnabled(false);
+    const newColumns = columns.map(col =>
       col.id === id ? { ...col, [field]: value } : col
     );
     setColumns(newColumns);
-    
+
     // Update path preview if path changed
     if (field === 'path' && inputText && isValidJson) {
       try {
@@ -385,7 +534,7 @@ function JSONExtractToolPageContent() {
         setPathErrors(prev => ({ ...prev, [id]: '' }));
       }
     }
-    
+
     // Update cache
     if (compareMode) {
       setCompareModeCache((prev: typeof defaultCompareCache) => ({ ...prev, columns1: newColumns }));
@@ -395,9 +544,11 @@ function JSONExtractToolPageContent() {
   };
 
   const addColumn2 = () => {
+    setAutoColumns2Enabled(false);
     const newId = (columns2.length + 1).toString();
     const newColumns2 = [...columns2, { id: newId, name: `Column ${newId}`, path: '$.' }];
     setColumns2(newColumns2);
+    event('json_extract_column_add', 'Tool Usage', `target:json2|mode:compare|columns:${newColumns2.length}`, newColumns2.length);
     // Update cache
     if (compareMode) {
       setCompareModeCache((prev: typeof defaultCompareCache) => ({ ...prev, columns2: newColumns2 }));
@@ -406,13 +557,15 @@ function JSONExtractToolPageContent() {
 
   // Clear all columns for JSON1
   const clearAllColumns = () => {
-    const defaultColumns = [{ id: '1', name: 'Column 1', path: '$.properties.title' }];
+    const defaultColumns = [DEFAULT_COLUMN];
+    setAutoColumnsEnabled(true);
     setColumns(defaultColumns);
     setSuggestedPaths([]); // Clear suggested paths
     setResults([]); // Clear results
     setSortedResults([]);
     setError('');
     setSortConfig(null);
+    event('json_extract_columns_clear', 'Tool Usage', `target:json1|mode:${compareMode ? 'compare' : 'single'}`, columns.length);
     // Update cache
     if (compareMode) {
       setCompareModeCache((prev: typeof defaultCompareCache) => ({ ...prev, columns1: defaultColumns }));
@@ -437,7 +590,9 @@ function JSONExtractToolPageContent() {
 
   // Clear all columns for both JSONs (compare mode)
   const clearAllColumnsCompare = () => {
-    const defaultColumns = [{ id: '1', name: 'Column 1', path: '$.properties.title' }];
+    const defaultColumns = [DEFAULT_COLUMN];
+    setAutoColumnsEnabled(true);
+    setAutoColumns2Enabled(true);
     setColumns(defaultColumns);
     setColumns2(defaultColumns);
     setSuggestedPaths([]);
@@ -449,18 +604,21 @@ function JSONExtractToolPageContent() {
     setError('');
     setSortConfig(null);
     setSortConfig2(null);
+    event('json_extract_columns_clear', 'Tool Usage', `target:both|mode:compare|columns:${columns.length + columns2.length}`, columns.length + columns2.length);
     // Update cache
-    setCompareModeCache((prev: typeof defaultCompareCache) => ({ 
-      ...prev, 
+    setCompareModeCache((prev: typeof defaultCompareCache) => ({
+      ...prev,
       columns1: defaultColumns,
-      columns2: defaultColumns 
+      columns2: defaultColumns
     }));
   };
 
   const removeColumn2 = (id: string) => {
     if (columns2.length > 1) {
+      setAutoColumns2Enabled(false);
       const newColumns2 = columns2.filter(col => col.id !== id);
       setColumns2(newColumns2);
+      event('json_extract_column_remove', 'Tool Usage', `target:json2|mode:compare|columns:${newColumns2.length}`, newColumns2.length);
       // Update cache
       if (compareMode) {
         setCompareModeCache((prev: typeof defaultCompareCache) => ({ ...prev, columns2: newColumns2 }));
@@ -469,11 +627,12 @@ function JSONExtractToolPageContent() {
   };
 
   const updateColumn2 = (id: string, field: 'name' | 'path', value: string) => {
-    const newColumns2 = columns2.map(col => 
+    setAutoColumns2Enabled(false);
+    const newColumns2 = columns2.map(col =>
       col.id === id ? { ...col, [field]: value } : col
     );
     setColumns2(newColumns2);
-    
+
     // Update path preview if path changed
     if (field === 'path' && inputText2 && isValidJson2) {
       try {
@@ -485,37 +644,44 @@ function JSONExtractToolPageContent() {
         setPathErrors(prev => ({ ...prev, [id + '_json2']: '' }));
       }
     }
-    
+
     // Update cache
     if (compareMode) {
       setCompareModeCache((prev: typeof defaultCompareCache) => ({ ...prev, columns2: newColumns2 }));
     }
   };
 
-  const extractData = () => {
+  const extractData = useCallback((options: { track?: boolean } = {}) => {
     if (!inputText.trim()) {
-      setError(t('json-extract.enterJsonData'));
+      setError('');
+      setResults([]);
+      setResults2([]);
+      setSortedResults([]);
+      setSortedResults2([]);
       return;
     }
 
     if (compareMode && !inputText2.trim()) {
-      setError(t('json-extract.enterJsonData'));
+      setError('');
+      setResults([]);
+      setResults2([]);
+      setSortedResults([]);
+      setSortedResults2([]);
       return;
     }
 
-    setIsProcessing(true);
     setError('');
 
     try {
       const jsonData1 = JSON.parse(inputText);
       const jsonData2 = compareMode ? JSON.parse(inputText2) : null;
-      
+
       const extractedResults1: ExtractedRow[] = [];
       const extractedResults2: ExtractedRow[] = [];
 
       // Extract values from each column for first JSON
       const columnResults1: { [key: string]: unknown[] } = {};
-      
+
       columns.forEach(column => {
         const values = extractPath(jsonData1, column.path);
         columnResults1[column.name] = values;
@@ -523,38 +689,38 @@ function JSONExtractToolPageContent() {
 
       // Find the maximum number of results across all columns for first JSON
       const maxResults1 = Math.max(...Object.values(columnResults1).map(arr => arr.length));
-      
+
       // Create rows - one for each result for first JSON
       for (let i = 0; i < maxResults1; i++) {
         const row: ExtractedRow = { _index: i };
-        
+
         columns.forEach(column => {
           const values = columnResults1[column.name];
           row[column.name] = values[i] || null;
         });
-        
+
         extractedResults1.push(row);
       }
 
       // If in compare mode, extract from second JSON using columns2
       if (compareMode && jsonData2) {
         const columnResults2: { [key: string]: unknown[] } = {};
-        
+
         columns2.forEach(column => {
           const values = extractPath(jsonData2, column.path);
           columnResults2[column.name] = values;
         });
 
         const maxResults2 = Math.max(...Object.values(columnResults2).map(arr => arr.length));
-        
+
         for (let i = 0; i < maxResults2; i++) {
           const row: ExtractedRow = { _index: i };
-          
+
           columns2.forEach(column => {
             const values = columnResults2[column.name];
             row[column.name] = values[i] || null;
           });
-          
+
           extractedResults2.push(row);
         }
       }
@@ -565,22 +731,30 @@ function JSONExtractToolPageContent() {
       setSortedResults2(extractedResults2);
       setSortConfig(null);
       setSortConfig2(null);
-      
-      // Track extraction event
-      event('json_extract', 'Tool Usage', 'JSON Path Extract', inputText.length);
+      event(
+        options.track ? 'json_extract_manual_success' : 'json_extract_auto_success',
+        'Tool Usage',
+        `mode:${compareMode ? 'compare' : 'single'}|rows:${extractedResults1.length}|rows2:${extractedResults2.length}|columns:${columns.length + (compareMode ? columns2.length : 0)}`,
+        extractedResults1.length + extractedResults2.length
+      );
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Invalid JSON format');
       setResults([]);
       setResults2([]);
       setSortedResults([]);
       setSortedResults2([]);
-    } finally {
-      setIsProcessing(false);
+      event(
+        options.track ? 'json_extract_manual_failure' : 'json_extract_auto_failure',
+        'Tool Usage',
+        `mode:${compareMode ? 'compare' : 'single'}|error:${err instanceof Error ? err.message : 'unknown'}`,
+        inputText.length + inputText2.length
+      );
     }
-  };
+  }, [columns, columns2, compareMode, extractPath, inputText, inputText2]);
 
   // Clear single mode data and cache
   const handleClearSingle = () => {
+    event('json_extract_clear', 'Tool Usage', `mode:single|rows:${results.length}|columns:${columns.length}`, inputText.length);
     setInputText('');
     setResults([]);
     setSortedResults([]);
@@ -589,17 +763,19 @@ function JSONExtractToolPageContent() {
     setIsValidJson(true);
     setSortConfig(null);
     setSuggestedPaths([]);
-    
+
     const clearedCache = {
       inputText: '',
-      columns: [{ id: '1', name: 'Column 1', path: '$.properties.title' }]
+      columns: [DEFAULT_COLUMN]
     };
+    setAutoColumnsEnabled(true);
     setSingleModeCache(clearedCache);
     setColumns(clearedCache.columns);
   };
 
   // Clear compare mode data and cache
   const handleClearCompare = () => {
+    event('json_extract_clear', 'Tool Usage', `mode:compare|rows:${results.length + results2.length}|columns:${columns.length + columns2.length}`, inputText.length + inputText2.length);
     setInputText('');
     setInputText2('');
     setResults([]);
@@ -615,13 +791,15 @@ function JSONExtractToolPageContent() {
     setSortConfig2(null);
     setSuggestedPaths([]);
     setSuggestedPaths2([]);
-    
+
     const clearedCache = {
       inputText1: '',
       inputText2: '',
-      columns1: [{ id: '1', name: 'Column 1', path: '$.properties.title' }],
-      columns2: [{ id: '1', name: 'Column 1', path: '$.properties.title' }]
+      columns1: [DEFAULT_COLUMN],
+      columns2: [DEFAULT_COLUMN]
     };
+    setAutoColumnsEnabled(true);
+    setAutoColumns2Enabled(true);
     setCompareModeCache(clearedCache);
     setColumns(clearedCache.columns1);
     setColumns2(clearedCache.columns2);
@@ -643,16 +821,28 @@ function JSONExtractToolPageContent() {
         setSuggestedPaths([]);
         return;
       }
-      
+
       const jsonData = JSON.parse(jsonText);
       const suggestions = generateSuggestedPaths(jsonData);
       setSuggestedPaths(suggestions);
+      if (autoColumnsEnabled) {
+        const autoColumns = createAutoColumns(suggestions);
+        setColumns(autoColumns);
+        event('json_extract_auto_columns', 'Tool Usage', `target:json1|mode:${compareMode ? 'compare' : 'single'}|suggestions:${suggestions.length}`, autoColumns.length);
+        if (compareMode) {
+          setCompareModeCache((prev: typeof defaultCompareCache) => ({ ...prev, columns1: autoColumns }));
+        } else {
+          setSingleModeCache((prev: typeof defaultSingleCache) => ({ ...prev, columns: autoColumns }));
+        }
+      }
       setError('');
-    } catch {
+      event('json_extract_analyze_success', 'Tool Usage', `target:json1|mode:${compareMode ? 'compare' : 'single'}|suggestions:${suggestions.length}`, suggestions.length);
+    } catch (error) {
       setSuggestedPaths([]);
       // Don't set error here, let the user continue typing
+      event('json_extract_analyze_failure', 'Tool Usage', `target:json1|mode:${compareMode ? 'compare' : 'single'}|error:${error instanceof Error ? error.message : 'unknown'}`, jsonText.length);
     }
-  }, []);
+  }, [autoColumnsEnabled, compareMode]);
 
   // Analyze second JSON and generate suggestions
   const analyzeJSON2 = useCallback((jsonText: string) => {
@@ -661,19 +851,27 @@ function JSONExtractToolPageContent() {
         setSuggestedPaths2([]);
         return;
       }
-      
+
       const jsonData = JSON.parse(jsonText);
       const suggestions = generateSuggestedPaths(jsonData);
       setSuggestedPaths2(suggestions);
-    } catch {
+      if (autoColumns2Enabled) {
+        const autoColumns = createAutoColumns(suggestions);
+        setColumns2(autoColumns);
+        setCompareModeCache((prev: typeof defaultCompareCache) => ({ ...prev, columns2: autoColumns }));
+        event('json_extract_auto_columns', 'Tool Usage', `target:json2|mode:compare|suggestions:${suggestions.length}`, autoColumns.length);
+      }
+      event('json_extract_analyze_success', 'Tool Usage', `target:json2|mode:compare|suggestions:${suggestions.length}`, suggestions.length);
+    } catch (error) {
       setSuggestedPaths2([]);
+      event('json_extract_analyze_failure', 'Tool Usage', `target:json2|mode:compare|error:${error instanceof Error ? error.message : 'unknown'}`, jsonText.length);
     }
-  }, []);
+  }, [autoColumns2Enabled]);
 
   // Handle mode switch with caching
   const handleModeSwitch = (isCompareMode: boolean) => {
     if (isCompareMode === compareMode) return;
-    
+
     if (compareMode) {
       // Switching from compare to single mode
       const newCompareCache = {
@@ -683,13 +881,13 @@ function JSONExtractToolPageContent() {
         columns2: [...columns2]
       };
       setCompareModeCache(newCompareCache);
-      
+
       // Restore single mode cache
       setInputText(singleModeCache.inputText);
       setColumns(singleModeCache.columns);
       setInputText2('');
-      setColumns2([{ id: '1', name: 'Column 1', path: '$.properties.title' }]);
-      
+      setColumns2([DEFAULT_COLUMN]);
+
       // Analyze JSON if there's cached data
       if (singleModeCache.inputText.trim()) {
         analyzeJSON(singleModeCache.inputText);
@@ -701,13 +899,13 @@ function JSONExtractToolPageContent() {
         columns: [...columns]
       };
       setSingleModeCache(newSingleCache);
-      
+
       // Restore compare mode cache
       setInputText(compareModeCache.inputText1);
       setInputText2(compareModeCache.inputText2);
       setColumns(compareModeCache.columns1);
       setColumns2(compareModeCache.columns2);
-      
+
       // Analyze JSON if there's cached data
       if (compareModeCache.inputText1.trim()) {
         analyzeJSON(compareModeCache.inputText1);
@@ -716,8 +914,9 @@ function JSONExtractToolPageContent() {
         analyzeJSON2(compareModeCache.inputText2);
       }
     }
-    
+
     setCompareMode(isCompareMode);
+    event('json_extract_mode_switch', 'Tool Usage', `from:${compareMode ? 'compare' : 'single'}|to:${isCompareMode ? 'compare' : 'single'}`, inputText.length + inputText2.length);
     setResults([]);
     setResults2([]);
     setSortedResults([]);
@@ -735,7 +934,7 @@ function JSONExtractToolPageContent() {
     if (!jsonText.trim()) {
       return { isValid: true, error: '' };
     }
-    
+
     try {
       JSON.parse(jsonText);
       return { isValid: true, error: '' };
@@ -748,9 +947,9 @@ function JSONExtractToolPageContent() {
         const lines = jsonText.substring(0, position).split('\n');
         const lineNumber = lines.length;
         const columnNumber = lines[lines.length - 1].length + 1;
-        return { 
-          isValid: false, 
-          error: `Line ${lineNumber}, Column ${columnNumber}: ${err.message}` 
+        return {
+          isValid: false,
+          error: `Line ${lineNumber}, Column ${columnNumber}: ${err.message}`
         };
       }
       return { isValid: false, error: err.message };
@@ -762,20 +961,20 @@ function JSONExtractToolPageContent() {
     if (!path.trim()) {
       return { isValid: true, preview: '', error: '' };
     }
-    
+
     try {
       const results = extractPath(jsonData, path);
       if (results.length === 0) {
         return { isValid: true, preview: 'No results', error: '' };
       }
-      
+
       const preview = results.slice(0, 3).map(result => {
         if (typeof result === 'string') return `"${result}"`;
         if (result === null) return 'null';
         if (typeof result === 'object') return JSON.stringify(result);
         return String(result);
       }).join(', ');
-      
+
       const suffix = results.length > 3 ? ` ... (+${results.length - 3} more)` : '';
       return { isValid: true, preview: preview + suffix, error: '' };
     } catch (error) {
@@ -791,7 +990,7 @@ function JSONExtractToolPageContent() {
       setPathErrors(prev => ({ ...prev, [columnId]: '' }));
       return;
     }
-    
+
     const validation = validateJsonPath(path, jsonData);
     setPathPreviews(prev => ({ ...prev, [columnId]: validation.preview }));
     setPathErrors(prev => ({ ...prev, [columnId]: validation.error }));
@@ -800,12 +999,12 @@ function JSONExtractToolPageContent() {
   // Handle input change with debounced analysis
   const handleInputChange = (value: string) => {
     setInputText(value);
-    
+
     // Validate JSON
     const validation = validateJson(value);
     setIsValidJson(validation.isValid);
     setJsonError(validation.error);
-    
+
     // Update path previews if JSON is valid
     if (validation.isValid && value.trim()) {
       try {
@@ -833,7 +1032,7 @@ function JSONExtractToolPageContent() {
         return newPreviews;
       });
     }
-    
+
     // Update cache
     if (compareMode) {
       setCompareModeCache((prev: typeof defaultCompareCache) => ({ ...prev, inputText1: value }));
@@ -845,12 +1044,12 @@ function JSONExtractToolPageContent() {
   // Handle second input change with debounced analysis
   const handleInputChange2 = (value: string) => {
     setInputText2(value);
-    
+
     // Validate JSON
     const validation = validateJson(value);
     setIsValidJson2(validation.isValid);
     setJsonError2(validation.error);
-    
+
     // Update path previews if JSON is valid
     if (validation.isValid && value.trim()) {
       try {
@@ -878,7 +1077,7 @@ function JSONExtractToolPageContent() {
         return newPreviews;
       });
     }
-    
+
     // Update cache
     if (compareMode) {
       setCompareModeCache((prev: typeof defaultCompareCache) => ({ ...prev, inputText2: value }));
@@ -890,7 +1089,7 @@ function JSONExtractToolPageContent() {
     const timeoutId = setTimeout(() => {
       analyzeJSON(inputText);
     }, 500);
-    
+
     return () => clearTimeout(timeoutId);
   }, [inputText, analyzeJSON]);
 
@@ -899,21 +1098,37 @@ function JSONExtractToolPageContent() {
     const timeoutId = setTimeout(() => {
       analyzeJSON2(inputText2);
     }, 500);
-    
+
     return () => clearTimeout(timeoutId);
   }, [inputText2, analyzeJSON2]);
 
+  useEffect(() => {
+    if (!inputText.trim() || !isValidJson || (compareMode && (!inputText2.trim() || !isValidJson2))) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      extractData();
+    }, 350);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [columns, columns2, compareMode, extractData, inputText, inputText2, isValidJson, isValidJson2]);
+
   // Add suggested path to columns
   const addSuggestedPath = (path: string) => {
+    setAutoColumnsEnabled(false);
     const newId = (columns.length + 1).toString();
     const columnName = path.split('.').pop() || `Column ${newId}`;
     setColumns([...columns, { id: newId, name: columnName, path }]);
+    event('json_extract_suggested_path_add', 'Tool Usage', `target:json1|mode:${compareMode ? 'compare' : 'single'}|path:${path}`, path.length);
   };
 
   const addSuggestedPath2 = (path: string) => {
+    setAutoColumns2Enabled(false);
     const newId = (columns2.length + 1).toString();
     const columnName = path.split('.').pop() || `Column ${newId}`;
     setColumns2([...columns2, { id: newId, name: columnName, path }]);
+    event('json_extract_suggested_path_add', 'Tool Usage', `target:json2|mode:compare|path:${path}`, path.length);
   };
 
   // Copy paths from JSON1 to JSON2
@@ -923,35 +1138,37 @@ function JSONExtractToolPageContent() {
       id: col.id + '_copy'
     }));
     setColumns2(copiedColumns);
+    event('json_extract_paths_copy', 'Tool Usage', `from:json1|to:json2|columns:${copiedColumns.length}`, copiedColumns.length);
   };
 
 
   const handleSort = (columnName: string) => {
     let direction: 'asc' | 'desc' = 'asc';
-    
+
     if (sortConfig && sortConfig.key === columnName && sortConfig.direction === 'asc') {
       direction = 'desc';
     }
-    
+
     const sortedData = [...(sortedResults.length > 0 ? sortedResults : results)].sort((a, b) => {
       const aValue = a[columnName];
       const bValue = b[columnName];
-      
+
       // Handle null/undefined values
       if (aValue === null || aValue === undefined) return direction === 'asc' ? 1 : -1;
       if (bValue === null || bValue === undefined) return direction === 'asc' ? -1 : 1;
-      
+
       // Convert to string for comparison
       const aStr = String(aValue).toLowerCase();
       const bStr = String(bValue).toLowerCase();
-      
+
       if (aStr < bStr) return direction === 'asc' ? -1 : 1;
       if (aStr > bStr) return direction === 'asc' ? 1 : -1;
       return 0;
     });
-    
+
     setSortedResults(sortedData);
     setSortConfig({ key: columnName, direction });
+    event('json_extract_sort', 'Tool Usage', `target:json1|mode:${compareMode ? 'compare' : 'single'}|column:${columnName}|direction:${direction}`, sortedData.length);
   };
 
   // Handle sort for second JSON results
@@ -960,40 +1177,41 @@ function JSONExtractToolPageContent() {
     if (sortConfig2 && sortConfig2.key === columnName && sortConfig2.direction === 'asc') {
       direction = 'desc';
     }
-    
+
     const sortedData = [...results2].sort((a, b) => {
       const aValue = a[columnName];
       const bValue = b[columnName];
-      
+
       // Handle null/undefined values
       if (aValue === null || aValue === undefined) return direction === 'asc' ? 1 : -1;
       if (bValue === null || bValue === undefined) return direction === 'asc' ? -1 : 1;
-      
+
       // Convert to string for comparison
       const aStr = String(aValue).toLowerCase();
       const bStr = String(bValue).toLowerCase();
-      
+
       if (aStr < bStr) return direction === 'asc' ? -1 : 1;
       if (aStr > bStr) return direction === 'asc' ? 1 : -1;
       return 0;
     });
-    
+
     setSortedResults2(sortedData);
     setSortConfig2({ key: columnName, direction });
+    event('json_extract_sort', 'Tool Usage', `target:json2|mode:compare|column:${columnName}|direction:${direction}`, sortedData.length);
   };
 
   // Function to compare two values and determine if they are different
   const compareValues = (val1: unknown, val2: unknown): boolean => {
     if (val1 === null || val1 === undefined) val1 = '';
     if (val2 === null || val2 === undefined) val2 = '';
-    
+
     if (Array.isArray(val1) && Array.isArray(val2)) {
       return val1.join(', ') !== val2.join(', ');
     }
-    
+
     if (Array.isArray(val1)) val1 = val1.join(', ');
     if (Array.isArray(val2)) val2 = val2.join(', ');
-    
+
     return String(val1) !== String(val2);
   };
 
@@ -1043,24 +1261,25 @@ function JSONExtractToolPageContent() {
         }
       ]
     };
-    
+
     const jsonString = JSON.stringify(exampleData, null, 2);
     const newColumns = [
       { id: '1', name: 'Title', path: '$.features[*].properties.title' },
       { id: '2', name: 'Description', path: '$.features[*].properties.description' },
       { id: '3', name: 'Category', path: '$.features[*].properties.category' }
     ];
-    
+
     setInputText(jsonString);
     analyzeJSON(jsonString);
     setColumns(newColumns);
-    
+
     // Update cache
     const newSingleCache = {
       inputText: jsonString,
       columns: newColumns
     };
     setSingleModeCache(newSingleCache);
+    event('json_extract_example_load', 'Tool Usage', `mode:single|columns:${newColumns.length}`, jsonString.length);
   };
 
   const handleLoadCompareExample = () => {
@@ -1077,7 +1296,7 @@ function JSONExtractToolPageContent() {
           "vendor": "TechCorp"
         },
         {
-          "id": "p002", 
+          "id": "p002",
           "title": "Coffee Maker",
           "price": 129.99,
           "category": "Home & Kitchen",
@@ -1112,7 +1331,7 @@ function JSONExtractToolPageContent() {
           },
           {
             "sku": "CM-002",
-            "product_name": "Espresso Machine", 
+            "product_name": "Espresso Machine",
             "unit_price": 149.99,
             "dept": "Appliances",
             "customer_rating": 4.6,
@@ -1140,10 +1359,10 @@ function JSONExtractToolPageContent() {
         ]
       }
     };
-    
+
     const jsonString1 = JSON.stringify(exampleData1, null, 2);
     const jsonString2 = JSON.stringify(exampleData2, null, 2);
-    
+
     const newColumns1 = [
       { id: '1', name: 'Product', path: '$.products[*].title' },
       { id: '2', name: 'Price', path: '$.products[*].price' },
@@ -1151,7 +1370,7 @@ function JSONExtractToolPageContent() {
       { id: '4', name: 'Rating', path: '$.products[*].rating' },
       { id: '5', name: 'Status', path: '$.products[*].availability' }
     ];
-    
+
     const newColumns2 = [
       { id: '1', name: 'Product', path: '$.inventory.items[*].product_name' },
       { id: '2', name: 'Price', path: '$.inventory.items[*].unit_price' },
@@ -1159,14 +1378,14 @@ function JSONExtractToolPageContent() {
       { id: '4', name: 'Rating', path: '$.inventory.items[*].customer_rating' },
       { id: '5', name: 'Status', path: '$.inventory.items[*].stock_status' }
     ];
-    
+
     setInputText(jsonString1);
     setInputText2(jsonString2);
     analyzeJSON(jsonString1);
     analyzeJSON2(jsonString2);
     setColumns(newColumns1);
     setColumns2(newColumns2);
-    
+
     // Update cache
     const newCompareCache = {
       inputText1: jsonString1,
@@ -1175,16 +1394,17 @@ function JSONExtractToolPageContent() {
       columns2: newColumns2
     };
     setCompareModeCache(newCompareCache);
+    event('json_extract_example_load', 'Tool Usage', `mode:compare|columns:${newColumns1.length + newColumns2.length}`, jsonString1.length + jsonString2.length);
   };
 
   const exportToCSV = () => {
     const dataToExport = sortedResults.length > 0 ? sortedResults : results;
     if (dataToExport.length === 0) return;
-    
+
     const headers = columns.map(col => col.name);
     const csvContent = [
       headers.join(','),
-      ...dataToExport.map(row => 
+      ...dataToExport.map(row =>
         headers.map(header => {
           const value = row[header];
           if (value === null || value === undefined) return '';
@@ -1194,7 +1414,7 @@ function JSONExtractToolPageContent() {
         }).join(',')
       )
     ].join('\n');
-    
+
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -1202,14 +1422,15 @@ function JSONExtractToolPageContent() {
     a.download = 'extracted_data.csv';
     a.click();
     URL.revokeObjectURL(url);
+    event('json_extract_export_csv', 'Tool Usage', `mode:${compareMode ? 'compare' : 'single'}|rows:${dataToExport.length}|columns:${headers.length}`, dataToExport.length);
   };
 
   const copyMarkdown = () => {
     const dataToExport = sortedResults.length > 0 ? sortedResults : results;
     if (dataToExport.length === 0) return;
-    
+
     const headers = columns.map(col => col.name);
-    
+
     // Create markdown table
     const markdownContent = [
       // Header row
@@ -1217,7 +1438,7 @@ function JSONExtractToolPageContent() {
       // Separator row
       `| ${headers.map(() => '---').join(' | ')} |`,
       // Data rows
-      ...dataToExport.map(row => 
+      ...dataToExport.map(row =>
         `| ${headers.map(header => {
           const value = row[header];
           if (value === null || value === undefined) return '-';
@@ -1226,13 +1447,15 @@ function JSONExtractToolPageContent() {
         }).join(' | ')} |`
       )
     ].join('\n');
-    
+
     // Copy to clipboard
     navigator.clipboard.writeText(markdownContent).then(() => {
       setCopySuccess(true);
       setTimeout(() => setCopySuccess(false), 2000);
+      event('json_extract_copy_markdown_success', 'Tool Usage', `mode:${compareMode ? 'compare' : 'single'}|rows:${dataToExport.length}|columns:${headers.length}`, markdownContent.length);
     }).catch(err => {
       console.error('Failed to copy markdown:', err);
+      event('json_extract_copy_markdown_failure', 'Tool Usage', `mode:${compareMode ? 'compare' : 'single'}|rows:${dataToExport.length}`, markdownContent.length);
     });
   };
 
@@ -1240,7 +1463,7 @@ function JSONExtractToolPageContent() {
   const exportToJSON = () => {
     const dataToExport = sortedResults.length > 0 ? sortedResults : results;
     if (dataToExport.length === 0) return;
-    
+
     const jsonContent = JSON.stringify(dataToExport, null, 2);
     const blob = new Blob([jsonContent], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -1249,29 +1472,32 @@ function JSONExtractToolPageContent() {
     a.download = 'extracted_data.json';
     a.click();
     URL.revokeObjectURL(url);
+    event('json_extract_export_json', 'Tool Usage', `mode:${compareMode ? 'compare' : 'single'}|rows:${dataToExport.length}`, dataToExport.length);
   };
 
   // Copy as JSON
   const copyAsJSON = () => {
     const dataToExport = sortedResults.length > 0 ? sortedResults : results;
     if (dataToExport.length === 0) return;
-    
+
     const jsonContent = JSON.stringify(dataToExport, null, 2);
     navigator.clipboard.writeText(jsonContent).then(() => {
       setCopySuccess(true);
       setTimeout(() => setCopySuccess(false), 2000);
+      event('json_extract_copy_json_success', 'Tool Usage', `mode:${compareMode ? 'compare' : 'single'}|rows:${dataToExport.length}`, jsonContent.length);
     }).catch(err => {
       console.error('Failed to copy JSON:', err);
+      event('json_extract_copy_json_failure', 'Tool Usage', `mode:${compareMode ? 'compare' : 'single'}|rows:${dataToExport.length}`, jsonContent.length);
     });
   };
 
   // Export comparison results
   const exportComparisonResults = () => {
     if (!compareMode || results.length === 0) return;
-    
+
     const data1 = sortedResults.length > 0 ? sortedResults : results;
     const data2 = sortedResults2.length > 0 ? sortedResults2 : results2;
-    
+
     const comparisonData = {
       json1: {
         columns: columns.map(col => ({ name: col.name, path: col.path })),
@@ -1283,7 +1509,7 @@ function JSONExtractToolPageContent() {
       },
       exportedAt: new Date().toISOString()
     };
-    
+
     const jsonContent = JSON.stringify(comparisonData, null, 2);
     const blob = new Blob([jsonContent], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -1292,137 +1518,139 @@ function JSONExtractToolPageContent() {
     a.download = 'comparison_results.json';
     a.click();
     URL.revokeObjectURL(url);
+    event('json_extract_export_comparison_json', 'Tool Usage', `mode:compare|rows:${data1.length + data2.length}|columns:${columns.length + columns2.length}`, data1.length + data2.length);
   };
 
   return (
     <div className="min-h-screen flex flex-col" itemScope itemType="https://schema.org/WebApplication">
-      <main className="flex-1 pt-20 2xl:pt-22">
-        <div className='max-w-[2000px] mx-auto'>
-          <div className='overflow-hidden font-extrabold px-5 md:px-10 lg:px-16'>
-            {/* Breadcrumb */}
-            <motion.div 
-              className="mt-8 mb-6"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
+      <main className="flex-1 pt-20">
+        <section className="mx-auto max-w-[2000px] px-5 pb-8 pt-10 md:px-10 md:pb-10 md:pt-14 lg:px-16 lg:pb-12 lg:pt-20">
+          <div className="max-w-5xl">
+            <PrimaryPillLink
+              href={language === 'en' ? '/' : '/zh'}
+              className="min-h-10 transform-none px-4 text-sm hover:translate-x-0 hover:translate-y-0"
             >
-              <Link 
-                href={language === 'en' ? '/' : '/zh'}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-gray-800/50 hover:bg-gray-700/50 border border-gray-700 hover:border-[#a1c4fd]/50 rounded-lg text-gray-300 hover:text-[#a1c4fd] transition-all duration-200 backdrop-blur-sm text-sm font-medium"
-              >
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
-                </svg>
+                <span aria-hidden="true">←</span>
                 {t('json-extract.backToTools')}
-              </Link>
-            </motion.div>
+            </PrimaryPillLink>
 
-            <motion.h1 
-              className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#a1c4fd] to-[#c2e9fb] leading-tight text-center text-2xl mb-4 md:text-4xl md:mb-6 lg:text-5xl lg:mb-8"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
+            <SectionLabel className="mt-8">MOFEI DEV TOOLS</SectionLabel>
+            <h1
+              className="mt-5 max-w-4xl text-[40px] font-semibold leading-[0.98] tracking-[-0.02em] text-white md:text-[58px] lg:text-[68px]"
               itemProp="name"
             >
               {titleText}
-            </motion.h1>
-            
-            <motion.p 
-              className="text-gray-300/90 text-base md:text-lg lg:text-xl font-medium leading-relaxed tracking-wide text-center"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+            </h1>
+
+            <p
+              className="mt-6 max-w-3xl text-base leading-8 text-white/72 md:text-lg md:leading-9"
               itemProp="description"
             >
               {subtitleText}
-            </motion.p>
-          </div>
-          
-          <motion.div 
-            className="flex justify-center px-5 md:px-10 lg:px-16 py-2"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
-          >
-            <ContributeButton variant="ghost" size="sm" />
-          </motion.div>
-        </div>
+            </p>
 
-        <div className='max-w-[2000px] mx-auto px-5 md:px-10 lg:px-16 py-6 md:py-8 lg:py-12'>
-          <motion.div 
-            className="max-w-6xl mx-auto"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-          >
+            <div className="mt-8">
+              <ContributeButton variant="ghost" size="sm" />
+            </div>
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-[2000px] px-5 pb-10 pt-2 md:px-10 md:pb-14 lg:px-16 lg:pb-20">
+          <div className="mx-auto max-w-6xl space-y-5">
             {/* Mode Toggle */}
-            <div className="mb-6">
-              <div className="flex items-center gap-4">
-                <label className="text-white font-medium">Mode:</label>
-                <div className="flex bg-gray-800/50 border border-gray-700 rounded-lg p-1">
+            <GlassPanel className="transform-none p-4 hover:translate-y-0 md:p-6">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <label className="inline-flex items-center gap-2 text-sm font-medium text-white/84">
+                  <LabelIcon>
+                    <ColumnsIcon />
+                  </LabelIcon>
+                  {language === 'zh' ? '提取模式' : 'Extraction Mode'}
+                </label>
+                <div className="inline-flex rounded-full border border-white/[0.08] bg-white/[0.035] p-1">
                   <button
                     onClick={() => handleModeSwitch(false)}
-                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                    className={`inline-flex min-h-10 items-center gap-1.5 rounded-full px-5 text-sm font-medium transition-colors duration-200 ${
                       !compareMode
-                        ? 'bg-[#a1c4fd] text-gray-900'
-                        : 'text-gray-300 hover:text-white'
+                        ? 'bg-white text-slate-950'
+                        : 'text-white/58 hover:text-white'
                     }`}
                   >
                     {t('json-extract.singleMode')}
                   </button>
                   <button
                     onClick={() => handleModeSwitch(true)}
-                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                    className={`inline-flex min-h-10 items-center gap-1.5 rounded-full px-5 text-sm font-medium transition-colors duration-200 ${
                       compareMode
-                        ? 'bg-[#a1c4fd] text-gray-900'
-                        : 'text-gray-300 hover:text-white'
+                        ? 'bg-white text-slate-950'
+                        : 'text-white/58 hover:text-white'
                     }`}
                   >
                     {t('json-extract.compareMode')}
                   </button>
                 </div>
               </div>
-            </div>
+            </GlassPanel>
 
             {/* Input area */}
-            <div className="mb-6">
+            <GlassPanel className="transform-none p-4 hover:translate-y-0 md:p-6">
               {compareMode ? (
                 <div className="mb-4">
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-white font-medium">{t('json-extract.compareMode')}</h3>
-                    <div className="flex gap-2">
+                    <h3 className="inline-flex items-center gap-2 text-sm font-medium text-white/84">
+                      <LabelIcon>
+                        <JsonIcon />
+                      </LabelIcon>
+                      {t('json-extract.compareMode')}
+                    </h3>
+                    <div className="flex flex-wrap justify-end gap-2">
                       <button
                         onClick={handleLoadCompareExample}
-                        className="text-[#a1c4fd] hover:text-[#c2e9fb] text-sm transition-colors duration-200"
+                        className="inline-flex items-center gap-1.5 text-[#a1c4fd] hover:text-[#c2e9fb] text-sm transition-colors duration-200"
                       >
+                        <ExampleIcon />
                         {t('json-extract.loadCompareExample')}
                       </button>
                       <button
-                        onClick={handleClearCompare}
-                        className="text-gray-400 hover:text-white text-sm transition-colors duration-200"
+                        onClick={() => setUsageGuideOpen((open) => !open)}
+                        className="inline-flex items-center gap-1.5 text-white/56 hover:text-white text-sm transition-colors duration-200"
+                        aria-expanded={usageGuideOpen}
                       >
+                        <InfoIcon />
+                        {language === 'zh' ? '使用说明' : 'How To Use'}
+                      </button>
+                      <button
+                        onClick={handleClearCompare}
+                        className="inline-flex items-center gap-1.5 text-gray-400 hover:text-white text-sm transition-colors duration-200"
+                      >
+                        <ClearIcon />
                         {t('json-extract.clear')}
                       </button>
                     </div>
                   </div>
+                  {usageGuideOpen && <UsageGuide language={language} />}
                   <div className="grid gap-4 lg:grid-cols-2">
                     {/* First JSON input */}
                     <div>
                       <div className="mb-3">
-                        <label className="text-white font-medium">
+                        <label className="inline-flex items-center gap-2 text-sm font-medium text-white/84">
+                          <LabelIcon tone="cyan">
+                            <JsonIcon />
+                          </LabelIcon>
                           {t('json-extract.jsonData1')}
                         </label>
                       </div>
                       <div className="relative">
-                        <textarea
+                        <ResizableTextarea
                           value={inputText}
                           onChange={(e) => handleInputChange(e.target.value)}
                           placeholder={t('json-extract.placeholder')}
-                          className={`w-full h-48 bg-gray-800/50 border rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none resize-none font-mono text-sm ${
-                            !isValidJson 
-                              ? 'border-red-500 focus:border-red-400' 
-                              : 'border-gray-700 focus:border-[#a1c4fd]'
+                          initialHeight={192}
+                          containerClassName={`rounded-lg bg-gray-800/50 focus-within:ring-0 ${
+                            !isValidJson
+                              ? 'border-red-500 focus-within:border-red-400'
+                              : 'border-gray-700 focus-within:border-[#a1c4fd]'
                           }`}
+                          resizeTitle={language === 'zh' ? '拖拽调整 JSON 输入框高度' : 'Drag to resize JSON input height'}
                         />
                         {!isValidJson && (
                           <div className="absolute top-2 right-2">
@@ -1442,18 +1670,25 @@ function JSONExtractToolPageContent() {
                     {/* Second JSON input */}
                     <div>
                       <div className="mb-3">
-                        <label className="text-white font-medium">{t('json-extract.jsonData2')}</label>
+                        <label className="inline-flex items-center gap-2 text-sm font-medium text-white/84">
+                          <LabelIcon tone="emerald">
+                            <JsonIcon />
+                          </LabelIcon>
+                          {t('json-extract.jsonData2')}
+                        </label>
                       </div>
                       <div className="relative">
-                        <textarea
+                        <ResizableTextarea
                           value={inputText2}
                           onChange={(e) => handleInputChange2(e.target.value)}
                           placeholder={t('json-extract.placeholder')}
-                          className={`w-full h-48 bg-gray-800/50 border rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none resize-none font-mono text-sm ${
-                            !isValidJson2 
-                              ? 'border-red-500 focus:border-red-400' 
-                              : 'border-gray-700 focus:border-[#c2e9fb]'
+                          initialHeight={192}
+                          containerClassName={`rounded-lg bg-gray-800/50 focus-within:ring-0 ${
+                            !isValidJson2
+                              ? 'border-red-500 focus-within:border-red-400'
+                              : 'border-gray-700 focus-within:border-[#c2e9fb]'
                           }`}
+                          resizeTitle={language === 'zh' ? '拖拽调整 JSON 输入框高度' : 'Drag to resize JSON input height'}
                         />
                         {!isValidJson2 && (
                           <div className="absolute top-2 right-2">
@@ -1474,34 +1709,50 @@ function JSONExtractToolPageContent() {
               ) : (
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <label className="text-white font-medium">
+                    <label className="inline-flex items-center gap-2 text-sm font-medium text-white/84">
+                      <LabelIcon tone="cyan">
+                        <JsonIcon />
+                      </LabelIcon>
                       {t('json-extract.jsonData')}
                     </label>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap justify-end gap-2">
                       <button
                         onClick={handleLoadExample}
-                        className="text-[#a1c4fd] hover:text-[#c2e9fb] text-sm transition-colors duration-200"
+                        className="inline-flex items-center gap-1.5 text-[#a1c4fd] hover:text-[#c2e9fb] text-sm transition-colors duration-200"
                       >
+                        <ExampleIcon />
                         {t('json-extract.loadExample')}
                       </button>
                       <button
-                        onClick={handleClear}
-                        className="text-gray-400 hover:text-white text-sm transition-colors duration-200"
+                        onClick={() => setUsageGuideOpen((open) => !open)}
+                        className="inline-flex items-center gap-1.5 text-white/56 hover:text-white text-sm transition-colors duration-200"
+                        aria-expanded={usageGuideOpen}
                       >
+                        <InfoIcon />
+                        {language === 'zh' ? '使用说明' : 'How To Use'}
+                      </button>
+                      <button
+                        onClick={handleClear}
+                        className="inline-flex items-center gap-1.5 text-gray-400 hover:text-white text-sm transition-colors duration-200"
+                      >
+                        <ClearIcon />
                         {t('json-extract.clear')}
                       </button>
                     </div>
                   </div>
+                  {usageGuideOpen && <UsageGuide language={language} />}
                   <div className="relative">
-                    <textarea
+                    <ResizableTextarea
                       value={inputText}
                       onChange={(e) => handleInputChange(e.target.value)}
                       placeholder={t('json-extract.placeholder')}
-                      className={`w-full h-48 bg-gray-800/50 border rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none resize-none font-mono text-sm ${
-                        !isValidJson 
-                          ? 'border-red-500 focus:border-red-400' 
-                          : 'border-gray-700 focus:border-[#a1c4fd]'
+                      initialHeight={192}
+                      containerClassName={`rounded-lg bg-gray-800/50 focus-within:ring-0 ${
+                        !isValidJson
+                          ? 'border-red-500 focus-within:border-red-400'
+                          : 'border-gray-700 focus-within:border-[#a1c4fd]'
                       }`}
+                      resizeTitle={language === 'zh' ? '拖拽调整 JSON 输入框高度' : 'Drag to resize JSON input height'}
                     />
                     {!isValidJson && (
                       <div className="absolute top-2 right-2">
@@ -1518,16 +1769,56 @@ function JSONExtractToolPageContent() {
                   )}
                 </div>
               )}
-            </div>
+            </GlassPanel>
 
+            <GlassPanel className="transform-none p-4 hover:translate-y-0 md:p-6">
+              <button
+                type="button"
+                onClick={() => setAdvancedOpen((open) => !open)}
+                className="flex w-full items-center justify-between gap-4 text-left"
+                aria-expanded={advancedOpen}
+              >
+                <span className="flex min-w-0 flex-col gap-1">
+                  <span className="inline-flex items-center gap-2 text-sm font-medium text-white/84">
+                    <LabelIcon>
+                      <ColumnsIcon />
+                    </LabelIcon>
+                    {language === 'zh' ? '详细调整' : 'Advanced Options'}
+                  </span>
+                  <span className="pl-8 text-xs leading-5 text-white/42">
+                    {language === 'zh'
+                      ? '系统会自动提取，如果你需要调整细节请在这里调整'
+                      : 'Results are extracted automatically. Adjust details here only when needed.'}
+                  </span>
+                </span>
+                <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.035] text-white/58">
+                  <svg
+                    className={`h-3.5 w-3.5 transition-transform duration-200 ${advancedOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M6 9l6 6 6-6" />
+                  </svg>
+                </span>
+              </button>
+
+              {advancedOpen && (
+                <div className="mt-5 space-y-5">
             {/* Suggested paths */}
             {(suggestedPaths.length > 0 || suggestedPaths2.length > 0) && (
-              <div className="mb-6">
-                <label className="text-white font-medium mb-3 block">{t('json-extract.suggestedPaths')}</label>
+              <div className="rounded-[22px] border border-white/[0.08] bg-white/[0.025] p-4">
+                <label className="mb-3 inline-flex items-center gap-2 text-sm font-medium text-white/84">
+                  <LabelIcon>
+                    <JsonIcon />
+                  </LabelIcon>
+                  {t('json-extract.suggestedPaths')}
+                </label>
                 <div className={`grid gap-4 ${compareMode ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'}`}>
                   {/* First JSON suggestions */}
                   {suggestedPaths.length > 0 && (
-                    <div className="bg-gray-800/30 rounded-lg p-4 border border-gray-700">
+                    <div className="rounded-[18px] border border-white/[0.08] bg-white/[0.035] p-4">
                       <p className="text-gray-300 text-sm mb-3">
                         {compareMode ? `${t('json-extract.jsonData1')} - ${t('json-extract.suggestedPathsDesc')}` : t('json-extract.suggestedPathsDesc')}
                       </p>
@@ -1547,7 +1838,7 @@ function JSONExtractToolPageContent() {
 
                   {/* Second JSON suggestions */}
                   {compareMode && suggestedPaths2.length > 0 && (
-                    <div className="bg-gray-800/30 rounded-lg p-4 border border-gray-700">
+                    <div className="rounded-[18px] border border-white/[0.08] bg-white/[0.035] p-4">
                       <p className="text-gray-300 text-sm mb-3">
                         {t('json-extract.jsonData2')} - {t('json-extract.suggestedPathsDesc')}
                       </p>
@@ -1569,10 +1860,15 @@ function JSONExtractToolPageContent() {
             )}
 
             {/* Column configuration */}
-            <div className="mb-6">
+            <div className="rounded-[22px] border border-white/[0.08] bg-white/[0.025] p-4">
               {compareMode && (
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-white font-medium">{t('json-extract.extractionColumns')}</h3>
+                  <h3 className="inline-flex items-center gap-2 text-sm font-medium text-white/84">
+                    <LabelIcon>
+                      <ColumnsIcon />
+                    </LabelIcon>
+                    {t('json-extract.extractionColumns')}
+                  </h3>
                   <button
                     onClick={clearAllColumnsCompare}
                     className="text-red-400 hover:text-red-300 text-sm transition-colors duration-200 flex items-center gap-1"
@@ -1588,7 +1884,10 @@ function JSONExtractToolPageContent() {
                 {/* First JSON columns */}
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <label className="text-white font-medium">
+                    <label className="inline-flex items-center gap-2 text-sm font-medium text-white/84">
+                      <LabelIcon>
+                        <ColumnsIcon />
+                      </LabelIcon>
                       {compareMode ? `${t('json-extract.jsonData1')} - ${t('json-extract.extractionColumns')}` : t('json-extract.extractionColumns')}
                     </label>
                     <div className="flex gap-2">
@@ -1614,7 +1913,7 @@ function JSONExtractToolPageContent() {
                       </button>
                     </div>
                   </div>
-                  
+
                   <div className="space-y-3">
                     {columns.map((column) => (
                       <div key={column.id} className="flex gap-3 items-center p-3 bg-gray-800/30 rounded-lg border border-gray-700">
@@ -1623,6 +1922,7 @@ function JSONExtractToolPageContent() {
                             type="text"
                             value={column.name}
                             onChange={(e) => updateColumn(column.id, 'name', e.target.value)}
+                            onBlur={() => event('json_extract_column_update', 'Tool Usage', `target:json1|field:name|mode:${compareMode ? 'compare' : 'single'}`, column.name.length)}
                             placeholder={t('json-extract.columnName')}
                             className="w-full bg-gray-800/50 border border-gray-600 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-[#a1c4fd]"
                           />
@@ -1632,10 +1932,11 @@ function JSONExtractToolPageContent() {
                             type="text"
                             value={column.path}
                             onChange={(e) => updateColumn(column.id, 'path', e.target.value)}
+                            onBlur={() => event('json_extract_column_update', 'Tool Usage', `target:json1|field:path|mode:${compareMode ? 'compare' : 'single'}`, column.path.length)}
                             placeholder={t('json-extract.columnPath')}
                             className={`w-full bg-gray-800/50 border rounded px-3 py-2 text-white text-sm focus:outline-none font-mono ${
-                              pathErrors[column.id] 
-                                ? 'border-red-500 focus:border-red-400' 
+                              pathErrors[column.id]
+                                ? 'border-red-500 focus:border-red-400'
                                 : 'border-gray-600 focus:border-[#a1c4fd]'
                             }`}
                           />
@@ -1669,7 +1970,10 @@ function JSONExtractToolPageContent() {
                 {compareMode && (
                   <div>
                     <div className="flex items-center justify-between mb-3">
-                      <label className="text-white font-medium">
+                      <label className="inline-flex items-center gap-2 text-sm font-medium text-white/84">
+                        <LabelIcon>
+                          <ColumnsIcon />
+                        </LabelIcon>
                         {t('json-extract.jsonData2')} - {t('json-extract.extractionColumns')}
                       </label>
                       <div className="flex gap-2">
@@ -1693,7 +1997,7 @@ function JSONExtractToolPageContent() {
                         </button>
                       </div>
                     </div>
-                    
+
                     <div className="space-y-3">
                       {columns2.map((column) => (
                         <div key={column.id} className="flex gap-3 items-center p-3 bg-gray-800/30 rounded-lg border border-gray-700">
@@ -1702,6 +2006,7 @@ function JSONExtractToolPageContent() {
                               type="text"
                               value={column.name}
                               onChange={(e) => updateColumn2(column.id, 'name', e.target.value)}
+                              onBlur={() => event('json_extract_column_update', 'Tool Usage', `target:json2|field:name|mode:compare`, column.name.length)}
                               placeholder={t('json-extract.columnName')}
                               className="w-full bg-gray-800/50 border border-gray-600 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-[#c2e9fb]"
                             />
@@ -1711,10 +2016,11 @@ function JSONExtractToolPageContent() {
                               type="text"
                               value={column.path}
                               onChange={(e) => updateColumn2(column.id, 'path', e.target.value)}
+                              onBlur={() => event('json_extract_column_update', 'Tool Usage', `target:json2|field:path|mode:compare`, column.path.length)}
                               placeholder={t('json-extract.columnPath')}
                               className={`w-full bg-gray-800/50 border rounded px-3 py-2 text-white text-sm focus:outline-none font-mono ${
-                                pathErrors[column.id + '_json2'] 
-                                  ? 'border-red-500 focus:border-red-400' 
+                                pathErrors[column.id + '_json2']
+                                  ? 'border-red-500 focus:border-red-400'
                                   : 'border-gray-600 focus:border-[#c2e9fb]'
                               }`}
                             />
@@ -1746,17 +2052,9 @@ function JSONExtractToolPageContent() {
                 )}
               </div>
             </div>
-
-            {/* Extract button */}
-            <div className="flex justify-center mb-6">
-              <button
-                onClick={extractData}
-                disabled={isProcessing || !inputText.trim() || !isValidJson || (compareMode && (!inputText2.trim() || !isValidJson2))}
-                className="px-6 py-3 bg-gradient-to-r from-[#a1c4fd] to-[#c2e9fb] text-gray-900 font-medium rounded-lg hover:from-[#8fb3fc] hover:to-[#b1e1fa] transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-              >
-                {isProcessing ? t('json-extract.processing') : t('json-extract.extractData')}
-              </button>
-            </div>
+                </div>
+              )}
+            </GlassPanel>
 
             {/* Error message */}
             {error && (
@@ -1767,9 +2065,12 @@ function JSONExtractToolPageContent() {
 
             {/* Results */}
             {(sortedResults.length > 0 || results.length > 0) && (
-              <div className="mb-6">
+              <GlassPanel className="transform-none p-4 hover:translate-y-0 md:p-6">
                 <div className="flex items-center justify-between mb-3">
-                  <label className="text-white font-medium">
+                  <label className="inline-flex items-center gap-2 text-sm font-medium text-white/84">
+                    <LabelIcon>
+                      <ResultIcon />
+                    </LabelIcon>
                     {compareMode ? t('json-extract.compareResults') : t('json-extract.extractedData')} ({(sortedResults.length > 0 ? sortedResults : results).length} {t('json-extract.rows')})
                   </label>
                   <div className="flex flex-wrap gap-2">
@@ -1778,8 +2079,8 @@ function JSONExtractToolPageContent() {
                       <button
                         onClick={copyMarkdown}
                         className={`text-sm transition-colors duration-200 flex items-center gap-1 px-2 py-1 rounded ${
-                          copySuccess 
-                            ? 'text-green-400 hover:text-green-300 bg-green-500/10' 
+                          copySuccess
+                            ? 'text-green-400 hover:text-green-300 bg-green-500/10'
                             : 'text-[#a1c4fd] hover:text-[#c2e9fb] hover:bg-[#a1c4fd]/10'
                         }`}
                       >
@@ -1804,7 +2105,7 @@ function JSONExtractToolPageContent() {
                         {language === 'zh' ? '复制' : 'Copy'} JSON
                       </button>
                     </div>
-                    
+
                     {/* Export options */}
                     <div className="flex gap-1">
                       <button
@@ -1839,7 +2140,7 @@ function JSONExtractToolPageContent() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="bg-gray-800/30 rounded-lg border border-gray-700 overflow-hidden">
                   <div className="overflow-x-auto">
                     <table className="w-full">
@@ -1854,24 +2155,24 @@ function JSONExtractToolPageContent() {
                                 >
                                   {column.name}
                                   <div className="flex flex-col">
-                                    <svg 
+                                    <svg
                                       className={`w-3 h-3 ${
-                                        sortConfig?.key === column.name && sortConfig.direction === 'asc' 
-                                          ? 'text-[#a1c4fd]' 
+                                        sortConfig?.key === column.name && sortConfig.direction === 'asc'
+                                          ? 'text-[#a1c4fd]'
                                           : 'text-gray-500'
-                                      }`} 
-                                      fill="currentColor" 
+                                      }`}
+                                      fill="currentColor"
                                       viewBox="0 0 24 24"
                                     >
                                       <path d="M7 14l5-5 5 5z"/>
                                     </svg>
-                                    <svg 
+                                    <svg
                                       className={`w-3 h-3 -mt-1 ${
-                                        sortConfig?.key === column.name && sortConfig.direction === 'desc' 
-                                          ? 'text-[#a1c4fd]' 
+                                        sortConfig?.key === column.name && sortConfig.direction === 'desc'
+                                          ? 'text-[#a1c4fd]'
                                           : 'text-gray-500'
-                                      }`} 
-                                      fill="currentColor" 
+                                      }`}
+                                      fill="currentColor"
                                       viewBox="0 0 24 24"
                                     >
                                       <path d="M7 10l5 5 5-5z"/>
@@ -1933,24 +2234,24 @@ function JSONExtractToolPageContent() {
                                               >
                                                 {column.name}
                                                 <div className="flex flex-col">
-                                                  <svg 
+                                                  <svg
                                                     className={`w-3 h-3 ${
-                                                      sortConfig?.key === column.name && sortConfig.direction === 'asc' 
-                                                        ? 'text-[#a1c4fd]' 
+                                                      sortConfig?.key === column.name && sortConfig.direction === 'asc'
+                                                        ? 'text-[#a1c4fd]'
                                                         : 'text-gray-500'
-                                                    }`} 
-                                                    fill="currentColor" 
+                                                    }`}
+                                                    fill="currentColor"
                                                     viewBox="0 0 24 24"
                                                   >
                                                     <path d="M7 14l5-5 5 5z"/>
                                                   </svg>
-                                                  <svg 
+                                                  <svg
                                                     className={`w-3 h-3 -mt-1 ${
-                                                      sortConfig?.key === column.name && sortConfig.direction === 'desc' 
-                                                        ? 'text-[#a1c4fd]' 
+                                                      sortConfig?.key === column.name && sortConfig.direction === 'desc'
+                                                        ? 'text-[#a1c4fd]'
                                                         : 'text-gray-500'
-                                                    }`} 
-                                                    fill="currentColor" 
+                                                    }`}
+                                                    fill="currentColor"
                                                     viewBox="0 0 24 24"
                                                   >
                                                     <path d="M7 10l5 5 5-5z"/>
@@ -1970,7 +2271,7 @@ function JSONExtractToolPageContent() {
                                                 const value1 = row[column.name];
                                                 const correspondingCol2 = columns2.find(col => col.name === column.name);
                                                 const val2 = correspondingCol2 && row2 ? row2[correspondingCol2.name] : undefined;
-                                                
+
                                                 return (
                                                   <td key={column.id} className={`px-3 py-2 border-b border-gray-700/30 text-sm rounded-sm ${getComparisonClass(value1, val2, true, !!row2)}`}>
                                                     {formatValue(value1)}
@@ -2009,24 +2310,24 @@ function JSONExtractToolPageContent() {
                                               >
                                                 {column.name}
                                                 <div className="flex flex-col">
-                                                  <svg 
+                                                  <svg
                                                     className={`w-3 h-3 ${
-                                                      sortConfig2?.key === column.name && sortConfig2.direction === 'asc' 
-                                                        ? 'text-[#a1c4fd]' 
+                                                      sortConfig2?.key === column.name && sortConfig2.direction === 'asc'
+                                                        ? 'text-[#a1c4fd]'
                                                         : 'text-gray-500'
-                                                    }`} 
-                                                    fill="currentColor" 
+                                                    }`}
+                                                    fill="currentColor"
                                                     viewBox="0 0 24 24"
                                                   >
                                                     <path d="M7 14l5-5 5 5z"/>
                                                   </svg>
-                                                  <svg 
+                                                  <svg
                                                     className={`w-3 h-3 -mt-1 ${
-                                                      sortConfig2?.key === column.name && sortConfig2.direction === 'desc' 
-                                                        ? 'text-[#a1c4fd]' 
+                                                      sortConfig2?.key === column.name && sortConfig2.direction === 'desc'
+                                                        ? 'text-[#a1c4fd]'
                                                         : 'text-gray-500'
-                                                    }`} 
-                                                    fill="currentColor" 
+                                                    }`}
+                                                    fill="currentColor"
                                                     viewBox="0 0 24 24"
                                                   >
                                                     <path d="M7 10l5 5 5-5z"/>
@@ -2046,7 +2347,7 @@ function JSONExtractToolPageContent() {
                                                 const value2 = row[column.name];
                                                 const correspondingCol1 = columns.find(col => col.name === column.name);
                                                 const val1 = correspondingCol1 && row1 ? row1[correspondingCol1.name] : undefined;
-                                                
+
                                                 return (
                                                   <td key={column.id} className={`px-3 py-2 border-b border-gray-700/30 text-sm rounded-sm ${getComparisonClass(val1, value2, !!row1, true)}`}>
                                                     {formatValue(value2)}
@@ -2095,32 +2396,46 @@ function JSONExtractToolPageContent() {
                     </table>
                   </div>
                 </div>
-              </div>
+              </GlassPanel>
             )}
 
             {/* Usage instructions */}
-            <motion.div 
-              className="bg-gray-800/30 rounded-lg p-4 border border-gray-700"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.6 }}
-            >
-              <h2 className="text-white font-medium mb-2 flex items-center gap-2">
-                <svg className="w-5 h-5 text-[#a1c4fd]" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                </svg>
+            <GlassPanel className="transform-none p-4 hover:translate-y-0 md:p-6">
+              <h2 className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-white/84">
+                <LabelIcon>
+                  <InfoIcon />
+                </LabelIcon>
                 {t('json-extract.usageTitle')}
               </h2>
-              <ul className="text-gray-300 text-sm space-y-1">
-                <li>• <code className="bg-gray-700/50 px-2 py-1 rounded">$.properties.title</code> - {t('json-extract.usage1')}</li>
-                <li>• <code className="bg-gray-700/50 px-2 py-1 rounded">$.features[*].properties.name</code> - {t('json-extract.usage2')}</li>
-                <li>• <code className="bg-gray-700/50 px-2 py-1 rounded">$.data[0].value</code> - {t('json-extract.usage3')}</li>
-                <li>• <code className="bg-gray-700/50 px-2 py-1 rounded">$.users[*].profile.email</code> - {t('json-extract.usage4')}</li>
-                <li>• <code className="bg-gray-700/50 px-2 py-1 rounded">$.items[*].tags[*]</code> - {t('json-extract.usage5')}</li>
+              <ul className="space-y-2 text-sm leading-6 text-white/58">
+                <li className="flex gap-3">
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-white/38" aria-hidden="true" />
+                  <span><code className="rounded bg-white/[0.06] px-2 py-1 text-white/74">$.properties.title</code> - {t('json-extract.usage1')}</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-white/38" aria-hidden="true" />
+                  <span><code className="rounded bg-white/[0.06] px-2 py-1 text-white/74">$.features[*].properties.name</code> - {t('json-extract.usage2')}</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-white/38" aria-hidden="true" />
+                  <span><code className="rounded bg-white/[0.06] px-2 py-1 text-white/74">$.data[0].value</code> - {t('json-extract.usage3')}</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-white/38" aria-hidden="true" />
+                  <span><code className="rounded bg-white/[0.06] px-2 py-1 text-white/74">$.users[*].profile.email</code> - {t('json-extract.usage4')}</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-white/38" aria-hidden="true" />
+                  <span><code className="rounded bg-white/[0.06] px-2 py-1 text-white/74">$.items[*].tags[*]</code> - {t('json-extract.usage5')}</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-white/38" aria-hidden="true" />
+                  <span>{t('json-extract.usage6')}</span>
+                </li>
               </ul>
-            </motion.div>
-          </motion.div>
-        </div>
+            </GlassPanel>
+          </div>
+        </section>
       </main>
 
       <footer>

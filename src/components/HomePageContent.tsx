@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { GlassPanel, PrimaryPillLink, SectionLabel } from '@mofei-dev/ui';
 import ContributeButton from '@/components/Common/ContributeButton';
 import { getHomeTools, HOME_COPY } from '@/lib/tool-content';
 import type { SiteLanguage } from '@/lib/site';
@@ -13,34 +14,42 @@ export default function HomePageContent({ lang }: { lang: SiteLanguage }) {
 
   return (
     <main className="flex-1 pt-20">
-      <div className="max-w-[2000px] mx-auto">
-        <div className="overflow-hidden font-extrabold px-5 md:px-10 lg:px-16">
-          <h1 className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#a1c4fd] to-[#c2e9fb] leading-tight text-3xl mt-8 mb-4 md:text-5xl md:mt-12 md:mb-6 lg:text-6xl lg:mt-16 lg:mb-8 xl:text-7xl xl:mt-20 xl:mb-10">
+      <section className="mx-auto max-w-[2000px] px-5 pb-10 pt-12 md:px-10 md:pb-14 md:pt-16 lg:px-16 lg:pb-16 lg:pt-24">
+        <div className="max-w-5xl">
+          <SectionLabel className="mb-5">MOFEI DEV TOOLS</SectionLabel>
+          <h1 className="max-w-4xl text-[40px] font-semibold leading-[0.98] tracking-[-0.02em] text-white md:text-[64px] lg:text-[78px]">
             {content.title}
           </h1>
 
-          <p className="text-gray-300/90 text-lg md:text-xl lg:text-2xl font-medium leading-relaxed tracking-wide mb-8">
+          <p className="mt-6 max-w-3xl text-base leading-8 text-white/72 md:text-lg md:leading-9">
             {content.subtitle}
           </p>
 
-          <div className="flex justify-center pb-2">
-            <ContributeButton variant="primary" size="lg" />
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <PrimaryPillLink href="#tools-list" className="transform-none hover:translate-x-0 hover:translate-y-0">
+              {lang === 'zh' ? '浏览工具' : 'Browse tools'}
+              <span aria-hidden="true">↓</span>
+            </PrimaryPillLink>
+            <ContributeButton variant="ghost" size="sm" />
           </div>
         </div>
-      </div>
+      </section>
 
-      <div className="max-w-[2000px] mx-auto px-5 md:px-10 lg:px-16 py-6 md:py-8 lg:py-12">
+      <div id="tools-list" className="max-w-[2000px] mx-auto scroll-mt-24 px-5 md:px-10 lg:px-16 pb-6 pt-2 md:pb-8 lg:pb-12">
         {categories.map((category) => (
           <section key={category.key} className="mb-12 md:mb-16">
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-6 md:mb-8 flex items-center gap-3">
-              <div className="w-1 h-8 bg-gradient-to-b from-[#a1c4fd] to-[#c2e9fb] rounded-full"></div>
+            <div className="mb-6 flex items-center gap-3 md:mb-8">
+              <SectionLabel>{category.title}</SectionLabel>
+              <span className="h-px flex-1 bg-gradient-to-r from-white/12 to-transparent" />
+              <h2 className="sr-only">
               {category.title}
-            </h2>
+              </h2>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
               {category.tools.map((tool) => (
                 <Link key={tool.path} href={tool.path} className="block h-full">
-                  <article className="bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-6 border border-gray-700 hover:border-[#a1c4fd]/50 h-full flex flex-col relative">
+                  <GlassPanel className="relative flex h-full transform-none flex-col p-6 hover:translate-y-0">
                     <div className="flex flex-col items-center text-center mb-4">
                       <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#a1c4fd] to-[#c2e9fb] flex items-center justify-center flex-shrink-0 text-2xl mb-3">
                         {tool.icon}
@@ -58,7 +67,7 @@ export default function HomePageContent({ lang }: { lang: SiteLanguage }) {
                     <p className="text-gray-300 text-sm leading-relaxed flex-1 text-center">
                       {tool.description}
                     </p>
-                  </article>
+                  </GlassPanel>
                 </Link>
               ))}
             </div>
@@ -66,7 +75,7 @@ export default function HomePageContent({ lang }: { lang: SiteLanguage }) {
         ))}
 
         <section className="mt-16 md:mt-20">
-          <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 md:p-8 border border-gray-700">
+          <GlassPanel className="transform-none p-6 hover:translate-y-0 md:p-8">
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 bg-gradient-to-br from-[#a1c4fd] to-[#c2e9fb] rounded-full flex items-center justify-center flex-shrink-0">
                 <svg className="w-6 h-6 text-gray-900" fill="currentColor" viewBox="0 0 24 24">
@@ -76,9 +85,19 @@ export default function HomePageContent({ lang }: { lang: SiteLanguage }) {
               <div className="flex-1">
                 <h2 className="text-xl font-bold text-white mb-2">{content.moreTools}</h2>
                 <p className="text-gray-300">{content.moreToolsDesc}</p>
+                <div className="mt-5">
+                  <PrimaryPillLink
+                    href="https://github.com/zmofei/mofei-dev-tools/discussions/new?category=ideas"
+                    className="transform-none hover:translate-x-0 hover:translate-y-0"
+                  >
+                    <span aria-hidden="true">💡</span>
+                    {content.submitIdea}
+                    <span aria-hidden="true">→</span>
+                  </PrimaryPillLink>
+                </div>
               </div>
             </div>
-          </div>
+          </GlassPanel>
         </section>
       </div>
     </main>
