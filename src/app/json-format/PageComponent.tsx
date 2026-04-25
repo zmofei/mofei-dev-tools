@@ -226,7 +226,7 @@ export default function JsonFormatPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <main className="flex-1 pt-10">
-        <section className="mx-auto max-w-[2000px] px-5 pb-8 pt-8 md:px-10 lg:px-16 lg:pt-12">
+        <section className="mx-auto max-w-[2000px] px-5 pb-8 pt-6 md:px-10 md:pt-8 lg:px-16 lg:pt-12">
           <div className="max-w-5xl">
             <PrimaryPillLink href={lang === 'zh' ? '/zh' : '/'} className="min-h-10 transform-none px-4 text-sm hover:translate-x-0 hover:translate-y-0">
               <span aria-hidden="true">←</span>

@@ -558,12 +558,12 @@ function GeoJSONToolPageContent() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <main className="flex-1 pt-20 2xl:pt-22">
+      <main className="flex-1 pt-10">
         <div className='max-w-[2000px] mx-auto'>
         <div className='overflow-hidden font-extrabold px-5 md:px-10 lg:px-16'>
           {/* Breadcrumb */}
           <motion.div 
-            className="mt-8 mb-6"
+            className="mb-6 mt-4"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
@@ -1114,7 +1114,7 @@ function GeoJSONToolPageContent() {
 function GeoJSONToolPageFallback() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-900">
-      <main className="flex-1 pt-20 2xl:pt-22">
+      <main className="flex-1 pt-10">
         <div className="max-w-[2000px] mx-auto px-5 md:px-10 lg:px-16 py-6 md:py-8 lg:py-12">
           <div className="flex justify-center items-center h-64">
             <div className="text-white">Loading...</div>

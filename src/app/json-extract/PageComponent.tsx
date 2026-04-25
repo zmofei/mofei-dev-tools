@@ -1523,8 +1523,8 @@ function JSONExtractToolPageContent() {
 
   return (
     <div className="min-h-screen flex flex-col" itemScope itemType="https://schema.org/WebApplication">
-      <main className="flex-1 pt-20">
-        <section className="mx-auto max-w-[2000px] px-5 pb-8 pt-10 md:px-10 md:pb-10 md:pt-14 lg:px-16 lg:pb-12 lg:pt-20">
+      <main className="flex-1 pt-10">
+        <section className="mx-auto max-w-[2000px] px-5 pb-8 pt-6 md:px-10 md:pb-10 md:pt-8 lg:px-16 lg:pb-12 lg:pt-12">
           <div className="max-w-5xl">
             <PrimaryPillLink
               href={language === 'en' ? '/' : '/zh'}

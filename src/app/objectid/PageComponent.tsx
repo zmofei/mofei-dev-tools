@@ -401,8 +401,8 @@ function ObjectIdToolPageContent() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <main className="flex-1 pt-20">
-        <section className="mx-auto max-w-[2000px] px-5 pb-8 pt-10 md:px-10 md:pb-10 md:pt-14 lg:px-16 lg:pb-12 lg:pt-20">
+      <main className="flex-1 pt-10">
+        <section className="mx-auto max-w-[2000px] px-5 pb-8 pt-6 md:px-10 md:pb-10 md:pt-8 lg:px-16 lg:pb-12 lg:pt-12">
           <div className="max-w-5xl">
             <PrimaryPillLink
               href={language === 'en' ? '/' : '/zh'}
@@ -747,7 +747,7 @@ function ObjectIdToolPageContent() {
 function ObjectIdToolPageFallback() {
   return (
     <div className="min-h-screen flex flex-col">
-      <main className="flex-1 pt-20 2xl:pt-22">
+      <main className="flex-1 pt-10">
         <div className="max-w-[2000px] mx-auto px-5 md:px-10 lg:px-16 py-6 md:py-8 lg:py-12">
           <div className="flex justify-center items-center h-64">
             <div className="text-white">Loading...</div>
