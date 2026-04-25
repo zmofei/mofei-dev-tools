@@ -246,3 +246,61 @@ test('json extract functions suggest paths, create columns, and extract row valu
   assert.ok(generateSuggestedJsonPaths(json[0]).includes('$.properties.title'));
   assert.ok(generateSuggestedJsonPaths(json[0]).includes('$.tags[*]'));
 });
+
+test('json formatter functions format, minify, inspect, and create paths', () => {
+  const {
+    formatJson,
+    getJsonStats,
+    jsonPathForChild,
+    normalizeJsonLike,
+    normalizeJsonLikeWithReasons,
+  } = loadTsModule('src/lib/json-format-tool.ts');
+
+  const input = '{"name":"Mofei","items":[1,true,null],"meta":{"city":"Helsinki"}}';
+  const result = formatJson(input, 2);
+
+  assert.equal(result.ok, true);
+  assert.equal(result.parser, 'strict');
+  assert.equal(result.minified, input);
+  assert.match(result.formatted, /\n  "items": \[/);
+  assert.equal(result.stats.keys, 4);
+  assert.equal(result.stats.arrays, 1);
+  assert.equal(result.stats.objects, 2);
+  assert.equal(result.stats.booleans, 1);
+  assert.equal(result.stats.nulls, 1);
+  assert.equal(jsonPathForChild('$.meta', 'city'), '$.meta.city');
+  assert.equal(jsonPathForChild('$', 'not-simple key'), '$["not-simple key"]');
+  assert.equal(jsonPathForChild('$.items', 0), '$.items[0]');
+
+  assert.deepEqual(plain(getJsonStats({ ok: true, list: [1, 2] })), {
+    keys: 2,
+    arrays: 1,
+    objects: 1,
+    strings: 0,
+    numbers: 2,
+    booleans: 1,
+    nulls: 0,
+    maxDepth: 2,
+  });
+
+  const invalid = formatJson('{bad');
+  assert.equal(invalid.ok, false);
+  assert.match(invalid.error, /JSON|property|position/i);
+
+  const jsonLike = `{
+    auth: "剧中人",
+    gender: 'male',
+    website: "http://bh-lay.com",
+    hobbies: ["photography", "coding",],
+  }`;
+  const tolerant = formatJson(jsonLike);
+
+  assert.equal(tolerant.ok, true);
+  assert.equal(tolerant.parser, 'tolerant');
+  assert.deepEqual(plain(tolerant.tolerantReasons), ['unquotedKeys', 'singleQuotedStrings', 'trailingCommas']);
+  assert.equal(tolerant.value.auth, '剧中人');
+  assert.equal(tolerant.value.gender, 'male');
+  assert.deepEqual(plain(tolerant.value.hobbies), ['photography', 'coding']);
+  assert.deepEqual(JSON.parse(normalizeJsonLike(jsonLike)), plain(tolerant.value));
+  assert.deepEqual(plain(normalizeJsonLikeWithReasons('{// note\nok: true}').reasons), ['comments', 'unquotedKeys']);
+});

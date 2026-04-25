@@ -142,8 +142,8 @@ function assertSeoEntry(toolName, language, seo) {
   assert.equal(seo.locale, language === 'zh' ? 'zh_CN' : 'en_US');
 }
 
-test('base64 and geojson SEO entries contain required en and zh metadata', () => {
-  for (const toolName of ['base64', "'base64-image'", 'geojson']) {
+test('base64, json-format, and geojson SEO entries contain required en and zh metadata', () => {
+  for (const toolName of ['base64', "'base64-image'", "'json-format'", 'geojson']) {
     const seo = evaluateObjectLiteral(extractObjectLiteral(toolSeoSource, toolName));
 
     assert.deepEqual(Object.keys(seo).sort(), ['en', 'zh']);
@@ -157,7 +157,7 @@ test('ordinary tool path rules keep English unprefixed and Chinese under /zh', (
   assert.match(siteSource, /language === 'zh' \? `\/zh\/\$\{slug\}` : `\/\$\{slug\}`/);
   assert.doesNotMatch(siteSource, /`\/en\/\$\{slug\}`/);
 
-  for (const slug of ['base64', 'base64-image', 'geojson']) {
+  for (const slug of ['base64', 'base64-image', 'json-format', 'geojson']) {
     assert.match(siteSource, new RegExp(`'${slug}'`), `${slug} should be a configured tool slug`);
   }
 });
@@ -168,38 +168,42 @@ test('sitemap gives ordinary tools en-US, zh-CN, and x-default alternates', () =
   assert.match(sitemapSource, /'zh-CN': `\$\{SITE_URL\}\/zh\/\$\{slug\}`/);
   assert.match(sitemapSource, /'x-default': `\$\{SITE_URL\}\/\$\{slug\}`/);
 
-  for (const slug of ['base64', 'base64-image', 'geojson']) {
+  for (const slug of ['base64', 'base64-image', 'json-format', 'geojson']) {
     const keyPattern = slug.includes('-') ? `'${slug}'` : slug;
     assert.match(sitemapSource, new RegExp(`${keyPattern}: \\{ changeFrequency:`), `${slug} should be in TOOL_CONFIG`);
   }
 });
 
-test('generated sitemap and robots include base64-image canonical routes', () => {
+test('generated sitemap and robots include ordinary tool canonical routes', () => {
   const sitemap = loadTsModule('src/app/sitemap.ts').default();
   const robots = loadTsModule('src/app/robots.ts').default();
   const urls = sitemap.map((entry) => entry.url);
-  const base64ImageEn = sitemap.find((entry) => entry.url === 'https://tools.mofei.life/base64-image');
-  const base64ImageZh = sitemap.find((entry) => entry.url === 'https://tools.mofei.life/zh/base64-image');
 
-  assert.ok(base64ImageEn, 'English base64-image URL should be in sitemap');
-  assert.ok(base64ImageZh, 'Chinese base64-image URL should be in sitemap');
-  assert.ok(!urls.includes('https://tools.mofei.life/en/base64-image'), 'non-canonical /en/base64-image should not be in sitemap');
+  for (const slug of ['base64-image', 'json-format']) {
+    const englishEntry = sitemap.find((entry) => entry.url === `https://tools.mofei.life/${slug}`);
+    const chineseEntry = sitemap.find((entry) => entry.url === `https://tools.mofei.life/zh/${slug}`);
 
-  for (const entry of [base64ImageEn, base64ImageZh]) {
-    assert.deepEqual(JSON.parse(JSON.stringify(entry.alternates.languages)), {
-      'en-US': 'https://tools.mofei.life/base64-image',
-      'zh-CN': 'https://tools.mofei.life/zh/base64-image',
-      'x-default': 'https://tools.mofei.life/base64-image',
-    });
+    assert.ok(englishEntry, `English ${slug} URL should be in sitemap`);
+    assert.ok(chineseEntry, `Chinese ${slug} URL should be in sitemap`);
+    assert.ok(!urls.includes(`https://tools.mofei.life/en/${slug}`), `non-canonical /en/${slug} should not be in sitemap`);
+
+    for (const entry of [englishEntry, chineseEntry]) {
+      assert.deepEqual(JSON.parse(JSON.stringify(entry.alternates.languages)), {
+        'en-US': `https://tools.mofei.life/${slug}`,
+        'zh-CN': `https://tools.mofei.life/zh/${slug}`,
+        'x-default': `https://tools.mofei.life/${slug}`,
+      });
+    }
+
+    assert.ok(robots.rules.allow.includes(`/${slug}`), `robots should allow English ${slug} route`);
+    assert.ok(robots.rules.allow.includes(`/zh/${slug}`), `robots should allow Chinese ${slug} route`);
   }
 
-  assert.ok(robots.rules.allow.includes('/base64-image'), 'robots should allow English base64-image route');
-  assert.ok(robots.rules.allow.includes('/zh/base64-image'), 'robots should allow Chinese base64-image route');
   assert.ok(robots.rules.disallow.includes('/api/'), 'robots should keep API routes disallowed');
 });
 
-test('localized base64, base64-image, and geojson pages reject unsupported languages', async () => {
-  for (const toolName of ['base64', 'base64-image', 'geojson']) {
+test('localized base64, json-format, and geojson pages reject unsupported languages', async () => {
+  for (const toolName of ['base64', 'base64-image', 'json-format', 'geojson']) {
     const pageSource = await readFile(new URL(`src/app/[lang]/${toolName}/page.tsx`, ROOT), 'utf8');
     const layoutSource = await readFile(new URL(`src/app/[lang]/${toolName}/layout.tsx`, ROOT), 'utf8');
 

@@ -5,6 +5,7 @@ export const TOOL_SLUGS = [
   'base64-image',
   'bbox',
   'geojson',
+  'json-format',
   'json-extract',
   'coordinate-converter',
   'objectid',

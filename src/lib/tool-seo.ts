@@ -209,6 +209,40 @@ export const TOOL_SEO: Record<ToolSlug, Record<SiteLanguage, ToolSeoEntry>> = {
       },
     },
   },
+  'json-format': {
+    zh: {
+      title: '免费 JSON 格式化工具 - 在线 JSON 查看器与校验器 | Mofei 工具',
+      description: '使用免费的在线 JSON 格式化工具格式化、压缩、校验和查看 JSON 数据。支持可折叠树形视图、复制结果和本地浏览器处理，适合 API 调试、配置检查和数据分析。',
+      keywords: ['JSON 格式化', 'JSON 查看器', 'JSON 校验器', 'JSON 压缩', 'JSON 美化', '在线 JSON 工具', 'JSON 树形查看', 'JSON 格式检查', 'API 调试', 'JSON 格式化工具', '免费 JSON 工具', 'JSON 在线格式化'],
+      category: '开发工具',
+      classification: 'JSON 处理工具',
+      locale: 'zh_CN',
+      openGraph: {
+        title: '免费 JSON 格式化工具 - 在线 JSON 查看器与校验器',
+        description: '格式化、压缩、校验 JSON，并使用可折叠树形视图快速查看数据结构。',
+      },
+      twitter: {
+        title: '免费 JSON 格式化工具 - 在线 JSON 查看器与校验器',
+        description: '格式化、压缩、校验 JSON，并使用可折叠树形视图快速查看数据结构。',
+      },
+    },
+    en: {
+      title: "Free JSON Formatter & Viewer - Online JSON Validator | Mofei's Tools",
+      description: 'Format, minify, validate, and inspect JSON with a free online JSON formatter. Includes a collapsible JSON tree viewer, copy-ready output, and local browser processing for API debugging, config review, and data inspection.',
+      keywords: ['JSON formatter', 'JSON viewer', 'JSON validator', 'JSON minifier', 'JSON beautifier', 'online JSON tool', 'collapsible JSON tree', 'JSON format checker', 'API debugging', 'free JSON formatter', 'online JSON formatter'],
+      category: 'Developer Tools',
+      classification: 'JSON Processing Tool',
+      locale: 'en_US',
+      openGraph: {
+        title: 'Free JSON Formatter & Viewer - Online JSON Validator',
+        description: 'Format, minify, validate, and inspect JSON with a collapsible tree viewer.',
+      },
+      twitter: {
+        title: 'Free JSON Formatter & Viewer - Online JSON Validator',
+        description: 'Format, minify, validate, and inspect JSON with a collapsible tree viewer.',
+      },
+    },
+  },
   objectid: {
     zh: {
       title: '免费 MongoDB ObjectID 生成器 - 在线创建唯一数据库标识符 | Mofei 工具',

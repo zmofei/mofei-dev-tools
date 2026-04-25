@@ -114,6 +114,17 @@ function getToolStructuredDataConfig(
           ? ['免费使用', '无需注册', '支持中英文', '在线处理', 'JSONPath 语法支持', '多列提取', '数组遍历', 'CSV 导出', '对比模式', '实时预览']
           : ['Free to use', 'No registration required', 'Bilingual support', 'Online processing', 'JSONPath syntax support', 'Multi-column extraction', 'Array traversal', 'CSV export', 'Comparison mode', 'Real-time preview'],
       };
+    case 'json-format':
+      return {
+        name: isZh ? '免费 JSON 格式化与查看工具' : 'Free JSON Formatter & Viewer',
+        description: isZh
+          ? '免费在线 JSON 格式化工具，支持格式化、压缩、校验和可折叠树形查看。'
+          : 'Free online JSON formatter with minify, validation, and collapsible tree inspection.',
+        applicationSubCategory: isZh ? 'JSON 工具' : 'JSON Tool',
+        featureList: isZh
+          ? ['免费使用', '无需注册', '支持中英文', '浏览器本地处理', 'JSON 格式化', 'JSON 压缩', 'JSON 校验', '树形查看', '折叠展开', '复制结果']
+          : ['Free to use', 'No registration required', 'Bilingual support', 'Local browser processing', 'JSON formatting', 'JSON minifying', 'JSON validation', 'Tree viewer', 'Collapse and expand', 'Copy output'],
+      };
     case 'objectid':
       return {
         name: isZh ? '免费 MongoDB ObjectID 生成器' : 'Free MongoDB ObjectID Generator',
@@ -138,8 +149,8 @@ function getWebsiteStructuredData(language: SiteLanguage) {
     name: language === 'zh' ? 'Mofei开发工具集合' : 'Mofei Dev Tools',
     description:
       language === 'zh'
-        ? 'Mofei开发工具集合：文本 Base64 转换、GeoJSON预览、JSONPath 提取等实用开发工具。免费在线使用，支持中英文界面。'
-        : 'Collection of useful development tools: text Base64 conversion, GeoJSON preview, JSON Path extraction, and more. Free online tools with a bilingual interface.',
+        ? 'Mofei开发工具集合：文本 Base64 转换、JSON 格式化、JSONPath 提取、GeoJSON预览等实用开发工具。免费在线使用，支持中英文界面。'
+        : 'Collection of useful development tools: text Base64 conversion, JSON formatting, JSON Path extraction, GeoJSON preview, and more. Free online tools with a bilingual interface.',
     url: homeUrl(language),
     author: {
       '@type': 'Person',

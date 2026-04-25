@@ -19,7 +19,7 @@ export const HOME_COPY = {
     title: 'Tools Collection',
     subtitle: 'These are the handy tools Mofei frequently uses during development. Sharing them with you, hoping to make your work a bit easier.',
     moreTools: 'Tools Being Considered',
-    moreToolsDesc: 'Planned additions focus on everyday development chores: JSON formatting, color conversion, regex testing, and small data cleanup tasks.',
+    moreToolsDesc: 'Planned additions focus on everyday development chores: color conversion, regex testing, timestamp parsing, and small data cleanup tasks.',
     submitIdea: 'Submit a tool idea',
     categories: {
       dev: 'Development Tools',
@@ -28,9 +28,9 @@ export const HOME_COPY = {
   },
   zh: {
     title: '工具合集',
-    subtitle: '这些是 Mofei 在开发过程中经常使用的便捷工具。分享给大家，希望能让你的工作更轻松一些。',
+    subtitle: '这些是我在开发过程中经常使用的便捷工具。分享给大家，希望能让你的工作更轻松一些。',
     moreTools: '正在整理更多常用工具',
-    moreToolsDesc: '后续会优先补齐日常开发里高频但零散的小工具，比如 JSON 格式化、颜色转换、正则测试和数据清理。',
+    moreToolsDesc: '后续会优先补齐日常开发里高频但零散的小工具，比如颜色转换、正则测试、时间戳解析和数据清理。',
     submitIdea: '提交工具想法',
     categories: {
       dev: '开发工具',
@@ -84,6 +84,22 @@ export const TOOL_CONTENT: Record<ToolSlug, ToolEntry> = {
       zh: {
         name: 'JSON 路径提取',
         description: '使用 JSONPath 语法从 JSON 数据中提取特定值',
+        categoryLabel: '开发工具',
+      },
+    },
+  },
+  'json-format': {
+    icon: '🧩',
+    category: 'dev',
+    copy: {
+      en: {
+        name: 'JSON Formatter & Viewer',
+        description: 'Format, minify, validate, and inspect JSON with a collapsible tree viewer',
+        categoryLabel: 'Development Tools',
+      },
+      zh: {
+        name: 'JSON 格式化与查看',
+        description: '格式化、压缩、校验 JSON，并用可折叠树形视图查看结构',
         categoryLabel: '开发工具',
       },
     },

@@ -89,6 +89,43 @@ test('json-extract en/zh SEO config is complete and English has openGraph/twitte
   assert.match(localizedLayout, /createToolMetadata\(\{\s*slug:\s*'json-extract',\s*\.\.\.TOOL_SEO\['json-extract'\]\[lang\]/s);
 });
 
+test('json-format SEO and localized routes follow canonical tool routing', () => {
+  const toolSeo = readSource('src/lib/tool-seo.ts');
+  const site = readSource('src/lib/site.ts');
+  const structuredData = readSource('src/components/StructuredData.tsx');
+  const jsonFormatBlock = extractObjectLiteral(toolSeo, "'json-format':");
+  const zhBlock = extractObjectLiteral(jsonFormatBlock, 'zh:');
+  const enBlock = extractObjectLiteral(jsonFormatBlock, 'en:');
+  const requiredSeoFields = [
+    'title',
+    'description',
+    'keywords',
+    'category',
+    'classification',
+    'locale',
+    'openGraph',
+    'twitter',
+  ];
+
+  assert.match(site, /'json-format'/, 'json-format should be included in TOOL_SLUGS');
+  assertHasFields('json-format zh SEO', zhBlock, requiredSeoFields);
+  assertHasFields('json-format en SEO', enBlock, requiredSeoFields);
+  assert.match(enBlock, /locale:\s*'en_US'/, 'English json-format SEO should use en_US locale');
+  assert.match(zhBlock, /locale:\s*'zh_CN'/, 'Chinese json-format SEO should use zh_CN locale');
+  assert.match(structuredData, /case\s+'json-format':/, 'StructuredData should include json-format');
+
+  const rootRoute = readSource('src/app/json-format/page.tsx');
+  const localizedPage = readSource('src/app/[lang]/json-format/page.tsx');
+  const localizedLayout = readSource('src/app/[lang]/json-format/layout.tsx');
+
+  assert.match(rootRoute, /createToolMetadata\(\{\s*slug:\s*'json-format',\s*\.\.\.getToolSeo\('json-format',\s*'en'\)/s);
+  assert.match(rootRoute, /StructuredData\s+type="tool"\s+language="en"\s+slug="json-format"/);
+  assert.match(localizedPage, /isSiteLanguage\(lang\)/, 'localized json-format page should validate lang');
+  assert.match(localizedPage, /generateStaticParams\(\)/, 'localized json-format page should statically enumerate languages');
+  assert.match(localizedPage, /SITE_LANGUAGES\.map/, 'localized json-format page should use SITE_LANGUAGES');
+  assert.match(localizedLayout, /createToolMetadata\(\{\s*slug:\s*'json-format',\s*\.\.\.TOOL_SEO\['json-format'\]\[lang\]/s);
+});
+
 test('bbox SEO configuration covers every BBOX language and hreflang mapping', () => {
   const bboxI18n = readSource('src/lib/bbox-i18n.ts');
   const languageList = bboxI18n.match(/BBOX_LANGUAGES\s*=\s*\[([^\]]+)\]/s);

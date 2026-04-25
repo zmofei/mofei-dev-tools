@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { GlassPanel, PrimaryPillLink, SectionLabel } from '@mofei-dev/ui';
-import ContributeButton from '@/components/Common/ContributeButton';
 import { getHomeTools, HOME_COPY } from '@/lib/tool-content';
 import type { SiteLanguage } from '@/lib/site';
 
@@ -13,8 +12,8 @@ export default function HomePageContent({ lang }: { lang: SiteLanguage }) {
   ];
 
   return (
-    <main className="flex-1 pt-20">
-      <section className="mx-auto max-w-[2000px] px-5 pb-10 pt-12 md:px-10 md:pb-14 md:pt-16 lg:px-16 lg:pb-16 lg:pt-24">
+    <main className="flex-1 pt-6">
+      <section className="mx-auto max-w-[2000px] px-5 pb-10 pt-6 md:px-10 md:pb-14 md:pt-8 lg:px-16 lg:pb-16 lg:pt-10">
         <div className="max-w-5xl">
           <SectionLabel className="mb-5">MOFEI DEV TOOLS</SectionLabel>
           <h1 className="max-w-4xl text-[40px] font-semibold leading-[0.98] tracking-[-0.02em] text-white md:text-[64px] lg:text-[78px]">
@@ -25,13 +24,6 @@ export default function HomePageContent({ lang }: { lang: SiteLanguage }) {
             {content.subtitle}
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <PrimaryPillLink href="#tools-list" className="transform-none hover:translate-x-0 hover:translate-y-0">
-              {lang === 'zh' ? '浏览工具' : 'Browse tools'}
-              <span aria-hidden="true">↓</span>
-            </PrimaryPillLink>
-            <ContributeButton variant="ghost" size="sm" />
-          </div>
         </div>
       </section>
 

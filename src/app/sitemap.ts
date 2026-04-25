@@ -9,6 +9,7 @@ const TOOL_CONFIG: Record<(typeof TOOL_SLUGS)[number], { changeFrequency: Metada
   'base64-image': { changeFrequency: 'monthly', priority: 0.8 },
   bbox: { changeFrequency: 'monthly', priority: 0.8 },
   geojson: { changeFrequency: 'monthly', priority: 0.8 },
+  'json-format': { changeFrequency: 'weekly', priority: 0.9 },
   'json-extract': { changeFrequency: 'weekly', priority: 0.9 },
   'coordinate-converter': { changeFrequency: 'weekly', priority: 0.9 },
   objectid: { changeFrequency: 'monthly', priority: 0.8 },
