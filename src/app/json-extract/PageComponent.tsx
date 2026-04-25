@@ -3,14 +3,12 @@ import { useState, useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import {
   GlassPanel,
-  PrimaryPillLink,
-  SectionLabel,
 } from '@mofei-dev/ui';
 import Foot from '@/components/Common/Foot';
+import { ToolContentSection, ToolHero, ToolPageShell } from '@/components/Common/ToolLayout';
 import ResizableTextarea from '@/components/Common/ResizableTextarea';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { event } from '@/components/GoogleAnalytics';
-import ContributeButton from '@/components/Common/ContributeButton';
 
 interface Column {
   id: string;
@@ -1522,41 +1520,37 @@ function JSONExtractToolPageContent() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col" itemScope itemType="https://schema.org/WebApplication">
-      <main className="flex-1 pt-10">
-        <section className="mx-auto max-w-[2000px] px-5 pb-8 pt-6 md:px-10 md:pb-10 md:pt-8 lg:px-16 lg:pb-12 lg:pt-12">
-          <div className="max-w-5xl">
-            <PrimaryPillLink
-              href={language === 'en' ? '/' : '/zh'}
-              className="min-h-10 transform-none px-4 text-sm hover:translate-x-0 hover:translate-y-0"
-            >
-                <span aria-hidden="true">←</span>
-                {t('json-extract.backToTools')}
-            </PrimaryPillLink>
-
-            <SectionLabel className="mt-8">MOFEI DEV TOOLS</SectionLabel>
-            <h1
-              className="mt-5 max-w-4xl text-[40px] font-semibold leading-[0.98] tracking-[-0.02em] text-white md:text-[58px] lg:text-[68px]"
-              itemProp="name"
-            >
-              {titleText}
-            </h1>
-
-            <p
-              className="mt-6 max-w-3xl text-base leading-8 text-white/72 md:text-lg md:leading-9"
-              itemProp="description"
-            >
-              {subtitleText}
-            </p>
-
-            <div className="mt-8">
-              <ContributeButton variant="ghost" size="sm" />
-            </div>
-          </div>
-        </section>
-
-        <section className="mx-auto max-w-[2000px] px-5 pb-10 pt-2 md:px-10 md:pb-14 lg:px-16 lg:pb-20">
-          <div className="mx-auto max-w-6xl space-y-5">
+    <ToolPageShell itemScope itemType="https://schema.org/WebApplication">
+      <ToolHero
+        backHref={language === 'en' ? '/' : '/zh'}
+        backLabel={t('json-extract.backToTools')}
+        title={titleText}
+        subtitle={subtitleText}
+        infoSections={[
+          {
+            title: language === 'zh' ? '什么是 JSONPath？' : 'What is JSONPath?',
+            body: language === 'zh'
+              ? 'JSONPath 是一种从 JSON 文档中定位和提取字段的表达式语法，适合处理列表、嵌套对象和批量数据整理。'
+              : 'JSONPath is an expression syntax for locating and extracting fields from JSON documents, useful for lists, nested objects, and data cleanup.',
+          },
+          {
+            title: language === 'zh' ? '如何使用这个工具？' : 'How to use this tool',
+            body: language === 'zh'
+              ? '粘贴 JSON，选择推荐路径或添加自定义列，然后提取结果。对比模式可以同时检查两份 JSON 的字段差异。'
+              : 'Paste JSON, choose suggested paths or add custom columns, then extract results. Compare mode lets you inspect field differences between two JSON payloads.',
+          },
+        ]}
+        relatedTools={[
+          {
+            href: language === 'en' ? '/json-format' : '/zh/json-format',
+            label: t('json-extract.formatToolLink'),
+          },
+        ]}
+        titleProps={{ itemProp: 'name' }}
+        descriptionProps={{ itemProp: 'description' }}
+      />
+        <ToolContentSection>
+          <div className="w-full space-y-5">
             {/* Mode Toggle */}
             <GlassPanel className="transform-none p-4 hover:translate-y-0 md:p-6">
               <div className="flex flex-wrap items-center justify-between gap-3">
@@ -2435,13 +2429,12 @@ function JSONExtractToolPageContent() {
               </ul>
             </GlassPanel>
           </div>
-        </section>
-      </main>
+        </ToolContentSection>
 
       <footer>
         <Foot />
       </footer>
-    </div>
+    </ToolPageShell>
   );
 }
 

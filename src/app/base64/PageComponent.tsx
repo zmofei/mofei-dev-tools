@@ -2,10 +2,8 @@
 import { useCallback, useMemo, useRef, useState, useEffect, Suspense } from 'react';
 import {
   GlassPanel,
-  PrimaryPillLink,
   SecondaryButton,
   SelectInput,
-  SectionLabel,
   StatusToast,
   TextButton,
 } from '@mofei-dev/ui';
@@ -14,7 +12,7 @@ import ResizableTextarea from '@/components/Common/ResizableTextarea';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { event } from '@/components/GoogleAnalytics';
-import ContributeButton from '@/components/Common/ContributeButton';
+import { ToolContentSection, ToolHero, ToolLoadingFallback, ToolPageShell } from '@/components/Common/ToolLayout';
 
 function LabelIcon({
   children,
@@ -508,44 +506,36 @@ function Base64ToolPageContent() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <main className="flex-1 pt-10">
-        <section className="mx-auto max-w-[2000px] px-5 pb-8 pt-6 md:px-10 md:pb-10 md:pt-8 lg:px-16 lg:pb-12 lg:pt-12">
-          <div className="max-w-5xl">
-            <PrimaryPillLink
-              href={language === 'en' ? '/' : '/zh'}
-              className="min-h-10 transform-none px-4 text-sm hover:translate-x-0 hover:translate-y-0"
-            >
-              <span aria-hidden="true">←</span>
-              {t('base64.backToTools')}
-            </PrimaryPillLink>
+    <ToolPageShell>
+      <ToolHero
+        backHref={language === 'en' ? '/' : '/zh'}
+        backLabel={t('base64.backToTools')}
+        title={titleText}
+        subtitle={subtitleText}
+        infoSections={[
+          {
+            title: language === 'zh' ? '什么是 Base64？' : 'What is Base64?',
+            body: language === 'zh'
+              ? 'Base64 是一种把文本或二进制内容转换成可安全传输字符串的编码方式，常用于接口、配置、数据 URL 和调试场景。'
+              : 'Base64 is an encoding format that turns text or binary data into a transport-safe string, often used in APIs, config, data URLs, and debugging.',
+          },
+          {
+            title: language === 'zh' ? '如何使用这个工具？' : 'How to use this tool',
+            body: language === 'zh'
+              ? '选择编码或解码，粘贴文本或 Base64 字符串，结果会即时生成。你可以复制、分享，也可以从本地历史快速复用。'
+              : 'Choose encode or decode, paste text or a Base64 string, and the result updates instantly. You can copy, share, or reuse recent local history.',
+          },
+        ]}
+        relatedTools={[
+          {
+            href: language === 'en' ? '/base64-image' : '/zh/base64-image',
+            label: t('base64.imageToolLink'),
+          },
+        ]}
+      />
 
-            <SectionLabel className="mt-8">MOFEI DEV TOOLS</SectionLabel>
-            <h1 className="mt-5 max-w-4xl text-[40px] font-semibold leading-[0.98] tracking-[-0.02em] text-white md:text-[58px] lg:text-[68px]">
-              {titleText}
-            </h1>
-            <p className="mt-6 max-w-3xl text-base leading-8 text-white/72 md:text-lg md:leading-9">
-              {subtitleText}
-            </p>
-
-            <div className="mt-8">
-              <ContributeButton variant="ghost" size="sm" />
-            </div>
-
-            <div className="mt-4">
-              <PrimaryPillLink
-                href={language === 'en' ? '/base64-image' : '/zh/base64-image'}
-                className="min-h-10 transform-none px-4 text-sm hover:translate-x-0 hover:translate-y-0"
-              >
-                {t('base64.imageToolLink')}
-                <span aria-hidden="true">→</span>
-              </PrimaryPillLink>
-            </div>
-          </div>
-        </section>
-
-        <section className="mx-auto max-w-[2000px] px-5 pb-10 pt-2 md:px-10 md:pb-14 lg:px-16 lg:pb-20">
-          <div className="mx-auto max-w-5xl space-y-5">
+        <ToolContentSection>
+          <div className="w-full space-y-5">
             <GlassPanel className="transform-none p-4 hover:translate-y-0 md:p-6">
               <div className="mb-5 inline-flex rounded-full border border-white/[0.08] bg-white/[0.035] p-1">
                 <button
@@ -831,28 +821,17 @@ function Base64ToolPageContent() {
               </ul>
             </GlassPanel>
           </div>
-        </section>
-      </main>
+        </ToolContentSection>
 
       <footer>
         <Foot />
       </footer>
-    </div>
+    </ToolPageShell>
   );
 }
 
 function Base64ToolPageFallback() {
-  return (
-    <div className="min-h-screen flex flex-col">
-      <main className="flex-1 pt-10">
-        <div className="max-w-[2000px] mx-auto px-5 md:px-10 lg:px-16 py-6 md:py-8 lg:py-12">
-          <div className="flex justify-center items-center h-64">
-            <div className="text-white">Loading...</div>
-          </div>
-        </div>
-      </main>
-    </div>
-  );
+  return <ToolLoadingFallback />;
 }
 
 export default function Base64ToolPage() {

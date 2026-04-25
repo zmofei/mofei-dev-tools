@@ -2,15 +2,13 @@
 import { useCallback, useEffect, useRef, useState, Suspense } from 'react';
 import {
   GlassPanel,
-  PrimaryPillLink,
-  SectionLabel,
   StatusToast,
 } from '@mofei-dev/ui';
 import Foot from '@/components/Common/Foot';
+import { ToolContentSection, ToolHero, ToolLoadingFallback, ToolPageShell } from '@/components/Common/ToolLayout';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { event } from '@/components/GoogleAnalytics';
-import ContributeButton from '@/components/Common/ContributeButton';
 
 function LabelIcon({ children }: { children: React.ReactNode }) {
   return (
@@ -400,35 +398,29 @@ function ObjectIdToolPageContent() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <main className="flex-1 pt-10">
-        <section className="mx-auto max-w-[2000px] px-5 pb-8 pt-6 md:px-10 md:pb-10 md:pt-8 lg:px-16 lg:pb-12 lg:pt-12">
-          <div className="max-w-5xl">
-            <PrimaryPillLink
-              href={language === 'en' ? '/' : '/zh'}
-              className="min-h-10 transform-none px-4 text-sm hover:translate-x-0 hover:translate-y-0"
-            >
-              <span aria-hidden="true">←</span>
-              {language === 'zh' ? "返回工具" : "Back to Tools"}
-            </PrimaryPillLink>
-
-            <SectionLabel className="mt-8">MOFEI DEV TOOLS</SectionLabel>
-            <h1 className="mt-5 max-w-4xl text-[40px] font-semibold leading-[0.98] tracking-[-0.02em] text-white md:text-[58px] lg:text-[68px]">
-            {titleText}
-            </h1>
-          
-            <p className="mt-6 max-w-3xl text-base leading-8 text-white/72 md:text-lg md:leading-9">
-            {subtitleText}
-            </p>
-          
-            <div className="mt-8">
-              <ContributeButton variant="ghost" size="sm" />
-            </div>
-          </div>
-        </section>
-
-        <section className="mx-auto max-w-[2000px] px-5 pb-10 pt-2 md:px-10 md:pb-14 lg:px-16 lg:pb-20">
-          <div className="mx-auto max-w-4xl space-y-5">
+    <ToolPageShell>
+      <ToolHero
+        backHref={language === 'en' ? '/' : '/zh'}
+        backLabel={language === 'zh' ? "返回工具" : "Back to Tools"}
+        title={titleText}
+        subtitle={subtitleText}
+        infoSections={[
+          {
+            title: language === 'zh' ? '什么是 MongoDB ObjectID？' : 'What is a MongoDB ObjectID?',
+            body: language === 'zh'
+              ? 'ObjectID 是 MongoDB 常用的 12 字节唯一标识符，包含时间戳、随机值和计数信息，可用于生成和解析文档 ID。'
+              : 'An ObjectID is MongoDB’s common 12-byte unique identifier. It includes timestamp, random, and counter data for generating and inspecting document IDs.',
+          },
+          {
+            title: language === 'zh' ? '如何使用这个工具？' : 'How to use this tool',
+            body: language === 'zh'
+              ? '生成新的 ObjectID，或输入已有 ID 查看创建时间。需要复现特定时间的数据时，也可以设置自定义时间戳。'
+              : 'Generate a new ObjectID or paste an existing one to inspect its timestamp. Use a custom timestamp when you need IDs for a specific point in time.',
+          },
+        ]}
+      />
+        <ToolContentSection>
+          <div className="w-full space-y-5">
           {/* Share success message */}
           {shareMessage && (
             <StatusToast variant="success" title={shareMessage} />
@@ -734,28 +726,17 @@ function ObjectIdToolPageContent() {
           </GlassPanel>
 
           </div>
-        </section>
-      </main>
+        </ToolContentSection>
 
       <footer>
         <Foot />
       </footer>
-    </div>
+    </ToolPageShell>
   );
 }
 
 function ObjectIdToolPageFallback() {
-  return (
-    <div className="min-h-screen flex flex-col">
-      <main className="flex-1 pt-10">
-        <div className="max-w-[2000px] mx-auto px-5 md:px-10 lg:px-16 py-6 md:py-8 lg:py-12">
-          <div className="flex justify-center items-center h-64">
-            <div className="text-white">Loading...</div>
-          </div>
-        </div>
-      </main>
-    </div>
-  );
+  return <ToolLoadingFallback />;
 }
 
 export default function ObjectIdToolPage() {

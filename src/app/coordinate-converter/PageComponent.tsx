@@ -3,15 +3,13 @@ import { useState, useCallback, useEffect, useRef, Suspense } from 'react';
 import proj4 from 'proj4';
 import {
   GlassPanel,
-  PrimaryPillLink,
-  SectionLabel,
   StatusToast,
 } from '@mofei-dev/ui';
 import Foot from '@/components/Common/Foot';
+import { ToolContentSection, ToolHero, ToolPageShell } from '@/components/Common/ToolLayout';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { event } from '@/components/GoogleAnalytics';
 import { useSearchParams } from 'next/navigation';
-import ContributeButton from '@/components/Common/ContributeButton';
 import { toolPath } from '@/lib/site';
 
 /**
@@ -1016,33 +1014,31 @@ function CoordinateConverterPageContent() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col" itemScope itemType="https://schema.org/WebApplication">
-      <main className="flex-1 pt-10">
-        <section className="mx-auto max-w-[2000px] px-5 pb-8 pt-6 md:px-10 md:pb-10 md:pt-8 lg:px-16 lg:pb-12 lg:pt-12">
-          <div className="max-w-5xl">
-            <PrimaryPillLink
-              href={language === 'en' ? '/' : '/zh'}
-              className="min-h-10 transform-none px-4 text-sm hover:translate-x-0 hover:translate-y-0"
-            >
-              <span aria-hidden="true">←</span>
-              {t('coordinate-converter.backToTools')}
-            </PrimaryPillLink>
-
-            <SectionLabel className="mt-8">MOFEI DEV TOOLS</SectionLabel>
-            <h1 className="mt-5 max-w-4xl text-[40px] font-semibold leading-[0.98] tracking-[-0.02em] text-white md:text-[58px] lg:text-[68px]" itemProp="name">
-              {titleText}
-            </h1>
-            <p className="mt-6 max-w-3xl text-base leading-8 text-white/72 md:text-lg md:leading-9" itemProp="description">
-              {subtitleText}
-            </p>
-            <div className="mt-8">
-              <ContributeButton variant="ghost" size="sm" />
-            </div>
-          </div>
-        </section>
-
-        <section className="mx-auto max-w-[2000px] px-5 pb-10 pt-2 md:px-10 md:pb-14 lg:px-16 lg:pb-20">
-          <div className="mx-auto max-w-6xl space-y-5">
+    <ToolPageShell itemScope itemType="https://schema.org/WebApplication">
+      <ToolHero
+        backHref={language === 'en' ? '/' : '/zh'}
+        backLabel={t('coordinate-converter.backToTools')}
+        title={titleText}
+        subtitle={subtitleText}
+        infoSections={[
+          {
+            title: language === 'zh' ? '什么是坐标转换？' : 'What is coordinate conversion?',
+            body: language === 'zh'
+              ? '坐标转换会在不同地理坐标系统和投影之间换算位置，例如 WGS84、Web Mercator、DMS 和 UTM。'
+              : 'Coordinate conversion transforms locations between geographic coordinate systems and projections such as WGS84, Web Mercator, DMS, and UTM.',
+          },
+          {
+            title: language === 'zh' ? '如何使用这个工具？' : 'How to use this tool',
+            body: language === 'zh'
+              ? '选择源格式和目标格式，输入坐标后即可转换。你可以切换经纬度顺序、批量处理坐标，并复制转换结果。'
+              : 'Choose source and target formats, enter coordinates, and convert. You can switch latitude/longitude order, process multiple coordinates, and copy results.',
+          },
+        ]}
+        titleProps={{ itemProp: 'name' }}
+        descriptionProps={{ itemProp: 'description' }}
+      />
+        <ToolContentSection>
+          <div className="w-full space-y-5">
             {isLoadingFromUrl && (
               <StatusToast
                 variant="success"
@@ -1419,13 +1415,12 @@ function CoordinateConverterPageContent() {
               </div>
             </div>
           </div>
-        </section>
-      </main>
+        </ToolContentSection>
 
       <footer>
         <Foot />
       </footer>
-    </div>
+    </ToolPageShell>
   );
 }
 

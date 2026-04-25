@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useRef, useState, type TextareaHTMLAttributes } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState, type TextareaHTMLAttributes } from 'react';
 
 type ResizableTextareaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
   containerClassName?: string;
@@ -9,6 +9,7 @@ type ResizableTextareaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
   minHeight?: number;
   maxHeight?: number;
   resizeTitle?: string;
+  autoHeight?: boolean;
 };
 
 export default function ResizableTextarea({
@@ -18,11 +19,24 @@ export default function ResizableTextarea({
   minHeight = 144,
   maxHeight = 640,
   resizeTitle = 'Drag to resize',
+  autoHeight = false,
   style,
+  value,
   ...props
 }: ResizableTextareaProps) {
   const [height, setHeight] = useState(initialHeight);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const resizeStartRef = useRef<{ y: number; height: number } | null>(null);
+
+  useLayoutEffect(() => {
+    if (!autoHeight || !textareaRef.current) return;
+
+    const textarea = textareaRef.current;
+    textarea.style.height = 'auto';
+    const nextHeight = Math.max(minHeight, Math.min(maxHeight, textarea.scrollHeight));
+    setHeight(nextHeight);
+    textarea.style.height = `${nextHeight}px`;
+  }, [autoHeight, maxHeight, minHeight, value]);
 
   const startResize = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -52,6 +66,8 @@ export default function ResizableTextarea({
     <div className={`overflow-hidden rounded-[18px] border border-white/[0.08] bg-white/[0.035] transition-colors duration-200 focus-within:border-white/[0.18] focus-within:ring-2 focus-within:ring-white/20 ${containerClassName}`}>
       <textarea
         {...props}
+        ref={textareaRef}
+        value={value}
         className={`block w-full resize-none bg-transparent px-4 py-3 font-mono text-sm leading-6 text-white outline-none placeholder:text-white/28 ${textareaClassName}`}
         style={{ ...style, height }}
       />

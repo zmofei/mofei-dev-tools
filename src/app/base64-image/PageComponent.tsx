@@ -3,15 +3,13 @@
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import {
   GlassPanel,
-  PrimaryPillLink,
   SecondaryButton,
-  SectionLabel,
   SelectInput,
   StatusToast,
   TextButton,
 } from '@mofei-dev/ui';
-import ContributeButton from '@/components/Common/ContributeButton';
 import Foot from '@/components/Common/Foot';
+import { ToolContentSection, ToolHero, ToolPageShell } from '@/components/Common/ToolLayout';
 import ResizableTextarea from '@/components/Common/ResizableTextarea';
 import { event } from '@/components/GoogleAnalytics';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -379,7 +377,6 @@ export default function Base64ImagePageComponent() {
   const [error, setError] = useState('');
   const [previewLoadError, setPreviewLoadError] = useState(false);
   const [history, setHistory] = useState<GeneratedHistoryItem[]>([]);
-  const [showInfo, setShowInfo] = useState(false);
   const [isDraggingImage, setIsDraggingImage] = useState(false);
   const deferredPasteInput = useDeferredValue(pasteInput);
 
@@ -941,80 +938,35 @@ export default function Base64ImagePageComponent() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <main className="flex-1 pt-10">
-        <section className="mx-auto max-w-[2000px] px-5 pb-8 pt-6 md:px-10 md:pb-10 md:pt-8 lg:px-16 lg:pb-12 lg:pt-12">
-          <div className="max-w-5xl">
-            <PrimaryPillLink
-              href={language === 'en' ? '/' : '/zh'}
-              className="min-h-10 transform-none px-4 text-sm hover:translate-x-0 hover:translate-y-0"
-            >
-              <span aria-hidden="true">←</span>
-              {copy.back}
-            </PrimaryPillLink>
+    <ToolPageShell>
+      <ToolHero
+        backHref={language === 'en' ? '/' : '/zh'}
+        backLabel={copy.back}
+        title={copy.title}
+        subtitle={copy.subtitle}
+        infoSections={[
+          {
+            title: language === 'zh' ? '什么是图片 Base64？' : 'What is image Base64?',
+            body: language === 'zh'
+              ? '图片 Base64 会把图片文件编码成可嵌入 HTML、CSS、JSON 或接口载荷的 data URL，适合小图、图标和快速调试。'
+              : 'Image Base64 converts image files into data URLs that can be embedded in HTML, CSS, JSON, or API payloads, useful for small images, icons, and debugging.',
+          },
+          {
+            title: language === 'zh' ? '如何使用这个工具？' : 'How to use this tool',
+            body: language === 'zh'
+              ? '上传、拖入或粘贴图片即可生成 Base64 data URL。也可以粘贴已有 Base64 图片内容进行预览、复制或下载。'
+              : 'Upload, drop, or paste an image to generate a Base64 data URL. You can also paste existing Base64 image data to preview, copy, or download it.',
+          },
+        ]}
+        relatedTools={[
+          {
+            href: language === 'en' ? '/base64' : '/zh/base64',
+            label: copy.textTool,
+          },
+        ]}
+      />
 
-            <SectionLabel className="mt-8">MOFEI DEV TOOLS</SectionLabel>
-            <h1 className="mt-5 max-w-4xl text-[40px] font-semibold leading-[0.98] tracking-[-0.02em] text-white md:text-[58px] lg:text-[68px]">
-              {copy.title}
-            </h1>
-            <div className="mt-6 flex max-w-3xl items-start gap-3">
-              <p className="text-base leading-8 text-white/72 md:text-lg md:leading-9">
-                {copy.subtitle}
-              </p>
-              <button
-                type="button"
-                onClick={() => {
-                  const nextOpen = !showInfo;
-                  setShowInfo(nextOpen);
-                  if (nextOpen) {
-                    trackImageEvent('help_open', { surface: 'hero_info' });
-                  }
-                }}
-                className="mt-1 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/[0.12] bg-white/[0.045] text-sm font-semibold text-white/62 transition-colors hover:border-white/[0.22] hover:bg-white/[0.08] hover:text-white"
-                aria-expanded={showInfo}
-                aria-label={copy.infoButtonLabel}
-                title={copy.infoButtonLabel}
-              >
-                i
-              </button>
-            </div>
-
-            {showInfo && (
-              <div className="mt-5 max-w-3xl rounded-[18px] border border-white/[0.08] bg-white/[0.035] p-4">
-                <h2 className="inline-flex items-center gap-2 text-sm font-semibold text-white/84">
-                  <LabelIcon>
-                    <InfoIcon />
-                  </LabelIcon>
-                  {copy.infoTitle}
-                </h2>
-                <p className="mt-3 text-sm leading-6 text-white/62">
-                  {copy.infoIntro}
-                </p>
-                <ul className="mt-3 space-y-2 text-sm leading-6 text-white/58">
-                  {copy.infoSteps.map((step) => (
-                    <li key={step} className="flex gap-3">
-                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-white/38" aria-hidden="true" />
-                      <span>{step}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            <div className="mt-8 flex flex-wrap gap-3">
-              <ContributeButton variant="ghost" size="sm" />
-              <PrimaryPillLink
-                href={language === 'en' ? '/base64' : '/zh/base64'}
-                className="min-h-10 transform-none px-4 text-sm hover:translate-x-0 hover:translate-y-0"
-              >
-                {copy.textTool}
-                <span aria-hidden="true">→</span>
-              </PrimaryPillLink>
-            </div>
-          </div>
-        </section>
-
-        <section className="mx-auto max-w-[2000px] px-5 pb-10 pt-2 md:px-10 md:pb-14 lg:px-16 lg:pb-20">
+        <ToolContentSection>
           <div className="grid w-full grid-cols-1 gap-5 xl:grid-cols-2">
             <GlassPanel className="min-w-0 transform-none p-4 hover:translate-y-0 md:p-6">
               <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
@@ -1390,12 +1342,11 @@ export default function Base64ImagePageComponent() {
               </GlassPanel>
             </div>
           </div>
-        </section>
-      </main>
+        </ToolContentSection>
 
       <footer>
         <Foot />
       </footer>
-    </div>
+    </ToolPageShell>
   );
 }

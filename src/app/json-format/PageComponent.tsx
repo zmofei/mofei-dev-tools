@@ -1,8 +1,9 @@
 "use client";
 
 import { useMemo, useState } from 'react';
-import { GlassPanel, PrimaryPillLink, SectionLabel, TextButton } from '@mofei-dev/ui';
+import { GlassPanel, TextButton } from '@mofei-dev/ui';
 import Foot from '@/components/Common/Foot';
+import { ToolContentSection, ToolHero, ToolPageShell } from '@/components/Common/ToolLayout';
 import ResizableTextarea from '@/components/Common/ResizableTextarea';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { formatJson, jsonPathForChild, type JsonTolerantReason, type JsonValue } from '@/lib/json-format-tool';
@@ -36,6 +37,7 @@ type Copy = {
   tolerant: string;
   tolerantReasons: Record<JsonTolerantReason, string>;
   placeholder: string;
+  extractTool: string;
 };
 
 const COPY: Record<'en' | 'zh', Copy> = {
@@ -63,6 +65,7 @@ const COPY: Record<'en' | 'zh', Copy> = {
       trailingCommas: 'trailing commas are not allowed',
     },
     placeholder: 'Paste JSON here...',
+    extractTool: 'Need JSONPath extraction? Open JSON Path Extractor',
   },
   zh: {
     title: 'JSON 格式化与查看',
@@ -88,6 +91,7 @@ const COPY: Record<'en' | 'zh', Copy> = {
       trailingCommas: '严格 JSON 不允许尾逗号',
     },
     placeholder: '在左侧粘贴 JSON...',
+    extractTool: '需要提取 JSON 路径？打开 JSON 路径提取工具',
   },
 };
 
@@ -224,25 +228,34 @@ export default function JsonFormatPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <main className="flex-1 pt-10">
-        <section className="mx-auto max-w-[2000px] px-5 pb-8 pt-6 md:px-10 md:pt-8 lg:px-16 lg:pt-12">
-          <div className="max-w-5xl">
-            <PrimaryPillLink href={lang === 'zh' ? '/zh' : '/'} className="min-h-10 transform-none px-4 text-sm hover:translate-x-0 hover:translate-y-0">
-              <span aria-hidden="true">←</span>
-              {copy.back}
-            </PrimaryPillLink>
-            <SectionLabel className="mt-8">MOFEI DEV TOOLS</SectionLabel>
-            <h1 className="mt-5 max-w-4xl text-[40px] font-semibold leading-[0.98] tracking-[-0.02em] text-white md:text-[58px] lg:text-[68px]">
-              {copy.title}
-            </h1>
-            <p className="mt-6 max-w-3xl text-base leading-8 text-white/72 md:text-lg md:leading-9">
-              {copy.subtitle}
-            </p>
-          </div>
-        </section>
-
-        <section className="mx-auto max-w-[2000px] px-5 pb-10 pt-2 md:px-10 lg:px-16 lg:pb-20">
+    <ToolPageShell>
+      <ToolHero
+        backHref={lang === 'zh' ? '/zh' : '/'}
+        backLabel={copy.back}
+        title={copy.title}
+        subtitle={copy.subtitle}
+        infoSections={[
+          {
+            title: lang === 'zh' ? '什么是 JSON 格式化？' : 'What is JSON formatting?',
+            body: lang === 'zh'
+              ? 'JSON 格式化会把压缩或混乱的 JSON 重新排版成可读结构，也能校验语法、压缩输出，并用树形视图检查层级。'
+              : 'JSON formatting turns minified or messy JSON into a readable structure, validates syntax, minifies output, and helps inspect nested data in a tree view.',
+          },
+          {
+            title: lang === 'zh' ? '如何使用这个工具？' : 'How to use this tool',
+            body: lang === 'zh'
+              ? '在输入框粘贴 JSON，工具会自动格式化、校验并生成树形视图。非严格 JSON 会用宽松模式解析，并提示原因。'
+              : 'Paste JSON into the input. The tool formats, validates, and builds a tree view automatically. Non-strict JSON is parsed in tolerant mode with reasons shown.',
+          },
+        ]}
+        relatedTools={[
+          {
+            href: lang === 'zh' ? '/zh/json-extract' : '/json-extract',
+            label: copy.extractTool,
+          },
+        ]}
+      />
+        <ToolContentSection className="md:pb-10">
           <div className="grid gap-5 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
             <GlassPanel className="transform-none p-4 hover:translate-y-0 md:p-5">
               <div className="mb-3 flex items-center justify-between gap-3">
@@ -256,7 +269,11 @@ export default function JsonFormatPage() {
                 value={input}
                 onChange={(event) => setInput(event.target.value)}
                 placeholder={copy.placeholder}
-                className="min-h-[420px] w-full resize-y rounded-2xl border border-white/[0.10] bg-slate-950/50 p-4 font-mono text-sm leading-6 text-white/84 outline-none transition focus:border-cyan-200/35 focus:bg-slate-950/62"
+                autoHeight
+                initialHeight={420}
+                minHeight={260}
+                maxHeight={900}
+                textareaClassName="text-white/84"
               />
               {!result.ok && input.trim() ? (
                 <p className="mt-3 rounded-xl border border-rose-300/20 bg-rose-400/10 px-3 py-2 text-sm text-rose-100">
@@ -278,6 +295,30 @@ export default function JsonFormatPage() {
             </GlassPanel>
 
             <div className="space-y-5">
+              <GlassPanel className="transform-none p-4 hover:translate-y-0 md:p-5">
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <h2 className="text-sm font-semibold text-white/84">{copy.viewer}</h2>
+                    {result.ok ? (
+                      <p className="mt-1 text-xs text-white/42">
+                        {result.stats.objects} objects · {result.stats.arrays} arrays · {result.stats.keys} keys · depth {result.stats.maxDepth}
+                      </p>
+                    ) : null}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <TextButton onClick={() => setCollapsed(new Set())}>{copy.expand}</TextButton>
+                    <TextButton onClick={collapseAll}>{copy.collapse}</TextButton>
+                  </div>
+                </div>
+                <div className="max-h-[430px] overflow-auto rounded-2xl border border-white/[0.08] bg-slate-950/42 p-4 font-mono text-sm">
+                  {result.ok ? (
+                    <JsonTree value={result.value} collapsed={collapsed} setCollapsed={setCollapsed} />
+                  ) : (
+                    <span className="text-white/38">{copy.placeholder}</span>
+                  )}
+                </div>
+              </GlassPanel>
+
               <GlassPanel className="transform-none p-4 hover:translate-y-0 md:p-5">
                 <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
                   <h2 className="text-sm font-semibold text-white/84">{copy.output}</h2>
@@ -305,37 +346,12 @@ export default function JsonFormatPage() {
                   {output || ' '}
                 </pre>
               </GlassPanel>
-
-              <GlassPanel className="transform-none p-4 hover:translate-y-0 md:p-5">
-                <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <h2 className="text-sm font-semibold text-white/84">{copy.viewer}</h2>
-                    {result.ok ? (
-                      <p className="mt-1 text-xs text-white/42">
-                        {result.stats.objects} objects · {result.stats.arrays} arrays · {result.stats.keys} keys · depth {result.stats.maxDepth}
-                      </p>
-                    ) : null}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <TextButton onClick={() => setCollapsed(new Set())}>{copy.expand}</TextButton>
-                    <TextButton onClick={collapseAll}>{copy.collapse}</TextButton>
-                  </div>
-                </div>
-                <div className="max-h-[430px] overflow-auto rounded-2xl border border-white/[0.08] bg-slate-950/42 p-4 font-mono text-sm">
-                  {result.ok ? (
-                    <JsonTree value={result.value} collapsed={collapsed} setCollapsed={setCollapsed} />
-                  ) : (
-                    <span className="text-white/38">{copy.placeholder}</span>
-                  )}
-                </div>
-              </GlassPanel>
             </div>
           </div>
-        </section>
-      </main>
+        </ToolContentSection>
       <footer>
         <Foot />
       </footer>
-    </div>
+    </ToolPageShell>
   );
 }

@@ -1,13 +1,13 @@
 "use client"
 import { useState, useEffect, Suspense } from 'react';
 import { motion } from "motion/react"
-import Link from 'next/link';
 import Image from 'next/image';
+import { GlassPanel, TextButton } from '@mofei-dev/ui';
 import Foot from '@/components/Common/Foot';
+import { ToolContentSection, ToolHero, ToolLoadingFallback } from '@/components/Common/ToolLayout';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { event } from '@/components/GoogleAnalytics';
 import { useGeoJSONRedirect } from '@/hooks/useGeoJSONRedirect';
-import ContributeButton from '@/components/Common/ContributeButton';
 
 function GeoJSONToolPageContent() {
   const { t, language } = useLanguage();
@@ -559,85 +559,46 @@ function GeoJSONToolPageContent() {
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-1 pt-10">
-        <div className='max-w-[2000px] mx-auto'>
-        <div className='overflow-hidden font-extrabold px-5 md:px-10 lg:px-16'>
-          {/* Breadcrumb */}
-          <motion.div 
-            className="mb-6 mt-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <Link 
-              href={language === 'en' ? '/' : '/zh'}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-800/50 hover:bg-gray-700/50 border border-gray-700 hover:border-[#a1c4fd]/50 rounded-lg text-gray-300 hover:text-[#a1c4fd] transition-all duration-200 backdrop-blur-sm text-sm font-medium"
-            >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
-              </svg>
-              {t('geojson.backToTools')}
-            </Link>
-          </motion.div>
+        <ToolHero
+          backHref={language === 'en' ? '/' : '/zh'}
+          backLabel={t('geojson.backToTools')}
+          title={titleText}
+          subtitle={subtitleText}
+          infoSections={[
+            {
+              title: language === 'zh' ? '什么是 GeoJSON？' : 'What is GeoJSON?',
+              body: language === 'zh'
+                ? 'GeoJSON 是用 JSON 表示点、线、面等地理要素的开放格式，常用于地图预览、空间数据交换和 Web GIS 调试。'
+                : 'GeoJSON is an open JSON format for points, lines, polygons, and other geographic features, often used for map previews, spatial exchange, and Web GIS debugging.',
+            },
+            {
+              title: language === 'zh' ? '如何使用这个工具？' : 'How to use this tool',
+              body: language === 'zh'
+                ? '粘贴 GeoJSON 后生成 geojson.io 预览链接。小数据可直接放进 URL，大数据可通过 GitHub Gist 生成更稳定的分享链接。'
+                : 'Paste GeoJSON to generate a geojson.io preview link. Small data can live in the URL; larger data can use GitHub Gist for a more stable share link.',
+            },
+          ]}
+        />
 
-          <motion.h1 
-            className={`font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#a1c4fd] to-[#c2e9fb] leading-tight text-center
-              text-2xl mb-4
-              md:text-4xl md:mb-6
-              lg:text-5xl lg:mb-8
-              `}
+        <ToolContentSection>
+          <motion.div
+            className="w-full space-y-5"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            transition={{ duration: 0.6, delay: 0.3 }}
           >
-            {titleText}
-          </motion.h1>
-          
-          <motion.p 
-            className="text-gray-300/90 text-base md:text-lg lg:text-xl font-medium leading-relaxed tracking-wide text-center mb-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-          >
-            {subtitleText}
-          </motion.p>
-          
-          <motion.div
-            className="flex justify-center pb-2"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
-          >
-            <ContributeButton variant="ghost" size="sm" />
-          </motion.div>
-        </div>
-      </div>
-
-      <div className='max-w-[2000px] mx-auto px-5 md:px-10 lg:px-16 py-6 md:py-8 lg:py-12'>
-        <motion.div 
-          className="max-w-4xl mx-auto"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-        >
-          {/* Input area */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-3">
-              <label className="text-white font-medium">
+          <GlassPanel className="transform-none p-4 hover:translate-y-0 md:p-6">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <label className="text-sm font-semibold text-white/84">
                 {t('geojson.inputLabel')}
               </label>
-              <div className="flex gap-2">
-                <button
-                  onClick={handleExampleLoad}
-                  className="text-[#a1c4fd] hover:text-[#c2e9fb] text-sm transition-colors duration-200"
-                >
+              <div className="flex items-center gap-2">
+                <TextButton onClick={handleExampleLoad}>
                   {t('geojson.loadExample')}
-                </button>
-                <button
-                  onClick={handleClear}
-                  className="text-gray-400 hover:text-white text-sm transition-colors duration-200"
-                >
+                </TextButton>
+                <TextButton onClick={handleClear}>
                   {t('geojson.clear')}
-                </button>
+                </TextButton>
               </div>
             </div>
             <textarea
@@ -657,14 +618,14 @@ function GeoJSONToolPageContent() {
                 }
               }}
               placeholder={t('geojson.placeholder')}
-              className="w-full h-64 bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-[#a1c4fd] resize-none font-mono text-sm"
+              className="h-72 w-full resize-none rounded-2xl border border-white/[0.08] bg-slate-950/42 px-4 py-3 font-mono text-sm text-white placeholder-white/32 outline-none transition-colors focus:border-cyan-200/35"
             />
-          </div>
+          </GlassPanel>
 
           {/* Share success message */}
           {shareMessage && (
             <motion.div 
-              className="mb-4 p-3 bg-green-500/20 border border-green-500/50 rounded-lg text-green-300 text-sm text-center"
+              className="rounded-2xl border border-emerald-300/25 bg-emerald-300/[0.08] p-3 text-center text-sm text-emerald-100"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
@@ -675,15 +636,15 @@ function GeoJSONToolPageContent() {
 
           {/* Storage method selection and file size info */}
           {inputText && (
-            <motion.div 
-              className="mb-6 p-4 bg-gray-800/30 rounded-lg border border-gray-700"
+            <motion.div
+              className="rounded-2xl border border-white/[0.08] bg-white/[0.035] p-4"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="flex items-center justify-between mb-3">
+              <div className="mb-3 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-white font-medium">{t('geojson.storageMethod')}:</span>
+                  <span className="text-sm font-semibold text-white/84">{t('geojson.storageMethod')}:</span>
                   <span className={`text-xs px-2 py-1 rounded ${
                     isLargeFile ? 'bg-yellow-500/20 text-yellow-300' : 'bg-green-500/20 text-green-300'
                   }`}>
@@ -707,8 +668,8 @@ function GeoJSONToolPageContent() {
                       }}
                       className="text-[#a1c4fd] focus:ring-[#a1c4fd]"
                     />
-                    <span className="text-gray-300">{t('geojson.urlMethod')}</span>
-                    <span className="text-xs text-gray-400">({t('geojson.urlMethodDesc')})</span>
+                    <span className="text-white/72">{t('geojson.urlMethod')}</span>
+                    <span className="text-xs text-white/42">({t('geojson.urlMethodDesc')})</span>
                   </label>
                   
                   <label className="flex items-center gap-2 cursor-pointer">
@@ -723,13 +684,13 @@ function GeoJSONToolPageContent() {
                       }}
                       className="text-[#a1c4fd] focus:ring-[#a1c4fd]"
                     />
-                    <span className="text-gray-300">{t('geojson.gistMethod')}</span>
-                    <span className="text-xs text-gray-400">({t('geojson.gistMethodDesc')})</span>
+                    <span className="text-white/72">{t('geojson.gistMethod')}</span>
+                    <span className="text-xs text-white/42">({t('geojson.gistMethodDesc')})</span>
                   </label>
                 </div>
                 
                 {storageMethod === 'gist' && (
-                  <div className="mt-3 p-3 bg-blue-500/10 border border-blue-500/30 rounded">
+                  <div className="mt-3 rounded-2xl border border-cyan-200/15 bg-cyan-300/[0.06] p-3">
                     {githubUser ? (
                       // User is logged in
                       <div className="flex items-center justify-between">
@@ -742,17 +703,17 @@ function GeoJSONToolPageContent() {
                             height={32}
                           />
                           <div>
-                            <p className="text-sm text-blue-300">
+                            <p className="text-sm text-cyan-100">
                               {t('geojson.loggedInAs')} <strong>{githubUser.login}</strong>
                             </p>
-                            <p className="text-xs text-gray-400">
+                            <p className="text-xs text-white/42">
                               {t('geojson.gistWillBeCreated')}
                             </p>
                           </div>
                         </div>
                         <button
                           onClick={logout}
-                          className="text-xs text-gray-400 hover:text-white transition-colors"
+                          className="text-xs text-white/42 transition-colors hover:text-white"
                         >
                           {t('geojson.logout')}
                         </button>
@@ -944,41 +905,33 @@ function GeoJSONToolPageContent() {
             </motion.div>
           )}
 
-          {/* Generate button */}
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center">
             <button
               onClick={generatePreviewUrl}
               disabled={isUploading || !inputText.trim()}
-              className="px-6 py-3 bg-gradient-to-r from-[#a1c4fd] to-[#c2e9fb] text-gray-900 font-medium rounded-lg hover:from-[#8fb3fc] hover:to-[#b1e1fa] transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-6 text-sm font-semibold text-slate-950 transition-colors hover:bg-cyan-50 disabled:cursor-not-allowed disabled:opacity-45"
             >
               {isUploading ? t('geojson.uploading') : t('geojson.generate')}
             </button>
           </div>
 
-          {/* Output area */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-3">
-              <label className="text-white font-medium">
+          <GlassPanel className="transform-none p-4 hover:translate-y-0 md:p-6">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <label className="text-sm font-semibold text-white/84">
                 {t('geojson.outputLabel')}
               </label>
-              <div className="flex gap-2">
+              <div className="flex items-center gap-2">
                 {previewUrl && !error && (
                   <>
-                    <button
-                      onClick={() => handleCopy(previewUrl)}
-                      className="text-[#a1c4fd] hover:text-[#c2e9fb] text-sm transition-colors duration-200 flex items-center gap-1"
-                    >
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
-                      </svg>
+                    <TextButton onClick={() => handleCopy(previewUrl)}>
                       {t('geojson.copy')}
-                    </button>
+                    </TextButton>
                     <a
                       href={previewUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => event('geojson_open_preview', 'Tool Usage', `method:${previewUrl.includes('gist%3A') || previewUrl.includes('gist:') ? 'gist' : 'url'}`, previewUrl.length)}
-                      className="bg-gradient-to-r from-[#a1c4fd] to-[#c2e9fb] hover:from-[#8fb3fc] hover:to-[#b1e1fa] text-gray-900 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg"
+                      className="inline-flex min-h-9 items-center gap-2 rounded-full bg-white px-4 text-sm font-semibold text-slate-950 transition-colors hover:bg-cyan-50"
                     >
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
@@ -992,7 +945,7 @@ function GeoJSONToolPageContent() {
             
             {/* Warning message */}
             {warning && (
-              <div className="mb-3 p-3 bg-yellow-500/20 border border-yellow-500/50 rounded-lg text-yellow-300 text-sm">
+              <div className="mb-3 rounded-2xl border border-yellow-300/25 bg-yellow-300/[0.08] p-3 text-sm text-yellow-100">
                 {warning}
               </div>
             )}
@@ -1002,55 +955,49 @@ function GeoJSONToolPageContent() {
                 value={error || previewUrl}
                 readOnly
                 placeholder={t('geojson.resultPlaceholder')}
-                className={`w-full h-32 bg-gray-800/50 border rounded-lg px-4 py-3 placeholder-gray-400 resize-none text-sm ${
+                className={`h-32 w-full resize-none rounded-2xl border bg-slate-950/42 px-4 py-3 text-sm placeholder-white/32 outline-none ${
                   error 
-                    ? 'border-red-500 text-red-400' 
-                    : 'border-gray-700 text-white'
+                    ? 'border-red-300/35 text-red-200'
+                    : 'border-white/[0.08] text-white'
                 }`}
               />
             </div>
-          </div>
+          </GlassPanel>
 
           {/* History */}
           {history.length > 0 && (
-            <motion.div 
-              className="bg-gray-800/30 rounded-lg p-4 border border-gray-700 mb-6"
+            <motion.div
+              className="rounded-[8px] border border-white/[0.08] bg-white/[0.045] p-4 shadow-[0_20px_80px_rgba(0,0,0,0.20)] backdrop-blur md:p-6"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
             >
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-white font-medium flex items-center gap-2">
-                  <svg className="w-5 h-5 text-[#a1c4fd]" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M13,3A9,9 0 0,0 4,12H1L4.8919,16.1406L5,16L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.3,19 9.8,18.4 8.7,17.4L7.3,18.8C8.8,20.1 10.8,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3M15,8V12L18,14L17,15.5L13.5,13V8H15Z"/>
-                  </svg>
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <h3 className="text-sm font-semibold text-white/84">
                   {t('geojson.history')}
                 </h3>
-                <button
-                  onClick={clearHistory}
-                  className="text-gray-400 hover:text-white text-sm transition-colors"
-                >
+                <TextButton onClick={clearHistory} className="text-sm text-white/44 hover:text-rose-100">
                   {t('geojson.clearHistory')}
-                </button>
+                </TextButton>
               </div>
-              <div className="space-y-2 max-h-60 overflow-y-auto">
+              <div className="max-h-60 space-y-2 overflow-y-auto">
                 {history.map((item) => (
-                  <div key={item.id} className="flex items-center justify-between p-2 bg-gray-900/30 rounded border border-gray-600 hover:border-gray-500 transition-colors">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-white text-sm font-medium truncate">{item.name}</span>
-                        <span className="text-xs px-2 py-0.5 bg-gray-700 text-gray-300 rounded">{formatFileSize(item.size)}</span>
+                  <div key={item.id} className="flex items-center justify-between rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3 transition-colors hover:border-white/[0.14]">
+                    <div className="min-w-0 flex-1">
+                      <div className="mb-1 flex items-center gap-2">
+                        <span className="truncate text-sm font-medium text-white">{item.name}</span>
+                        <span className="rounded-full border border-white/[0.08] bg-white/[0.04] px-2 py-0.5 text-xs text-white/52">{formatFileSize(item.size)}</span>
                       </div>
-                      <div className="text-xs text-gray-400">{formatTimeAgo(item.timestamp)}</div>
+                      <div className="text-xs text-white/38">{formatTimeAgo(item.timestamp)}</div>
                     </div>
-                    <div className="flex items-center gap-2 ml-3">
+                    <div className="ml-3 flex items-center gap-2">
                       {item.gistId && (
                         <a
                           href={`https://gist.github.com/${item.gistId}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={() => event('geojson_history_open_gist', 'Tool Usage', `gist:${item.gistId}|size:${item.size}`, item.size)}
-                          className="text-blue-400 hover:text-blue-300 text-xs flex items-center gap-1 transition-colors"
+                          className="flex items-center gap-1 text-xs text-cyan-100/70 transition-colors hover:text-cyan-100"
                           title={t('geojson.viewGist')}
                         >
                           <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
@@ -1064,7 +1011,7 @@ function GeoJSONToolPageContent() {
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={() => event('geojson_history_open_preview', 'Tool Usage', `method:${item.gistId ? 'gist' : 'url'}|size:${item.size}`, item.size)}
-                        className="text-[#a1c4fd] hover:text-[#c2e9fb] text-xs flex items-center gap-1 transition-colors"
+                        className="flex items-center gap-1 text-xs text-cyan-100/70 transition-colors hover:text-cyan-100"
                         title={t('geojson.openPreviewNew')}
                       >
                         <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
@@ -1080,28 +1027,26 @@ function GeoJSONToolPageContent() {
           )}
 
           {/* Usage instructions */}
-          <motion.div 
-            className="bg-gray-800/30 rounded-lg p-4 border border-gray-700"
+          <motion.div
+            className="rounded-[8px] border border-white/[0.08] bg-white/[0.045] p-4 shadow-[0_20px_80px_rgba(0,0,0,0.20)] backdrop-blur md:p-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
           >
-            <h3 className="text-white font-medium mb-2 flex items-center gap-2">
-              <svg className="w-5 h-5 text-[#a1c4fd]" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-              </svg>
+            <h3 className="mb-3 text-sm font-semibold text-white/84">
               {t('geojson.usageTitle')}
             </h3>
-            <ul className="text-gray-300 text-sm space-y-1">
-              <li>• {t('geojson.usage1')}</li>
-              <li>• {t('geojson.usage2')}</li>
-              <li>• {t('geojson.usage3')}</li>
-              <li>• {t('geojson.usage4')}</li>
-              <li>• {t('geojson.usage5')}</li>
+            <ul className="space-y-2 text-sm leading-6 text-white/58">
+              {[t('geojson.usage1'), t('geojson.usage2'), t('geojson.usage3'), t('geojson.usage4'), t('geojson.usage5')].map((item) => (
+                <li key={item} className="flex gap-3">
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-white/38" aria-hidden="true" />
+                  <span>{item}</span>
+                </li>
+              ))}
             </ul>
           </motion.div>
         </motion.div>
-        </div>
+        </ToolContentSection>
       </main>
 
       <footer>
@@ -1112,17 +1057,7 @@ function GeoJSONToolPageContent() {
 }
 
 function GeoJSONToolPageFallback() {
-  return (
-    <div className="min-h-screen flex flex-col bg-gray-900">
-      <main className="flex-1 pt-10">
-        <div className="max-w-[2000px] mx-auto px-5 md:px-10 lg:px-16 py-6 md:py-8 lg:py-12">
-          <div className="flex justify-center items-center h-64">
-            <div className="text-white">Loading...</div>
-          </div>
-        </div>
-      </main>
-    </div>
-  );
+  return <ToolLoadingFallback className="bg-gray-900" />;
 }
 
 export default function GeoJSONToolPage() {
