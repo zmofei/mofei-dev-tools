@@ -531,6 +531,16 @@ function Base64ToolPageContent() {
             <div className="mt-8">
               <ContributeButton variant="ghost" size="sm" />
             </div>
+
+            <div className="mt-4">
+              <PrimaryPillLink
+                href={language === 'en' ? '/base64-image' : '/zh/base64-image'}
+                className="min-h-10 transform-none px-4 text-sm hover:translate-x-0 hover:translate-y-0"
+              >
+                {t('base64.imageToolLink')}
+                <span aria-hidden="true">→</span>
+              </PrimaryPillLink>
+            </div>
           </div>
         </section>
 

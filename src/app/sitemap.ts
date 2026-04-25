@@ -2,10 +2,11 @@ import type { MetadataRoute } from 'next';
 import { SITE_URL, TOOL_SLUGS, privacyUrl } from '@/lib/site';
 import { BBOX_HREFLANG, BBOX_LANGUAGES, bboxUrl } from '@/lib/bbox-i18n';
 
-const TODAY = '2026-04-07';
+const TODAY = '2026-04-25';
 
 const TOOL_CONFIG: Record<(typeof TOOL_SLUGS)[number], { changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency']; priority: number }> = {
   base64: { changeFrequency: 'monthly', priority: 0.8 },
+  'base64-image': { changeFrequency: 'monthly', priority: 0.8 },
   bbox: { changeFrequency: 'monthly', priority: 0.8 },
   geojson: { changeFrequency: 'monthly', priority: 0.8 },
   'json-extract': { changeFrequency: 'weekly', priority: 0.9 },

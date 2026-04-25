@@ -46,10 +46,10 @@ export default function HomePageContent({ lang }: { lang: SiteLanguage }) {
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 xl:gap-6">
               {category.tools.map((tool) => (
                 <Link key={tool.path} href={tool.path} className="block h-full">
-                  <GlassPanel className="relative flex h-full transform-none flex-col p-6 hover:translate-y-0">
+                  <GlassPanel className="relative flex h-full transform-none flex-col p-5 hover:translate-y-0 md:p-6 xl:p-5">
                     <div className="flex flex-col items-center text-center mb-4">
                       <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#a1c4fd] to-[#c2e9fb] flex items-center justify-center flex-shrink-0 text-2xl mb-3">
                         {tool.icon}

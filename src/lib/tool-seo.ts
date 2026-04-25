@@ -51,8 +51,8 @@ export const TOOL_SEO: Record<ToolSlug, Record<SiteLanguage, ToolSeoEntry>> = {
   base64: {
     zh: {
       title: '免费文本 Base64 转换器 - 在线编码解码工具 | Mofei 工具',
-      description: '使用免费的在线文本 Base64 转换器，在普通文本和 Base64 字符串之间快速转换。支持历史记录、分享功能，适合开发、调试和数据处理场景。',
-      keywords: ['文本 Base64 转换', 'Base64 编码', 'Base64 解码', 'Base64 转换器', '在线 Base64', 'Base64 编码器', 'Base64 解码器', '文本编码', '数据编码', 'Base64 工具', '免费 Base64', '在线编码工具', 'Base64 转换', '编码解码器', 'Base64 在线工具'],
+      description: '使用免费的在线文本 Base64 转换器，在普通文本和 Base64 字符串之间快速转换。此工具专注文本编码解码，适合开发、调试和数据处理场景。',
+      keywords: ['文本 Base64 转换', 'Base64 文本编码', 'Base64 文本解码', 'Base64 转换器', '在线 Base64', 'Base64 编码器', 'Base64 解码器', '文本编码', '数据编码', 'Base64 工具', '免费 Base64', '在线编码工具', 'Base64 转换', '编码解码器', 'Base64 在线工具'],
       category: '开发工具',
       classification: '文本处理工具',
       locale: 'zh_CN',
@@ -68,11 +68,47 @@ export const TOOL_SEO: Record<ToolSlug, Record<SiteLanguage, ToolSeoEntry>> = {
     },
     en: {
       title: "Free Text Base64 Converter - Online Encode Decode Tool | Mofei's Tools",
-      description: 'Convert plain text to Base64 and decode Base64 strings back to readable text with a free online tool. Includes history and sharing for development and debugging.',
-      keywords: ['text Base64 converter', 'Base64 encoder', 'Base64 decoder', 'Base64 converter', 'online Base64', 'text encoding', 'data encoding', 'Base64 tool', 'free Base64', 'encoding tool', 'Base64 conversion', 'encode decode', 'Base64 online'],
+      description: 'Convert plain text to Base64 and decode Base64 strings back to readable text with a free online tool. This text-focused converter includes history and sharing for development and debugging.',
+      keywords: ['text Base64 converter', 'Base64 text encoder', 'Base64 text decoder', 'Base64 converter', 'online Base64', 'text encoding', 'data encoding', 'Base64 tool', 'free Base64', 'encoding tool', 'Base64 conversion', 'encode decode', 'Base64 online'],
       category: 'Developer Tools',
       classification: 'Text Processing Tool',
       locale: 'en_US',
+    },
+  },
+  'base64-image': {
+    zh: {
+      title: '免费图片转 Base64 转换器 - Data URL 生成与在线预览 | Mofei 工具',
+      description: '使用免费的在线图片转 Base64 工具，将 PNG、JPG、WebP、SVG、GIF、AVIF 图片转换为 Base64 Data URL，也可以粘贴 Base64 图片字符串在线预览。适合 HTML、CSS、JSON 嵌入和快速调试，所有处理都在浏览器本地完成。',
+      keywords: ['图片转 Base64', 'Base64 图片转换器', 'Base64 图片预览', '图片转 Data URL', 'Data URL 生成器', '图片 Base64 编码', 'data:image Base64', '裸 Base64 图片', 'PNG 转 Base64', 'JPG 转 Base64', 'JPEG 转 Base64', 'WebP 转 Base64', 'SVG 转 Base64', 'GIF 转 Base64', 'AVIF 转 Base64', '在线图片编码', '免费 Base64 图片工具'],
+      category: '开发工具',
+      classification: '图片编码工具',
+      locale: 'zh_CN',
+      openGraph: {
+        title: '免费图片转 Base64 转换器 - Data URL 生成与在线预览',
+        description: '免费将 PNG、JPG、WebP、SVG、GIF、AVIF 图片转换为 Base64 Data URL，或粘贴 Base64 图片字符串直接预览。',
+      },
+      twitter: {
+        card: 'summary',
+        title: '免费图片转 Base64 转换器 - Data URL 生成与在线预览',
+        description: '免费将 PNG、JPG、WebP、SVG、GIF、AVIF 图片转换为 Base64 Data URL，或粘贴 Base64 图片字符串直接预览。',
+      },
+    },
+    en: {
+      title: "Free Image to Base64 Converter - Data URL Preview Tool | Mofei's Tools",
+      description: 'Use a free online image to Base64 converter for PNG, JPG, WebP, SVG, GIF, and AVIF images. Generate Base64 Data URLs, or paste Base64 image data to preview it instantly. Works locally in your browser for HTML, CSS, JSON, and quick debugging.',
+      keywords: ['image to Base64', 'Base64 image converter', 'image to Data URL', 'Data URL generator', 'Base64 image preview', 'data:image base64', 'raw Base64 image', 'PNG to Base64', 'JPG to Base64', 'JPEG to Base64', 'WebP to Base64', 'SVG to Base64', 'GIF to Base64', 'AVIF to Base64', 'online image encoder', 'free Base64 image tool'],
+      category: 'Developer Tools',
+      classification: 'Image Encoding Tool',
+      locale: 'en_US',
+      openGraph: {
+        title: 'Free Image to Base64 Converter - Data URL Preview Tool',
+        description: 'Convert PNG, JPG, WebP, SVG, GIF, and AVIF images to Base64 Data URLs for free, or paste Base64 image data and preview it instantly.',
+      },
+      twitter: {
+        card: 'summary',
+        title: 'Free Image to Base64 Converter - Data URL Preview Tool',
+        description: 'Convert PNG, JPG, WebP, SVG, GIF, and AVIF images to Base64 Data URLs for free, or paste Base64 image data and preview it instantly.',
+      },
     },
   },
   bbox: {

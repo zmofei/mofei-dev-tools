@@ -2,6 +2,7 @@ export const SITE_URL = 'https://tools.mofei.life';
 
 export const TOOL_SLUGS = [
   'base64',
+  'base64-image',
   'bbox',
   'geojson',
   'json-extract',

@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import { test } from 'node:test';
+import vm from 'node:vm';
 
+const require = createRequire(import.meta.url);
+const ts = require('typescript');
 const ROOT = new URL('../', import.meta.url);
 const toolSeoSource = await readFile(new URL('src/lib/tool-seo.ts', ROOT), 'utf8');
 const siteSource = await readFile(new URL('src/lib/site.ts', ROOT), 'utf8');
@@ -17,6 +22,36 @@ const REQUIRED_SEO_FIELDS = [
   'classification',
   'locale',
 ];
+
+function loadTsModule(path) {
+  const absolutePath = new URL(path, ROOT).pathname;
+  const source = readFileSync(absolutePath, 'utf8');
+  const { outputText } = ts.transpileModule(source, {
+    compilerOptions: {
+      module: ts.ModuleKind.CommonJS,
+      target: ts.ScriptTarget.ES2022,
+      esModuleInterop: true,
+      moduleResolution: ts.ModuleResolutionKind.Node10,
+    },
+  });
+  const cjsModule = { exports: {} };
+  const localRequire = (specifier) => {
+    if (specifier.startsWith('@/')) {
+      return loadTsModule(`src/${specifier.slice(2)}.ts`);
+    }
+    return require(specifier);
+  };
+
+  vm.runInNewContext(outputText, {
+    Buffer,
+    exports: cjsModule.exports,
+    module: cjsModule,
+    process,
+    require: localRequire,
+  }, { filename: absolutePath });
+
+  return cjsModule.exports;
+}
 
 function extractObjectLiteral(source, propertyName) {
   const propertyIndex = source.indexOf(`${propertyName}:`);
@@ -108,7 +143,7 @@ function assertSeoEntry(toolName, language, seo) {
 }
 
 test('base64 and geojson SEO entries contain required en and zh metadata', () => {
-  for (const toolName of ['base64', 'geojson']) {
+  for (const toolName of ['base64', "'base64-image'", 'geojson']) {
     const seo = evaluateObjectLiteral(extractObjectLiteral(toolSeoSource, toolName));
 
     assert.deepEqual(Object.keys(seo).sort(), ['en', 'zh']);
@@ -122,7 +157,7 @@ test('ordinary tool path rules keep English unprefixed and Chinese under /zh', (
   assert.match(siteSource, /language === 'zh' \? `\/zh\/\$\{slug\}` : `\/\$\{slug\}`/);
   assert.doesNotMatch(siteSource, /`\/en\/\$\{slug\}`/);
 
-  for (const slug of ['base64', 'geojson']) {
+  for (const slug of ['base64', 'base64-image', 'geojson']) {
     assert.match(siteSource, new RegExp(`'${slug}'`), `${slug} should be a configured tool slug`);
   }
 });
@@ -133,13 +168,38 @@ test('sitemap gives ordinary tools en-US, zh-CN, and x-default alternates', () =
   assert.match(sitemapSource, /'zh-CN': `\$\{SITE_URL\}\/zh\/\$\{slug\}`/);
   assert.match(sitemapSource, /'x-default': `\$\{SITE_URL\}\/\$\{slug\}`/);
 
-  for (const slug of ['base64', 'geojson']) {
-    assert.match(sitemapSource, new RegExp(`${slug}: \\{ changeFrequency:`), `${slug} should be in TOOL_CONFIG`);
+  for (const slug of ['base64', 'base64-image', 'geojson']) {
+    const keyPattern = slug.includes('-') ? `'${slug}'` : slug;
+    assert.match(sitemapSource, new RegExp(`${keyPattern}: \\{ changeFrequency:`), `${slug} should be in TOOL_CONFIG`);
   }
 });
 
-test('localized base64 and geojson pages reject unsupported languages', async () => {
-  for (const toolName of ['base64', 'geojson']) {
+test('generated sitemap and robots include base64-image canonical routes', () => {
+  const sitemap = loadTsModule('src/app/sitemap.ts').default();
+  const robots = loadTsModule('src/app/robots.ts').default();
+  const urls = sitemap.map((entry) => entry.url);
+  const base64ImageEn = sitemap.find((entry) => entry.url === 'https://tools.mofei.life/base64-image');
+  const base64ImageZh = sitemap.find((entry) => entry.url === 'https://tools.mofei.life/zh/base64-image');
+
+  assert.ok(base64ImageEn, 'English base64-image URL should be in sitemap');
+  assert.ok(base64ImageZh, 'Chinese base64-image URL should be in sitemap');
+  assert.ok(!urls.includes('https://tools.mofei.life/en/base64-image'), 'non-canonical /en/base64-image should not be in sitemap');
+
+  for (const entry of [base64ImageEn, base64ImageZh]) {
+    assert.deepEqual(JSON.parse(JSON.stringify(entry.alternates.languages)), {
+      'en-US': 'https://tools.mofei.life/base64-image',
+      'zh-CN': 'https://tools.mofei.life/zh/base64-image',
+      'x-default': 'https://tools.mofei.life/base64-image',
+    });
+  }
+
+  assert.ok(robots.rules.allow.includes('/base64-image'), 'robots should allow English base64-image route');
+  assert.ok(robots.rules.allow.includes('/zh/base64-image'), 'robots should allow Chinese base64-image route');
+  assert.ok(robots.rules.disallow.includes('/api/'), 'robots should keep API routes disallowed');
+});
+
+test('localized base64, base64-image, and geojson pages reject unsupported languages', async () => {
+  for (const toolName of ['base64', 'base64-image', 'geojson']) {
     const pageSource = await readFile(new URL(`src/app/[lang]/${toolName}/page.tsx`, ROOT), 'utf8');
     const layoutSource = await readFile(new URL(`src/app/[lang]/${toolName}/layout.tsx`, ROOT), 'utf8');
 

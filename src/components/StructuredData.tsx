@@ -49,7 +49,7 @@ function getToolStructuredDataConfig(
   switch (slug) {
     case 'base64':
       return {
-        name: isZh ? '文本 Base64 转换器' : 'Text Base64 Converter',
+        name: isZh ? '免费文本 Base64 转换器' : 'Free Text Base64 Converter',
         description: isZh
           ? '免费在线文本 Base64 转换工具，支持文本编码、解码、历史记录和结果分享。'
           : 'Free online text Base64 converter for encoding, decoding, history tracking, and result sharing.',
@@ -58,6 +58,17 @@ function getToolStructuredDataConfig(
           ? ['免费使用', '无需注册', '支持中英文', '在线处理', '文本编码', '文本解码', '历史记录', '结果分享']
           : ['Free to use', 'No registration required', 'Bilingual support', 'Online processing', 'Text encoding', 'Text decoding', 'History tracking', 'Result sharing'],
         screenshot: `/screenshots/base64-${language}.png`,
+      };
+    case 'base64-image':
+      return {
+        name: isZh ? '免费图片转 Base64 转换器' : 'Free Image to Base64 Converter',
+        description: isZh
+          ? '免费在线图片转 Base64 工具，支持 PNG、JPG、WebP、SVG、GIF、AVIF 转 Data URL 和 Base64 图片预览。'
+          : 'Free image to Base64 converter for PNG, JPG, WebP, SVG, GIF, and AVIF Data URLs with instant Base64 image preview.',
+        applicationSubCategory: isZh ? '图片编码工具' : 'Image Encoding Tool',
+        featureList: isZh
+          ? ['免费使用', '无需注册', '支持中英文', '浏览器本地处理', '图片转 Base64', 'Data URL 生成', '裸 Base64 图片预览', '支持 PNG、JPG、WebP、SVG、GIF 和 AVIF']
+          : ['Free to use', 'No registration required', 'Bilingual support', 'Local browser processing', 'Image to Base64', 'Data URL generation', 'Raw Base64 image preview', 'PNG, JPG, WebP, SVG, GIF, and AVIF support'],
       };
     case 'bbox':
       const bboxLanguage = normalizeBBoxLanguage(language);
@@ -71,10 +82,10 @@ function getToolStructuredDataConfig(
       };
     case 'coordinate-converter':
       return {
-        name: isZh ? 'GIS 坐标转换器' : 'GIS Coordinate Converter',
+        name: isZh ? '免费 GIS 坐标转换器' : 'Free GIS Coordinate Converter',
         description: isZh
-          ? '在线 GIS 坐标转换工具，支持 WGS84、GCJ-02、BD-09、UTM 和 Web Mercator。'
-          : 'Convert coordinates between geographic coordinate systems including WGS84, GCJ-02, BD-09, UTM, and Web Mercator.',
+          ? '免费在线 GIS 坐标转换工具，支持 WGS84、GCJ-02、BD-09、UTM 和 Web Mercator。'
+          : 'Free online coordinate converter for geographic coordinate systems including WGS84, GCJ-02, BD-09, UTM, and Web Mercator.',
         applicationSubCategory: isZh ? 'GIS 工具' : 'GIS Tool',
         featureList: isZh
           ? ['免费使用', '无需注册', '支持中英文', '在线处理', '多坐标系支持', 'WGS84 转换', 'GCJ-02 转换', 'BD-09 转换', 'UTM 投影转换', 'Web Mercator 转换', '批量转换']
@@ -82,7 +93,7 @@ function getToolStructuredDataConfig(
       };
     case 'geojson':
       return {
-        name: isZh ? 'GeoJSON 预览工具' : 'GeoJSON Preview Tool',
+        name: isZh ? '免费 GeoJSON 预览工具' : 'Free GeoJSON Preview Tool',
         description: isZh
           ? '免费在线 GeoJSON 预览工具，可快速生成 geojson.io 预览链接并检查地理数据。'
           : 'Free GeoJSON preview tool to generate geojson.io preview links and inspect geographic data quickly.',
@@ -94,10 +105,10 @@ function getToolStructuredDataConfig(
       };
     case 'json-extract':
       return {
-        name: isZh ? 'JSON Path 提取器' : 'JSON Path Extractor',
+        name: isZh ? '免费 JSON Path 提取器' : 'Free JSON Path Extractor',
         description: isZh
-          ? '使用 JSONPath 表达式从 JSON 数据中提取特定值，支持多列提取、数组遍历和导出。'
-          : 'Extract specific values from JSON data using JSONPath expressions with multi-column extraction, array traversal, and export support.',
+          ? '免费在线使用 JSONPath 表达式从 JSON 数据中提取特定值，支持多列提取、数组遍历和导出。'
+          : 'Free online JSON Path extractor for specific values from JSON data, with multi-column extraction, array traversal, and export support.',
         applicationSubCategory: isZh ? 'JSON 工具' : 'JSON Tool',
         featureList: isZh
           ? ['免费使用', '无需注册', '支持中英文', '在线处理', 'JSONPath 语法支持', '多列提取', '数组遍历', 'CSV 导出', '对比模式', '实时预览']
@@ -105,14 +116,14 @@ function getToolStructuredDataConfig(
       };
     case 'objectid':
       return {
-        name: isZh ? 'MongoDB ObjectID 生成器' : 'MongoDB ObjectID Generator',
+        name: isZh ? '免费 MongoDB ObjectID 生成器' : 'Free MongoDB ObjectID Generator',
         description: isZh
           ? '免费在线 MongoDB ObjectID 生成工具，支持自定义时间戳、时间戳提取和结构分析。'
           : 'Free online tool to generate MongoDB ObjectIDs with custom timestamp support, timestamp extraction, and structure analysis.',
         applicationSubCategory: isZh ? '数据库工具' : 'Database Tool',
         featureList: isZh
-          ? ['生成 MongoDB ObjectID', '自定义时间戳支持', 'ObjectID 结构分析', '时间戳提取', '复制和分享功能', '生成历史记录']
-          : ['Generate MongoDB ObjectID', 'Custom timestamp support', 'ObjectID structure analysis', 'Timestamp extraction', 'Copy and share functionality', 'Generation history tracking'],
+          ? ['免费使用', '无需注册', '生成 MongoDB ObjectID', '自定义时间戳支持', 'ObjectID 结构分析', '时间戳提取', '复制和分享功能', '生成历史记录']
+          : ['Free to use', 'No registration required', 'Generate MongoDB ObjectID', 'Custom timestamp support', 'ObjectID structure analysis', 'Timestamp extraction', 'Copy and share functionality', 'Generation history tracking'],
       };
   }
 }
@@ -139,11 +150,6 @@ function getWebsiteStructuredData(language: SiteLanguage) {
       '@type': 'Organization',
       name: 'Mofei',
       url: 'https://www.mofei.life',
-    },
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: `${SITE_URL}/search?q={search_term_string}`,
-      'query-input': 'required name=search_term_string',
     },
     mainEntity: {
       '@type': 'ItemList',
@@ -184,13 +190,27 @@ function getToolStructuredData(slug: ToolSlug, language: SiteLanguage | BBoxLang
     operatingSystem: 'Web Browser',
     softwareRequirements: 'Web Browser',
     permissions: 'No special permissions required',
+    isAccessibleForFree: true,
+    creator: {
+      '@type': 'Person',
+      name: 'Mofei',
+      url: 'https://www.mofei.life',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Mofei',
+      url: 'https://www.mofei.life',
+    },
     offers: {
       '@type': 'Offer',
       price: '0',
       priceCurrency: 'USD',
     },
     featureList: config.featureList,
-    downloadUrl: localizedUrl,
+    potentialAction: {
+      '@type': 'ViewAction',
+      target: localizedUrl,
+    },
     ...(config.screenshot ? { screenshot: `${SITE_URL}${config.screenshot}` } : {}),
   };
 }
@@ -202,7 +222,7 @@ function getObjectIdEnhancedStructuredData(language: SiteLanguage) {
   return {
     '@context': 'https://schema.org',
     '@type': ['WebApplication', 'SoftwareApplication'],
-    name: isZh ? 'MongoDB ObjectID 生成器' : 'MongoDB ObjectID Generator',
+    name: isZh ? '免费 MongoDB ObjectID 生成器' : 'Free MongoDB ObjectID Generator',
     description: isZh
       ? '免费在线 MongoDB ObjectID 生成工具，支持自定义时间戳。提取时间戳信息，分析结构，为 MongoDB 开发创建唯一数据库标识符。'
       : 'Free online tool to generate MongoDB ObjectIDs with custom timestamp support. Extract timestamps, analyze structure, and create unique database identifiers for MongoDB development.',
@@ -224,12 +244,12 @@ function getObjectIdEnhancedStructuredData(language: SiteLanguage) {
     },
     mainEntity: {
       '@type': 'SoftwareApplication',
-      name: isZh ? 'ObjectID 生成器' : 'ObjectID Generator',
+      name: isZh ? '免费 ObjectID 生成器' : 'Free ObjectID Generator',
       applicationCategory: isZh ? '数据库工具' : 'Database Tool',
       downloadUrl: localizedUrl,
       featureList: isZh
-        ? ['生成 MongoDB ObjectID', '自定义时间戳支持', 'ObjectID 结构分析', '时间戳提取', '复制和分享功能', '生成历史记录']
-        : ['Generate MongoDB ObjectID', 'Custom timestamp support', 'ObjectID structure analysis', 'Timestamp extraction', 'Copy and share functionality', 'Generation history tracking'],
+        ? ['免费使用', '无需注册', '生成 MongoDB ObjectID', '自定义时间戳支持', 'ObjectID 结构分析', '时间戳提取', '复制和分享功能', '生成历史记录']
+        : ['Free to use', 'No registration required', 'Generate MongoDB ObjectID', 'Custom timestamp support', 'ObjectID structure analysis', 'Timestamp extraction', 'Copy and share functionality', 'Generation history tracking'],
       browserRequirements: 'Requires JavaScript enabled',
     },
     potentialAction: {

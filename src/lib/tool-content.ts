@@ -56,6 +56,22 @@ export const TOOL_CONTENT: Record<ToolSlug, ToolEntry> = {
       },
     },
   },
+  'base64-image': {
+    icon: '🖼️',
+    category: 'dev',
+    copy: {
+      en: {
+        name: 'Image to Base64 Converter',
+        description: 'Convert PNG, JPG, WebP, SVG, GIF, and AVIF images to Base64 Data URLs with instant preview',
+        categoryLabel: 'Development Tools',
+      },
+      zh: {
+        name: '图片转 Base64 转换器',
+        description: '将 PNG、JPG、WebP、SVG、GIF、AVIF 图片转换为 Base64 Data URL，并支持在线预览',
+        categoryLabel: '开发工具',
+      },
+    },
+  },
   'json-extract': {
     icon: '📊',
     category: 'dev',

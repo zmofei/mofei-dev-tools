@@ -79,10 +79,14 @@ export default function ContributeButton({
           <span>🚀</span>
           {buttonText}
           <motion.span
-            animate={{ rotate: isOpen ? 180 : 0 }}
+            animate={{ scale: isOpen ? 1.08 : 1 }}
             transition={{ duration: 0.2 }}
+            aria-hidden="true"
+            className="inline-flex h-4 w-4 items-center justify-center"
           >
-            ↓
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M7.5 8.75h9M7.5 12h6M6.25 18.25l-2.5 2v-13A3.25 3.25 0 017 4h10a3.25 3.25 0 013.25 3.25V15A3.25 3.25 0 0117 18.25H6.25z" />
+            </svg>
           </motion.span>
         </ButtonComponent>
       </div>

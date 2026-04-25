@@ -29,6 +29,9 @@ const translations = {
     'tools.base64.name': '文本 Base64 转换',
     'tools.base64.description': '将普通文本编码为 Base64，或把 Base64 解码回可读文本',
     'tools.base64.category': '开发工具',
+    'tools.base64-image.name': '图片转 Base64 转换器',
+    'tools.base64-image.description': '将 PNG、JPG、WebP、SVG、GIF、AVIF 图片转换为 Base64 Data URL，并支持在线预览',
+    'tools.base64-image.category': '开发工具',
     'tools.geojson.name': 'GeoJSON预览',
     'tools.geojson.description': 'GeoJSON文件预览链接生成器，快速生成geojson.io预览URL',
     'tools.geojson.category': 'GIS工具',
@@ -89,6 +92,7 @@ const translations = {
     'base64.share': '分享',
     'base64.shareResult': '分享结果',
     'base64.shareCopied': '分享链接已复制！',
+    'base64.imageToolLink': '需要处理图片？打开 Base64 图片转换工具',
     'geojson.title': 'GeoJSON 预览工具',
     'geojson.subtitle': '将GeoJSON数据生成geojson.io预览链接',
     'geojson.backToTools': '返回工具集',
@@ -272,6 +276,9 @@ const translations = {
     'tools.base64.name': 'Text Base64 Converter',
     'tools.base64.description': 'Encode plain text to Base64 or decode Base64 back to readable text',
     'tools.base64.category': 'Development Tool',
+    'tools.base64-image.name': 'Image to Base64 Converter',
+    'tools.base64-image.description': 'Convert PNG, JPG, WebP, SVG, GIF, and AVIF images to Base64 Data URLs with instant preview',
+    'tools.base64-image.category': 'Development Tool',
     'tools.geojson.name': 'GeoJSON Preview',
     'tools.geojson.description': 'Generate geojson.io preview links for GeoJSON data visualization',
     'tools.geojson.category': 'GIS Tool',
@@ -332,6 +339,7 @@ const translations = {
     'base64.share': 'Share',
     'base64.shareResult': 'Share Result',
     'base64.shareCopied': 'Share link copied!',
+    'base64.imageToolLink': 'Working with images? Open the Base64 image converter',
     'geojson.title': 'GeoJSON Preview Tool',
     'geojson.subtitle': 'Generate geojson.io preview links for your GeoJSON data',
     'geojson.backToTools': 'Back to Tools',
@@ -530,8 +538,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       // 如果当前路径已经包含语言参数
       const restPath = pathSegments.slice(2).join('/');
       if (lang === 'en') {
-        // 英文版：如果是首页，跳转到根路径，否则使用 /en/xxx
-        const newPath = restPath ? `/en/${restPath}` : '/';
+        // 英文版使用无语言前缀的 canonical 路径
+        const newPath = restPath ? `/${restPath}` : '/';
         router.push(newPath);
       } else {
         // 中文版：始终使用 /zh/xxx
@@ -544,12 +552,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         const newPath = pathname === '/' ? '/zh' : `/zh${pathname}`;
         router.push(newPath);
       } else {
-        // 英文版，如果是首页就留在根路径
-        if (pathname !== '/') {
-          const newPath = `/en${pathname}`;
-          router.push(newPath);
+        // 英文版使用无语言前缀的 canonical 路径；如果已经是英文 canonical，就不需要跳转
+        if (pathname.startsWith('/en/')) {
+          router.push(pathname.replace(/^\/en/, '') || '/');
         }
-        // 如果已经是根路径，就不需要跳转
       }
     }
   };

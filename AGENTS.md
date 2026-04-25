@@ -93,6 +93,7 @@
 
 - Use `pnpm test` for the current Node test suite under `tests/`.
 - Use `pnpm run build` before deployment or after metadata/routing changes with a broad impact.
+- Do not run `pnpm run build` only because a final commit is about to be created; run it only when deployment readiness or the change risk actually calls for it.
 - Use `pnpm run cf:build` when validating Cloudflare/OpenNext output.
 - Existing tests assert SEO completeness, canonical route behavior, BBox multilingual routing, and sitemap/hreflang rules. Update tests when intentionally changing these contracts.
 

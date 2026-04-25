@@ -65,6 +65,47 @@ test('base64 functions encode, decode, validate, and detect Base64 text', () => 
   assert.equal(looksLikeBase64('plain text'), false);
 });
 
+test('base64 image functions parse data URLs, raw payloads, and image byte sizes', () => {
+  const {
+    detectImageMimeTypeFromBase64,
+    extensionForImageMimeType,
+    formatImageBytes,
+    isSupportedImageMimeType,
+    isValidBase64Payload,
+    parseBase64ImageInput,
+    stripBase64Whitespace,
+  } = loadTsModule('src/lib/base64-image-tool.ts');
+
+  const onePixelPng = 'iVBORw0KGgo=';
+  assert.equal(stripBase64Whitespace('iVBORw0K\nGgo='), onePixelPng);
+  assert.equal(isValidBase64Payload(onePixelPng), true);
+  assert.equal(isValidBase64Payload('not image base64'), false);
+  assert.equal(isSupportedImageMimeType('image/webp'), true);
+  assert.equal(isSupportedImageMimeType('text/plain'), false);
+  assert.equal(detectImageMimeTypeFromBase64(onePixelPng), 'image/png');
+  assert.equal(extensionForImageMimeType('image/webp'), 'webp');
+
+  assert.deepEqual(plain(parseBase64ImageInput(`data:image/png;base64,${onePixelPng}`)), {
+    dataUrl: `data:image/png;base64,${onePixelPng}`,
+    mimeType: 'image/png',
+    base64: onePixelPng,
+  });
+  assert.deepEqual(plain(parseBase64ImageInput(`data:image/jpeg;charset=utf-8;base64,${onePixelPng}`)), {
+    dataUrl: `data:image/png;base64,${onePixelPng}`,
+    mimeType: 'image/png',
+    base64: onePixelPng,
+  });
+  assert.deepEqual(plain(parseBase64ImageInput(onePixelPng, 'image/jpeg')), {
+    dataUrl: `data:image/png;base64,${onePixelPng}`,
+    mimeType: 'image/png',
+    base64: onePixelPng,
+  });
+  assert.throws(() => parseBase64ImageInput('data:text/plain;base64,aGVsbG8='), /Invalid Base64 image data/);
+  assert.equal(formatImageBytes(512), '512 B');
+  assert.equal(formatImageBytes(1536), '1.5 KB');
+  assert.equal(formatImageBytes(2 * 1024 * 1024), '2.00 MB');
+});
+
 test('objectid functions generate deterministic ids and extract timestamp components', () => {
   const {
     analyzeObjectId,

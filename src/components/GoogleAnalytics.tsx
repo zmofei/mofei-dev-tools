@@ -27,12 +27,29 @@ export const pageview = (url: string) => {
 };
 
 // Google Analytics 事件追踪
-export const event = (action: string, category: string, label?: string, value?: number) => {
+type GAEventParams = Record<string, string | number | boolean | null | undefined>;
+
+// Google Analytics 事件追踪
+export const event = (
+  action: string,
+  category: string,
+  labelOrParams?: string | GAEventParams,
+  value?: number,
+) => {
   if (typeof window !== 'undefined' && window.gtag) {
+    const eventParams = typeof labelOrParams === 'object' && labelOrParams !== null
+      ? {
+          event_category: category,
+          ...labelOrParams,
+        }
+      : {
+          event_category: category,
+          event_label: labelOrParams,
+          value: value,
+        };
+
     window.gtag('event', action, {
-      event_category: category,
-      event_label: label,
-      value: value,
+      ...eventParams,
     });
   }
 };
