@@ -89,6 +89,15 @@ test('json-extract en/zh SEO config is complete and English has openGraph/twitte
   assert.match(localizedLayout, /createToolMetadata\(\{\s*slug:\s*'json-extract',\s*\.\.\.TOOL_SEO\['json-extract'\]\[lang\]/s);
 });
 
+test('language provider initializes localized pages from pathname before hydration', () => {
+  const languageContext = readSource('src/contexts/LanguageContext.tsx');
+
+  assert.match(languageContext, /function\s+languageFromPathname\(pathname:\s*string\):\s*Language/);
+  assert.match(languageContext, /return\s+langSegment\s*===\s*'zh'\s*\?\s*'zh'\s*:\s*'en'/);
+  assert.match(languageContext, /useState<Language>\(\(\)\s*=>\s*languageFromPathname\(pathname\)\)/);
+  assert.doesNotMatch(languageContext, /useState<Language>\('en'\)/);
+});
+
 test('json-format SEO and localized routes follow canonical tool routing', () => {
   const toolSeo = readSource('src/lib/tool-seo.ts');
   const site = readSource('src/lib/site.ts');

@@ -512,23 +512,20 @@ const translations = {
   }
 };
 
+function languageFromPathname(pathname: string): Language {
+  const pathSegments = pathname.split('/');
+  const langSegment = pathSegments[1];
+
+  return langSegment === 'zh' ? 'zh' : 'en';
+}
+
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const pathname = usePathname();
-  const [language, setLanguage] = useState<Language>('en');
+  const pathname = usePathname() || '/';
+  const [language, setLanguageState] = useState<Language>(() => languageFromPathname(pathname));
 
   useEffect(() => {
-    // 从URL路径中获取语言参数
-    const pathSegments = pathname.split('/');
-    const langSegment = pathSegments[1]; // 第一个段应该是语言参数
-    
-    if (langSegment === 'zh') {
-      setLanguage('zh');
-    } else if (langSegment === 'en') {
-      setLanguage('en');
-    } else {
-      setLanguage('en');
-    }
+    setLanguageState(languageFromPathname(pathname));
   }, [pathname]);
 
   const changeLanguage = (lang: Language) => {
