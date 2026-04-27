@@ -200,6 +200,7 @@ test('generated sitemap and robots include ordinary tool canonical routes', () =
   }
 
   assert.ok(robots.rules.disallow.includes('/api/'), 'robots should keep API routes disallowed');
+  assert.ok(robots.rules.disallow.includes('/cdn-cgi/'), 'robots should disallow Cloudflare edge helper routes');
 });
 
 test('localized base64, json-format, and geojson pages reject unsupported languages', async () => {
