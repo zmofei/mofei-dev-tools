@@ -9,7 +9,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: ['/', '/zh', ...TOOL_SLUGS.flatMap((slug) => [`/${slug}`, `/zh/${slug}`]), ...bboxPaths],
-      disallow: ['/api/'],
+      disallow: ['/api/', '/cdn-cgi/'],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
   };
