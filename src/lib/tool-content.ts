@@ -1,6 +1,6 @@
 import { TOOL_SLUGS, toolPath, type SiteLanguage, type ToolSlug } from '@/lib/site';
 
-type ToolCategory = 'dev' | 'gis';
+type ToolCategory = 'dev' | 'gis' | 'productivity';
 
 type ToolCopy = {
   name: string;
@@ -24,6 +24,7 @@ export const HOME_COPY = {
     categories: {
       dev: 'Development Tools',
       gis: 'GIS & Mapping Tools',
+      productivity: 'Productivity Tools',
     },
   },
   zh: {
@@ -35,6 +36,7 @@ export const HOME_COPY = {
     categories: {
       dev: '开发工具',
       gis: 'GIS 地理工具',
+      productivity: '效率工具',
     },
   },
 } as const;
@@ -117,6 +119,22 @@ export const TOOL_CONTENT: Record<ToolSlug, ToolEntry> = {
         name: 'ObjectID 生成器',
         description: '生成 MongoDB ObjectID，支持自定义时间戳',
         categoryLabel: '开发工具',
+      },
+    },
+  },
+  timezone: {
+    icon: '🕒',
+    category: 'productivity',
+    copy: {
+      en: {
+        name: 'World Time Compare',
+        description: 'Compare city times, date differences, work-hour overlap, and share cross-time-zone meeting setups',
+        categoryLabel: 'Productivity Tools',
+      },
+      zh: {
+        name: '世界时间对照',
+        description: '对比城市时间、日期差异和工作时间重叠，并分享跨时区会议配置',
+        categoryLabel: '效率工具',
       },
     },
   },

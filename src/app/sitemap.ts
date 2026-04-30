@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 import { SITE_URL, TOOL_SLUGS, privacyUrl } from '@/lib/site';
 import { BBOX_HREFLANG, BBOX_LANGUAGES, bboxUrl } from '@/lib/bbox-i18n';
 
-const TODAY = '2026-04-25';
+const TODAY = '2026-04-30';
 
 const TOOL_CONFIG: Record<(typeof TOOL_SLUGS)[number], { changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency']; priority: number }> = {
   base64: { changeFrequency: 'monthly', priority: 0.8 },
@@ -13,6 +13,7 @@ const TOOL_CONFIG: Record<(typeof TOOL_SLUGS)[number], { changeFrequency: Metada
   'json-extract': { changeFrequency: 'weekly', priority: 0.9 },
   'coordinate-converter': { changeFrequency: 'weekly', priority: 0.9 },
   objectid: { changeFrequency: 'monthly', priority: 0.8 },
+  timezone: { changeFrequency: 'weekly', priority: 0.9 },
 };
 
 export default function sitemap(): MetadataRoute.Sitemap {

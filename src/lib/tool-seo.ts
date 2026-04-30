@@ -331,6 +331,40 @@ export const TOOL_SEO: Record<ToolSlug, Record<SiteLanguage, ToolSeoEntry>> = {
       },
     },
   },
+  timezone: {
+    zh: {
+      title: '免费世界时间对照 - 时区对照、城市时间换算与跨时区会议规划 | Mofei 工具',
+      description: '免费在线世界时间对照工具。添加城市或 IANA 时区，查看当地时间、日期差异和工作时间重叠，自动处理夏令时，并分享跨时区会议配置。',
+      keywords: ['世界时间对照', '时区对照', '城市时间换算', '跨时区会议', '工作时间重叠', '世界时钟', '时区转换器', '城市时间对比', '会议时间规划', '会议时间换算', '当地时间换算', 'IANA 时区', '夏令时换算', '全球时间换算', '在线世界时钟'],
+      category: '效率工具',
+      classification: '时区与会议规划工具',
+      locale: 'zh_CN',
+      openGraph: {
+        title: '免费世界时间对照 - 时区对照、城市时间换算与跨时区会议规划',
+        description: '添加城市或时区，查看当地时间、日期差异和工作时间重叠，快速规划跨时区会议。',
+      },
+      twitter: {
+        title: '免费世界时间对照 - 时区对照、城市时间换算与跨时区会议规划',
+        description: '添加城市或时区，查看当地时间、日期差异和工作时间重叠，快速规划跨时区会议。',
+      },
+    },
+    en: {
+      title: 'World Time Compare & Time Zone Converter | Mofei Tools',
+      description: 'Compare local time across cities and IANA time zones, find working-hour overlap, handle date differences and DST, and share cross-time-zone meeting setups.',
+      keywords: ['world time compare', 'time zone comparison', 'time zone converter', 'city timezone converter', 'working hours overlap', 'meeting time converter', 'compare time zones', 'city time converter', 'world clock meeting planner', 'cross timezone meeting planner', 'business hours overlap', 'daylight saving time converter', 'IANA timezone converter', 'local time converter', 'free world time tool'],
+      category: 'Productivity Tools',
+      classification: 'Time Zone and Meeting Planner',
+      locale: 'en_US',
+      openGraph: {
+        title: 'World Time Compare & Time Zone Converter',
+        description: 'Compare city times, find working-hour overlap, and convert meeting times between time zones.',
+      },
+      twitter: {
+        title: 'World Time Compare & Time Zone Converter',
+        description: 'Compare city times, find working-hour overlap, and convert meeting times between time zones.',
+      },
+    },
+  },
 };
 
 export function getToolSeo(slug: ToolSlug, language: SiteLanguage): ToolSeoEntry {
