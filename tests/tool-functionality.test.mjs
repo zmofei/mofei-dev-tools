@@ -164,6 +164,20 @@ test('timezone functions convert local inputs and classify working hours', () =>
   assert.deepEqual(plain(parseShareState(new URLSearchParams(encodeShareState([customId], helsinkiDate))).placeIds), [customId]);
 });
 
+test('timezone functions apply daylight saving offsets for selected dates', () => {
+  const { getTimeParts } = loadTsModule('src/lib/timezone-tool.ts');
+
+  const winter = new Date('2026-01-15T12:00:00.000Z');
+  const summer = new Date('2026-07-15T12:00:00.000Z');
+
+  assert.equal(getTimeParts(winter, 'America/Los_Angeles').offsetLabel, 'UTC-8');
+  assert.equal(getTimeParts(summer, 'America/Los_Angeles').offsetLabel, 'UTC-7');
+  assert.equal(getTimeParts(winter, 'Europe/Helsinki').offsetLabel, 'UTC+2');
+  assert.equal(getTimeParts(summer, 'Europe/Helsinki').offsetLabel, 'UTC+3');
+  assert.equal(getTimeParts(winter, 'Asia/Shanghai').offsetLabel, 'UTC+8');
+  assert.equal(getTimeParts(summer, 'Asia/Shanghai').offsetLabel, 'UTC+8');
+});
+
 test('timezone search helpers match places and custom IANA zones', () => {
   const {
     createCustomPlaceFromTimeZone,
