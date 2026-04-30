@@ -31,6 +31,7 @@ function loadTsModule(path) {
 
   vm.runInNewContext(outputText, {
     Buffer,
+    URLSearchParams,
     exports: cjsModule.exports,
     module: cjsModule,
     require: localRequire,
@@ -127,6 +128,148 @@ test('objectid functions generate deterministic ids and extract timestamp compon
     counterHex: '000001',
     timestamp,
   });
+});
+
+test('timezone functions convert local inputs and classify working hours', () => {
+  const {
+    buildDateFromLocalInput,
+    customTimeZoneId,
+    dateRelation,
+    encodeShareState,
+    findPlaceById,
+    formatTime,
+    getTimeParts,
+    getTimeStatus,
+    parseShareState,
+  } = loadTsModule('src/lib/timezone-tool.ts');
+
+  const helsinkiDate = buildDateFromLocalInput('2026-04-30', '18:30', 'Europe/Helsinki');
+  assert.ok(helsinkiDate);
+  assert.equal(formatTime(helsinkiDate, 'America/Los_Angeles'), '08:30');
+  assert.equal(formatTime(helsinkiDate, 'Asia/Shanghai'), '23:30');
+
+  const helsinkiParts = getTimeParts(helsinkiDate, 'Europe/Helsinki');
+  assert.equal(helsinkiParts.offsetLabel, 'UTC+3');
+  assert.equal(getTimeStatus({ hour: 10 }, { workStart: 9, workEnd: 17 }), 'working');
+  assert.equal(getTimeStatus({ hour: 7 }, { workStart: 9, workEnd: 17 }), 'sleeping');
+  assert.equal(getTimeStatus({ hour: 20 }, { workStart: 9, workEnd: 17 }), 'sleeping');
+  assert.equal(getTimeStatus({ hour: 2 }, { workStart: 9, workEnd: 17 }), 'sleeping');
+  assert.equal(dateRelation(helsinkiDate, 'Asia/Tokyo', 'America/Los_Angeles'), 'next');
+
+  const share = encodeShareState(['helsinki', 'tokyo'], helsinkiDate);
+  assert.deepEqual(plain(parseShareState(new URLSearchParams(share)).placeIds), ['helsinki', 'tokyo']);
+
+  const customId = customTimeZoneId('Europe/Oslo');
+  assert.equal(findPlaceById(customId).timeZone, 'Europe/Oslo');
+  assert.deepEqual(plain(parseShareState(new URLSearchParams(encodeShareState([customId], helsinkiDate))).placeIds), [customId]);
+});
+
+test('timezone search helpers match places and custom IANA zones', () => {
+  const {
+    createCustomPlaceFromTimeZone,
+    customTimeZoneId,
+    getSupportedTimeZones,
+    matchPlaceInput,
+    matchTimeZoneInput,
+    normalizePlaceIds,
+    placeInputLabel,
+    timeZoneName,
+    timeZoneOption,
+  } = loadTsModule('src/lib/timezone-tool.ts');
+
+  assert.equal(placeInputLabel(matchPlaceInput('Shanghai', [])), 'Shanghai, China (Asia/Shanghai)');
+  assert.equal(matchPlaceInput('China', ['shanghai'])?.id, 'beijing');
+  assert.equal(matchPlaceInput('Shanghai', ['shanghai']), undefined);
+  assert.equal(matchPlaceInput('  america/new_york  ', [])?.id, 'new-york');
+
+  const panamaOption = timeZoneOption('America/Panama');
+  assert.deepEqual(plain(panamaOption), {
+    label: 'Panama (America/Panama)',
+    searchText: 'panama america/panama',
+    timeZone: 'America/Panama',
+  });
+  assert.equal(timeZoneName('America/Argentina/Buenos_Aires'), 'Buenos Aires');
+  assert.equal(matchTimeZoneInput('Panama', [panamaOption], [])?.timeZone, 'America/Panama');
+  assert.equal(matchTimeZoneInput('America/Panama', [panamaOption], [])?.timeZone, 'America/Panama');
+  assert.equal(matchTimeZoneInput('Panama', [panamaOption], [customTimeZoneId('America/Panama')]), undefined);
+
+  const panama = createCustomPlaceFromTimeZone('America/Panama');
+  assert.equal(panama?.id, customTimeZoneId('America/Panama'));
+  assert.equal(panama?.name, 'Panama');
+  assert.equal(createCustomPlaceFromTimeZone('Not/A_Time_Zone'), undefined);
+
+  assert.deepEqual(plain(normalizePlaceIds(['tokyo', 'helsinki', 'tokyo', 'missing', customTimeZoneId('Europe/Oslo')])), [
+    'helsinki',
+    'tokyo',
+    customTimeZoneId('Europe/Oslo'),
+  ]);
+
+  assert.ok(getSupportedTimeZones().includes('UTC'));
+});
+
+test('timezone work ranges normalize colors and match local hours', () => {
+  const {
+    DEFAULT_WORK_RANGE_COLOR,
+    WORK_RANGE_COLORS,
+    getMatchingWorkRange,
+    hexToRgba,
+    normalizeWorkRange,
+    normalizeWorkRangeColor,
+    workRangeLabel,
+  } = loadTsModule('src/lib/timezone-tool.ts');
+
+  assert.deepEqual(plain(WORK_RANGE_COLORS), ['#ffffff', '#67e8f9', '#6ee7b7', '#fcd34d', '#fda4af']);
+  assert.equal(DEFAULT_WORK_RANGE_COLOR, '#ffffff');
+  assert.equal(normalizeWorkRangeColor('#12ABef'), '#12abef');
+  assert.equal(normalizeWorkRangeColor('cyan'), '#67e8f9');
+  assert.equal(normalizeWorkRangeColor('bad-color'), '#ffffff');
+  assert.equal(hexToRgba('#67e8f9', 0.18), 'rgba(103, 232, 249, 0.18)');
+
+  assert.deepEqual(plain(normalizeWorkRange({ start: -3, end: 99, color: 'rose' })), {
+    start: 0,
+    end: 24,
+    color: '#fda4af',
+  });
+  assert.deepEqual(plain(normalizeWorkRange({ start: 23, end: 5, color: '#123456' })), {
+    start: 23,
+    end: 24,
+    color: '#123456',
+  });
+  assert.deepEqual(plain(normalizeWorkRange({ start: 9, end: 17 })), {
+    start: 9,
+    end: 17,
+    color: '#ffffff',
+  });
+
+  const ranges = [
+    normalizeWorkRange({ start: 9, end: 12, color: '#ffffff' }),
+    normalizeWorkRange({ start: 13, end: 17, color: '#67e8f9' }),
+  ];
+  assert.equal(getMatchingWorkRange(8, ranges), null);
+  assert.equal(getMatchingWorkRange(9, ranges)?.color, '#ffffff');
+  assert.equal(getMatchingWorkRange(12, ranges), null);
+  assert.equal(getMatchingWorkRange(16, ranges)?.color, '#67e8f9');
+  assert.equal(workRangeLabel(ranges[1]), '13-16');
+});
+
+test('timezone share state rejects invalid zones and keeps custom zones', () => {
+  const {
+    DEFAULT_TIME_PLACES,
+    customTimeZoneId,
+    encodeShareState,
+    parseShareState,
+  } = loadTsModule('src/lib/timezone-tool.ts');
+
+  const selectedDate = new Date('2026-04-30T15:30:00.000Z');
+  const customId = customTimeZoneId('America/Panama');
+  const parsed = parseShareState(new URLSearchParams(encodeShareState(['missing', 'london', customId], selectedDate)));
+
+  assert.deepEqual(plain(parsed.placeIds), ['london', customId]);
+  assert.equal(parsed.selectedDate?.toISOString(), selectedDate.toISOString());
+
+  const fallback = parseShareState(new URLSearchParams('zones=missing&time=not-a-date'));
+  assert.deepEqual(plain(fallback.placeIds), plain(DEFAULT_TIME_PLACES));
+  assert.equal(fallback.selectedDate, null);
 });
 
 test('bbox functions parse common inputs, format share params, compute metrics, and create polygons', () => {

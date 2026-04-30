@@ -17,6 +17,7 @@ type StructuredDataProps =
 type ToolStructuredDataConfig = {
   name: string;
   description: string;
+  applicationCategory?: string;
   applicationSubCategory: string;
   featureList: string[];
   screenshot?: string;
@@ -136,6 +137,18 @@ function getToolStructuredDataConfig(
           ? ['免费使用', '无需注册', '生成 MongoDB ObjectID', '自定义时间戳支持', 'ObjectID 结构分析', '时间戳提取', '复制和分享功能', '生成历史记录']
           : ['Free to use', 'No registration required', 'Generate MongoDB ObjectID', 'Custom timestamp support', 'ObjectID structure analysis', 'Timestamp extraction', 'Copy and share functionality', 'Generation history tracking'],
       };
+    case 'timezone':
+      return {
+        name: isZh ? '免费世界时间对照工具' : 'World Time Compare & Time Zone Converter',
+        description: isZh
+          ? '免费在线世界时间对照工具，可对比城市当地时间、日期差异和工作时间重叠，快速换算城市时间并规划跨时区会议。'
+          : 'Compare world time across cities, check working-hour overlap, and convert meeting times between time zones with a DST-aware city timezone converter.',
+        applicationCategory: 'UtilitiesApplication',
+        applicationSubCategory: isZh ? '时区与会议规划工具' : 'Time Zone and Meeting Planner',
+        featureList: isZh
+          ? ['免费使用', '无需注册', '世界时间对照', '时区对照', '城市时间换算', '跨时区会议规划', '工作时间重叠', '分享链接', '自动处理夏令时']
+          : ['World time compare', 'Time zone comparison', 'City timezone converter', 'Working-hour overlap', 'Meeting time converter', 'Date difference display', 'Shareable links', 'Daylight saving time aware'],
+      };
   }
 }
 
@@ -171,6 +184,7 @@ function getWebsiteStructuredData(language: SiteLanguage) {
         item: {
           '@type': 'WebApplication',
           name: tool.name,
+          description: tool.description,
           url: toolUrl(tool.slug, language),
         },
       })),
@@ -196,7 +210,7 @@ function getToolStructuredData(slug: ToolSlug, language: SiteLanguage | BBoxLang
     description: config.description,
     url: localizedUrl,
     inLanguage,
-    applicationCategory: 'DeveloperApplication',
+    applicationCategory: config.applicationCategory ?? 'DeveloperApplication',
     applicationSubCategory: config.applicationSubCategory,
     operatingSystem: 'Web Browser',
     softwareRequirements: 'Web Browser',
@@ -272,8 +286,102 @@ function getObjectIdEnhancedStructuredData(language: SiteLanguage) {
   };
 }
 
-function getObjectIdBreadcrumbStructuredData(language: SiteLanguage) {
+function getTimezoneEnhancedStructuredData(language: SiteLanguage) {
+  const config = getToolStructuredDataConfig('timezone', language);
+  const localizedUrl = toolUrl('timezone', language);
   const isZh = language === 'zh';
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': ['WebApplication', 'SoftwareApplication'],
+    '@id': `${localizedUrl}#app`,
+    name: config.name,
+    description: config.description,
+    url: localizedUrl,
+    mainEntityOfPage: localizedUrl,
+    inLanguage: isZh ? 'zh-CN' : 'en-US',
+    applicationCategory: 'UtilitiesApplication',
+    applicationSubCategory: config.applicationSubCategory,
+    operatingSystem: 'Web Browser',
+    browserRequirements: 'Requires JavaScript enabled',
+    softwareRequirements: 'Web Browser',
+    permissions: 'No special permissions required',
+    isAccessibleForFree: true,
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+    },
+    creator: {
+      '@type': 'Person',
+      name: 'Mofei',
+      url: 'https://www.mofei.life',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Mofei',
+      url: 'https://www.mofei.life',
+    },
+    featureList: config.featureList,
+    potentialAction: {
+      '@type': 'UseAction',
+      name: isZh ? '对比时区' : 'Compare time zones',
+      target: localizedUrl,
+    },
+    sameAs: [toolUrl('timezone', 'en'), toolUrl('timezone', 'zh')],
+  };
+}
+
+function getTimezoneFaqStructuredData(language: SiteLanguage) {
+  const isZh = language === 'zh';
+  const localizedUrl = toolUrl('timezone', language);
+  const questions = isZh
+    ? [
+        { name: '怎么比较不同时区的时间？', answer: '添加要比较的城市或 IANA 时区，时间轴会把每个地点对应的当地小时并排显示，并标出跨日期的 +1 或 -1。' },
+        { name: '怎么找跨时区会议时间？', answer: '把参会人的城市都添加进来，然后查看哪些时间行同时落在大家的工作时间色块内，优先选择重叠最多的时间。' },
+        { name: '怎么知道同事现在是不是工作时间？', answer: '添加同事所在城市，看当前时间指示线是否落在该城市的工作时间范围内。如果对方团队作息不同，可以手动调整工作时间。' },
+        { name: '怎么把某个城市时间换算成本地时间？', answer: '把本地城市放在第一列，再添加目标城市。查看目标城市某个小时所在的同一行，就能看到对应的本地时间。' },
+        {
+          name: '这个时区换算会处理夏令时吗？',
+          answer: '会。工具使用浏览器的 IANA 时区数据进行换算，会根据所选日期和时区自动应用对应的夏令时偏移。',
+        },
+        { name: '可以把跨时区对照结果发给别人吗？', answer: '可以。点击“分享配置”会复制包含城市和时间状态的链接，对方打开后能看到同一组时区对照。' },
+      ]
+    : [
+        { name: 'How do I compare time across different time zones?', answer: 'Add the cities or IANA time zones you want to compare. The timeline shows each location’s matching local hour side by side, including date changes like +1 or -1 day.' },
+        { name: 'How can I find a good meeting time across time zones?', answer: 'Add every participant’s city, then scan for hours where the work-hour bands overlap. Pick a row where all or most locations are inside normal working hours.' },
+        { name: 'How do I know if a coworker is currently in working hours?', answer: 'Add your coworker’s city and check the current-time marker against the work-hour band. You can adjust the work range if their team uses different hours.' },
+        { name: 'How do I convert a city’s time to my local time?', answer: 'Add your city as the first reference column and add the target city. Select or read the target city’s hour in the timeline to see the matching local hour in your column.' },
+        {
+          name: 'Does the time zone tool handle daylight saving time?',
+          answer: 'Yes. The converter uses browser IANA time zone data, so offsets are applied for the selected date and location, including daylight saving time changes.',
+        },
+        { name: 'Can I share a timezone comparison with others?', answer: 'Yes. Use Share setup to copy a link with the selected cities and time so others can open the same comparison.' },
+      ];
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    url: localizedUrl,
+    inLanguage: isZh ? 'zh-CN' : 'en-US',
+    mainEntity: questions.map((question) => ({
+      '@type': 'Question',
+      name: question.name,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: question.answer,
+      },
+    })),
+  };
+}
+
+function getToolBreadcrumbStructuredData(slug: ToolSlug, language: SiteLanguage) {
+  const isZh = language === 'zh';
+  const config = getToolStructuredDataConfig(slug, language);
+  const categoryName = slug === 'timezone'
+    ? isZh ? '效率工具' : 'Productivity Tools'
+    : isZh ? '开发工具' : 'Developer Tools';
+  const categoryAnchor = slug === 'timezone' ? 'productivity-tools' : 'dev-tools';
 
   return {
     '@context': 'https://schema.org',
@@ -288,14 +396,14 @@ function getObjectIdBreadcrumbStructuredData(language: SiteLanguage) {
       {
         '@type': 'ListItem',
         position: 2,
-        name: isZh ? '开发工具' : 'Developer Tools',
-        item: `${homeUrl(language)}#dev-tools`,
+        name: categoryName,
+        item: `${homeUrl(language)}#${categoryAnchor}`,
       },
       {
         '@type': 'ListItem',
         position: 3,
-        name: isZh ? 'ObjectID 生成器' : 'ObjectID Generator',
-        item: toolUrl('objectid', language),
+        name: config.name,
+        item: toolUrl(slug, language),
       },
     ],
   };
@@ -312,7 +420,19 @@ export default function StructuredData(props: StructuredDataProps) {
     return (
       <Fragment>
         {scriptTag('tool-jsonld', getObjectIdEnhancedStructuredData(language))}
-        {scriptTag('objectid-breadcrumb-jsonld', getObjectIdBreadcrumbStructuredData(language))}
+        {scriptTag('objectid-breadcrumb-jsonld', getToolBreadcrumbStructuredData('objectid', language))}
+      </Fragment>
+    );
+  }
+
+  if (props.slug === 'timezone') {
+    const language = props.language === 'zh' ? 'zh' : 'en';
+
+    return (
+      <Fragment>
+        {scriptTag('tool-jsonld', getTimezoneEnhancedStructuredData(language))}
+        {scriptTag('timezone-faq-jsonld', getTimezoneFaqStructuredData(language))}
+        {scriptTag('timezone-breadcrumb-jsonld', getToolBreadcrumbStructuredData('timezone', language))}
       </Fragment>
     );
   }

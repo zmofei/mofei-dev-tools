@@ -8,6 +8,7 @@ export default function HomePageContent({ lang }: { lang: SiteLanguage }) {
   const tools = getHomeTools(lang);
   const categories = [
     { key: 'dev', title: content.categories.dev, tools: tools.filter((tool) => tool.category === 'dev') },
+    { key: 'productivity', title: content.categories.productivity, tools: tools.filter((tool) => tool.category === 'productivity') },
     { key: 'gis', title: content.categories.gis, tools: tools.filter((tool) => tool.category === 'gis') },
   ];
 
@@ -29,7 +30,7 @@ export default function HomePageContent({ lang }: { lang: SiteLanguage }) {
 
       <div id="tools-list" className="max-w-[2000px] mx-auto scroll-mt-24 px-5 md:px-10 lg:px-16 pb-6 pt-2 md:pb-8 lg:pb-12">
         {categories.map((category) => (
-          <section key={category.key} className="mb-12 md:mb-16">
+          <section key={category.key} id={`${category.key}-tools`} className="mb-12 scroll-mt-24 md:mb-16">
             <div className="mb-6 flex items-center gap-3 md:mb-8">
               <SectionLabel>{category.title}</SectionLabel>
               <span className="h-px flex-1 bg-gradient-to-r from-white/12 to-transparent" />
