@@ -133,15 +133,15 @@ src/
 
 - Node.js 20+ is recommended.
 - pnpm 10.10.0, as declared in `package.json`.
-- The default `pnpm dev` script starts Next.js on `local.mofei.life` with local HTTPS. You can either map that hostname to your machine or change the dev script to use your own local hostname.
+- The default `pnpm dev` script starts Next.js with a custom local HTTPS hostname. You can either map that hostname to your machine or change the `-H` value in `package.json` to use your own local hostname.
 
-For example, to use the default hostname, add this to `/etc/hosts` if it is not already configured:
+For example, after choosing a local hostname, add it to `/etc/hosts`:
 
 ```text
-127.0.0.1 local.mofei.life
+127.0.0.1 your-local-hostname.test
 ```
 
-If you prefer a different local domain, update the `-H local.mofei.life` part of the `dev` script in `package.json`.
+The checked-in default currently uses `local.mofei.life`; replace it if that does not fit your setup.
 
 ### Install
 
