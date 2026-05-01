@@ -132,7 +132,7 @@ function BBoxDrawingToolContent({ language }: { language: BBoxLanguage }) {
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isPanelCollapsed, setIsPanelCollapsed] = useState(false);
   const [isDrawHintVisible, setIsDrawHintVisible] = useState(true);
-  const mapboxToken = 'pk.eyJ1IjoibW9mZWkiLCJhIjoiY2w1Z3Z6OWw1MDNlaDNjcXpqMjZsMG5oZCJ9.nqfToaqgxmm3jbJzu6bK6Q';
+  const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
   // Check if device is mobile
   useEffect(() => {
@@ -148,6 +148,10 @@ function BBoxDrawingToolContent({ language }: { language: BBoxLanguage }) {
 
   // Load Mapbox and initialize map
   useEffect(() => {
+    if (!mapboxToken) {
+      console.warn('NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN is not configured.');
+      return;
+    }
 
     const loadMapbox = async () => {
       try {
@@ -374,7 +378,7 @@ function BBoxDrawingToolContent({ language }: { language: BBoxLanguage }) {
         mapInstanceRef.current = null;
       }
     };
-  }, [isMobile]);
+  }, [isMobile, mapboxToken]);
 
   // Drawing mode is disabled on mobile, so no need to manage map interactions
 

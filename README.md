@@ -117,10 +117,25 @@ Optional analytics and verification variables can be placed in `.env.local`:
 
 ```bash
 NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=pk.your-mapbox-public-token
 GOOGLE_SITE_VERIFICATION=your-verification-token
 ```
 
-For Cloudflare builds, set `NEXT_PUBLIC_GA_ID` as a Build environment variable so the client bundle receives the value during `next build`.
+`NEXT_PUBLIC_*` values are inlined by Next.js at build time. For local CLI deploys, keep them in `.env.local` before running `pnpm run deploy`. For Cloudflare Workers Git Builds, add them in Cloudflare Dashboard:
+
+1. Open **Workers & Pages**.
+2. Select the `mofei-dev-tools` Worker.
+3. Open **Settings > Build**.
+4. Add these under **Build variables and secrets**:
+
+```bash
+NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=pk.your-mapbox-public-token
+```
+
+Do not rely on runtime **Variables and Secrets** alone for these two values; runtime variables are available to the deployed Worker, but they are too late for `next build`. After changing a build variable, trigger a new deploy so the client bundle is rebuilt with the updated value.
+
+The Mapbox value is a browser-visible public `pk.*` token by design. Restrict allowed URLs in Mapbox, for example `https://tools.mofei.life/*` plus any local development origins you use.
 
 ### Develop
 
