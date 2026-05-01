@@ -170,8 +170,6 @@ Map is not configured
 Set NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN in .env.local for local development, or in Cloudflare Build variables for deploys. See README > Environment.
 ```
 
-The Mapbox value is a browser-visible public `pk.*` token by design. Restrict allowed URLs in Mapbox, for example `https://tools.mofei.life/*` plus any local development origins you use.
-
 Other optional analytics, GitHub preview, and site-verification variables are documented in `.env.local.example` and `.env.example`.
 
 `NEXT_PUBLIC_*` values are inlined by Next.js at build time. For local CLI deploys, keep required public values in `.env.local` before running `pnpm run deploy`.
