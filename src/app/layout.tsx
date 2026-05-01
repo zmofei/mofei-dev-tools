@@ -20,6 +20,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const googleSiteVerification = process.env.GOOGLE_SITE_VERIFICATION;
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
@@ -64,6 +66,11 @@ export const metadata: Metadata = {
       'zh-CN': homeUrl('zh'),
     },
   },
+  other: googleSiteVerification
+    ? {
+        'google-site-verification': googleSiteVerification,
+      }
+    : undefined,
 };
 
 function htmlLangFromPath(pathname: string) {
