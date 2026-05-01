@@ -141,7 +141,7 @@ For example, after choosing a local hostname, add it to `/etc/hosts`:
 127.0.0.1 your-local-hostname.test
 ```
 
-The checked-in default currently uses `local.mofei.life`; replace it if that does not fit your setup.
+Check the `dev` script in `package.json` for the current hostname and replace it if that does not fit your setup.
 
 ### Install
 
@@ -199,10 +199,10 @@ Do not rely on runtime **Variables and Secrets** alone for these two values. Run
 pnpm dev
 ```
 
-The dev script runs:
+The dev script runs Next.js with a custom HTTPS host. The exact hostname is defined in `package.json`; conceptually it is:
 
 ```bash
-next dev -H local.mofei.life --turbopack --experimental-https
+next dev -H your-local-hostname.test --turbopack --experimental-https
 ```
 
 Open the HTTPS local URL printed by Next.js.
