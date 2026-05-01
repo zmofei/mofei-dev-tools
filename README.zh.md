@@ -261,6 +261,9 @@ BBox 的语言配置比较特殊。它支持 `en`、`zh`、`de`、`es`、`fr`，
 
 欢迎贡献。修改公开页面时，请保持路由、metadata、sitemap、robots 和共享工具内容同步。
 
+- 新工具想法和一般反馈：[GitHub Discussion #7](https://github.com/zmofei/mofei-dev-tools/discussions/7)
+- Bug 和明确坏掉的问题：[GitHub Issues](https://github.com/zmofei/mofei-dev-tools/issues)
+
 更多流程见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
 ## 算法声明
