@@ -151,22 +151,17 @@ pnpm install
 
 ### Environment
 
-Copy one of the env templates when setting up a local checkout:
+Copy the local env template when setting up a local checkout:
 
 ```bash
 cp .env.local.example .env.local
 ```
 
-Optional analytics, GitHub preview, map, and verification variables can be placed in `.env.local`:
+For regular local development, the main variable to check is the Mapbox public token used by the BBox map:
 
 ```bash
-NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
-NEXT_PUBLIC_GITHUB_CLIENT_ID=Ov23...
 NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=pk.your-mapbox-public-token
-GOOGLE_SITE_VERIFICATION=your-verification-token
 ```
-
-`NEXT_PUBLIC_GITHUB_CLIENT_ID` is used by the GeoJSON preview flow for GitHub device authorization. A public fallback exists in the app, but keeping the value in `.env.local` makes local setup explicit.
 
 `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN` is required by the BBox tool's interactive Mapbox map. If it is missing, the BBox page still renders the tool panel, but the map area shows this configuration message instead of the interactive map:
 
@@ -177,9 +172,11 @@ Set NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN in .env.local for local development, or in C
 
 The Mapbox value is a browser-visible public `pk.*` token by design. Restrict allowed URLs in Mapbox, for example `https://tools.mofei.life/*` plus any local development origins you use.
 
-`NEXT_PUBLIC_*` values are inlined by Next.js at build time. For local CLI deploys, keep them in `.env.local` before running `pnpm run deploy`.
+Other optional analytics, GitHub preview, and site-verification variables are documented in `.env.local.example` and `.env.example`.
 
-For Cloudflare Workers Git Builds, add the public frontend variables in Cloudflare Dashboard:
+`NEXT_PUBLIC_*` values are inlined by Next.js at build time. For local CLI deploys, keep required public values in `.env.local` before running `pnpm run deploy`.
+
+For Cloudflare Workers Git Builds, add required public frontend variables in Cloudflare Dashboard:
 
 1. Open **Workers & Pages**.
 2. Select the `mofei-dev-tools` Worker.
@@ -187,11 +184,10 @@ For Cloudflare Workers Git Builds, add the public frontend variables in Cloudfla
 4. Add these under **Build variables and secrets**:
 
 ```bash
-NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
 NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=pk.your-mapbox-public-token
 ```
 
-Do not rely on runtime **Variables and Secrets** alone for these two values. Runtime variables are available to the deployed Worker, but they are too late for `next build`. After changing a build variable, trigger a fresh deploy so the client bundle is rebuilt with the updated value.
+Do not rely on runtime **Variables and Secrets** alone for `NEXT_PUBLIC_*` values. Runtime variables are available to the deployed Worker, but they are too late for `next build`. After changing a build variable, trigger a fresh deploy so the client bundle is rebuilt with the updated value.
 
 ### Develop
 
