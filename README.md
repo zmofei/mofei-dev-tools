@@ -111,9 +111,9 @@ src/
 pnpm install
 ```
 
-### Environment {#environment}
+### Environment
 
-Optional analytics and verification variables can be placed in `.env.local`:
+Optional analytics, map, and verification variables can be placed in `.env.local`:
 
 ```bash
 NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
@@ -121,7 +121,18 @@ NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=pk.your-mapbox-public-token
 GOOGLE_SITE_VERIFICATION=your-verification-token
 ```
 
-`NEXT_PUBLIC_*` values are inlined by Next.js at build time. For local CLI deploys, keep them in `.env.local` before running `pnpm run deploy`. For Cloudflare Workers Git Builds, add them in Cloudflare Dashboard:
+`NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN` is required by the BBox tool's interactive Mapbox map. If it is missing, the BBox page still renders the tool panel, but the map area shows this configuration message instead of the interactive map:
+
+```text
+Map is not configured
+Set NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN in .env.local for local development, or in Cloudflare Build variables for deploys. See README > Environment.
+```
+
+The Mapbox value is a browser-visible public `pk.*` token by design. Restrict allowed URLs in Mapbox, for example `https://tools.mofei.life/*` plus any local development origins you use.
+
+`NEXT_PUBLIC_*` values are inlined by Next.js at build time. For local CLI deploys, keep them in `.env.local` before running `pnpm run deploy`.
+
+For Cloudflare Workers Git Builds, add the public frontend variables in Cloudflare Dashboard:
 
 1. Open **Workers & Pages**.
 2. Select the `mofei-dev-tools` Worker.
@@ -133,11 +144,7 @@ NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
 NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=pk.your-mapbox-public-token
 ```
 
-Do not rely on runtime **Variables and Secrets** alone for these two values; runtime variables are available to the deployed Worker, but they are too late for `next build`. After changing a build variable, trigger a new deploy so the client bundle is rebuilt with the updated value.
-
-The Mapbox value is a browser-visible public `pk.*` token by design. Restrict allowed URLs in Mapbox, for example `https://tools.mofei.life/*` plus any local development origins you use.
-
-If `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN` is missing, the BBox page will still render the control panel but will show a map configuration message instead of the interactive Mapbox map.
+Do not rely on runtime **Variables and Secrets** alone for these two values. Runtime variables are available to the deployed Worker, but they are too late for `next build`. After changing a build variable, trigger a fresh deploy so the client bundle is rebuilt with the updated value.
 
 ### Develop
 
