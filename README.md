@@ -261,6 +261,9 @@ See the privacy page at `/privacy` or `/zh/privacy`.
 
 Contributions are welcome. Please keep routing, metadata, sitemap, robots, and shared tool content in sync when changing public pages.
 
+- Tool ideas and general feedback: [GitHub Discussion #7](https://github.com/zmofei/mofei-dev-tools/discussions/7)
+- Bugs and broken behavior: [GitHub Issues](https://github.com/zmofei/mofei-dev-tools/issues)
+
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the broader contribution workflow.
 
 ## Algorithm Declaration
