@@ -111,7 +111,7 @@ src/
 pnpm install
 ```
 
-### Environment
+### Environment {#environment}
 
 Optional analytics and verification variables can be placed in `.env.local`:
 
