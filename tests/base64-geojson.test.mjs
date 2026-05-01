@@ -145,8 +145,8 @@ function assertSeoEntry(toolName, language, seo) {
   assert.equal(seo.locale, language === 'zh' ? 'zh_CN' : 'en_US');
 }
 
-test('base64, json-format, timezone, and geojson SEO entries contain required en and zh metadata', () => {
-  for (const toolName of ['base64', "'base64-image'", "'json-format'", 'timezone', 'geojson']) {
+test('base64, json-format, time, and geojson SEO entries contain required en and zh metadata', () => {
+  for (const toolName of ['base64', "'base64-image'", "'json-format'", 'time', 'geojson']) {
     const seo = evaluateObjectLiteral(extractObjectLiteral(toolSeoSource, toolName));
 
     assert.deepEqual(Object.keys(seo).sort(), ['en', 'zh']);
@@ -155,11 +155,13 @@ test('base64, json-format, timezone, and geojson SEO entries contain required en
   }
 });
 
-test('timezone SEO targets multilingual time zone comparison intent', async () => {
-  const seo = evaluateObjectLiteral(extractObjectLiteral(toolSeoSource, 'timezone'));
-  const rootPageSource = await readFile(new URL('src/app/timezone/page.tsx', ROOT), 'utf8');
-  const pageComponentSource = await readFile(new URL('src/app/timezone/PageComponent.tsx', ROOT), 'utf8');
-  const localizedLayoutSource = await readFile(new URL('src/app/[lang]/timezone/layout.tsx', ROOT), 'utf8');
+test('time SEO targets multilingual time zone comparison intent', async () => {
+  const seo = evaluateObjectLiteral(extractObjectLiteral(toolSeoSource, 'time'));
+  const rootPageSource = await readFile(new URL('src/app/time/page.tsx', ROOT), 'utf8');
+  const pageComponentSource = await readFile(new URL('src/app/time/PageComponent.tsx', ROOT), 'utf8');
+  const localizedLayoutSource = await readFile(new URL('src/app/[lang]/time/layout.tsx', ROOT), 'utf8');
+  const legacyRootRedirectSource = await readFile(new URL('src/app/timezone/page.tsx', ROOT), 'utf8');
+  const legacyLocalizedRedirectSource = await readFile(new URL('src/app/[lang]/timezone/page.tsx', ROOT), 'utf8');
 
   assert.match(seo.en.title, /World Time Compare & Time Zone Converter/);
   assert.match(seo.en.description, /IANA time zones/i);
@@ -171,16 +173,16 @@ test('timezone SEO targets multilingual time zone comparison intent', async () =
   assert.ok(seo.zh.keywords.includes('城市时间换算'));
   assert.ok(seo.zh.keywords.includes('跨时区会议'));
 
-  assert.match(rootPageSource, /createToolMetadata\(\{\s*slug:\s*'timezone',\s*\.\.\.getToolSeo\('timezone',\s*'en'\)/s);
-  assert.match(rootPageSource, /StructuredData\s+type="tool"\s+language="en"\s+slug="timezone"/);
-  assert.match(localizedLayoutSource, /createToolMetadata\(\{\s*slug:\s*'timezone',\s*\.\.\.TOOL_SEO\.timezone\[lang\]\s*\}\)/s);
-  assert.match(structuredDataSource, /case\s+'timezone':/);
+  assert.match(rootPageSource, /createToolMetadata\(\{\s*slug:\s*'time',\s*\.\.\.getToolSeo\('time',\s*'en'\)/s);
+  assert.match(rootPageSource, /StructuredData\s+type="tool"\s+language="en"\s+slug="time"/);
+  assert.match(localizedLayoutSource, /createToolMetadata\(\{\s*slug:\s*'time',\s*\.\.\.TOOL_SEO\.time\[lang\]\s*\}\)/s);
+  assert.match(structuredDataSource, /case\s+'time':/);
   assert.match(structuredDataSource, /applicationCategory:\s*'UtilitiesApplication'/);
   assert.match(structuredDataSource, /'@type':\s*'FAQPage'/);
   assert.match(structuredDataSource, /timezone-breadcrumb-jsonld/);
   assert.doesNotMatch(structuredDataSource, /timezone-howto-jsonld/);
   assert.match(structuredDataSource, /description:\s*tool\.description/);
-  assert.match(structuredDataSource, /categoryAnchor\s*=\s*slug === 'timezone' \? 'productivity-tools' : 'dev-tools'/);
+  assert.match(structuredDataSource, /categoryAnchor\s*=\s*slug === 'time' \? 'productivity-tools' : 'dev-tools'/);
   assert.match(pageComponentSource, /faqTitle:/);
   assert.match(pageComponentSource, /How can I find a good meeting time across time zones\?/);
   assert.match(pageComponentSource, /怎么找跨时区会议时间？/);
@@ -198,10 +200,12 @@ test('timezone SEO targets multilingual time zone comparison intent', async () =
   ]) {
     assert.match(pageComponentSource, new RegExp(`trackTimezone\\('${eventName}'`), `timezone should track ${eventName}`);
   }
-  assert.match(toolContentSource, /timezone:\s*\{/);
+  assert.match(toolContentSource, /time:\s*\{/);
   assert.match(toolContentSource, /date differences/);
   assert.match(toolContentSource, /跨时区会议配置/);
   assert.match(homePageContentSource, /id=\{`\$\{category\.key\}-tools`\}/);
+  assert.match(legacyRootRedirectSource, /permanentRedirect\('\/time'\)/);
+  assert.match(legacyLocalizedRedirectSource, /permanentRedirect\(lang === 'zh' \? '\/zh\/time' : '\/time'\)/);
 });
 
 test('ordinary tool path rules keep English unprefixed and Chinese under /zh', () => {
@@ -209,7 +213,7 @@ test('ordinary tool path rules keep English unprefixed and Chinese under /zh', (
   assert.match(siteSource, /language === 'zh' \? `\/zh\/\$\{slug\}` : `\/\$\{slug\}`/);
   assert.doesNotMatch(siteSource, /`\/en\/\$\{slug\}`/);
 
-  for (const slug of ['base64', 'base64-image', 'json-format', 'timezone', 'geojson']) {
+  for (const slug of ['base64', 'base64-image', 'json-format', 'time', 'geojson']) {
     assert.match(siteSource, new RegExp(`'${slug}'`), `${slug} should be a configured tool slug`);
   }
 });
@@ -221,7 +225,7 @@ test('sitemap gives ordinary tools en-US, zh-CN, and x-default alternates', () =
   assert.match(sitemapSource, /'zh-CN': `\$\{SITE_URL\}\/zh\/\$\{slug\}`/);
   assert.match(sitemapSource, /'x-default': `\$\{SITE_URL\}\/\$\{slug\}`/);
 
-  for (const slug of ['base64', 'base64-image', 'json-format', 'timezone', 'geojson']) {
+  for (const slug of ['base64', 'base64-image', 'json-format', 'time', 'geojson']) {
     const keyPattern = slug.includes('-') ? `'${slug}'` : slug;
     assert.match(sitemapSource, new RegExp(`${keyPattern}: \\{ changeFrequency:`), `${slug} should be in TOOL_CONFIG`);
   }
@@ -232,7 +236,7 @@ test('generated sitemap and robots include ordinary tool canonical routes', () =
   const robots = loadTsModule('src/app/robots.ts').default();
   const urls = sitemap.map((entry) => entry.url);
 
-  for (const slug of ['base64-image', 'json-format', 'timezone']) {
+  for (const slug of ['base64-image', 'json-format', 'time']) {
     const englishEntry = sitemap.find((entry) => entry.url === `https://tools.mofei.life/${slug}`);
     const chineseEntry = sitemap.find((entry) => entry.url === `https://tools.mofei.life/zh/${slug}`);
 
@@ -256,8 +260,8 @@ test('generated sitemap and robots include ordinary tool canonical routes', () =
   assert.ok(robots.rules.disallow.includes('/cdn-cgi/'), 'robots should disallow Cloudflare edge helper routes');
 });
 
-test('localized base64, json-format, timezone, and geojson pages reject unsupported languages', async () => {
-  for (const toolName of ['base64', 'base64-image', 'json-format', 'timezone', 'geojson']) {
+test('localized base64, json-format, time, and geojson pages reject unsupported languages', async () => {
+  for (const toolName of ['base64', 'base64-image', 'json-format', 'time', 'geojson']) {
     const pageSource = await readFile(new URL(`src/app/[lang]/${toolName}/page.tsx`, ROOT), 'utf8');
     const layoutSource = await readFile(new URL(`src/app/[lang]/${toolName}/layout.tsx`, ROOT), 'utf8');
 

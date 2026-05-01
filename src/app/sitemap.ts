@@ -13,7 +13,7 @@ const TOOL_CONFIG: Record<(typeof TOOL_SLUGS)[number], { changeFrequency: Metada
   'json-extract': { changeFrequency: 'weekly', priority: 0.9 },
   'coordinate-converter': { changeFrequency: 'weekly', priority: 0.9 },
   objectid: { changeFrequency: 'monthly', priority: 0.8 },
-  timezone: { changeFrequency: 'weekly', priority: 0.9 },
+  time: { changeFrequency: 'weekly', priority: 0.9 },
 };
 
 export default function sitemap(): MetadataRoute.Sitemap {

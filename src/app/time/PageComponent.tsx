@@ -577,7 +577,7 @@ export default function TimezonePage() {
   };
 
   const share = async () => {
-    const url = `${window.location.origin}${toolPath('timezone', lang)}?${encodeShareState(placeIds, selectedDate)}`;
+    const url = `${window.location.origin}${toolPath('time', lang)}?${encodeShareState(placeIds, selectedDate)}`;
     try {
       await navigator.clipboard.writeText(url);
       setShareState('copied');

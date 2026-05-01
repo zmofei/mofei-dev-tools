@@ -9,7 +9,7 @@ export const TOOL_SLUGS = [
   'json-extract',
   'coordinate-converter',
   'objectid',
-  'timezone',
+  'time',
 ] as const;
 
 export const SITE_LANGUAGES = ['en', 'zh'] as const;

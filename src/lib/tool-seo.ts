@@ -331,7 +331,7 @@ export const TOOL_SEO: Record<ToolSlug, Record<SiteLanguage, ToolSeoEntry>> = {
       },
     },
   },
-  timezone: {
+  time: {
     zh: {
       title: '免费世界时间对照 - 时区对照、城市时间换算与跨时区会议规划 | Mofei 工具',
       description: '免费在线世界时间对照工具。添加城市或 IANA 时区，查看当地时间、日期差异和工作时间重叠，自动处理夏令时，并分享跨时区会议配置。',

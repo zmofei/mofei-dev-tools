@@ -122,7 +122,7 @@ export const TOOL_CONTENT: Record<ToolSlug, ToolEntry> = {
       },
     },
   },
-  timezone: {
+  time: {
     icon: '🕒',
     category: 'productivity',
     copy: {

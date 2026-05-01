@@ -16,7 +16,7 @@ export async function generateMetadata({
     notFound();
   }
 
-  return createToolMetadata({ slug: 'timezone', ...TOOL_SEO.timezone[lang] })
+  return createToolMetadata({ slug: 'time', ...TOOL_SEO.time[lang] })
 }
 
 export default function TimezoneLayout({

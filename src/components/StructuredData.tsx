@@ -137,7 +137,7 @@ function getToolStructuredDataConfig(
           ? ['免费使用', '无需注册', '生成 MongoDB ObjectID', '自定义时间戳支持', 'ObjectID 结构分析', '时间戳提取', '复制和分享功能', '生成历史记录']
           : ['Free to use', 'No registration required', 'Generate MongoDB ObjectID', 'Custom timestamp support', 'ObjectID structure analysis', 'Timestamp extraction', 'Copy and share functionality', 'Generation history tracking'],
       };
-    case 'timezone':
+    case 'time':
       return {
         name: isZh ? '免费世界时间对照工具' : 'World Time Compare & Time Zone Converter',
         description: isZh
@@ -287,8 +287,8 @@ function getObjectIdEnhancedStructuredData(language: SiteLanguage) {
 }
 
 function getTimezoneEnhancedStructuredData(language: SiteLanguage) {
-  const config = getToolStructuredDataConfig('timezone', language);
-  const localizedUrl = toolUrl('timezone', language);
+  const config = getToolStructuredDataConfig('time', language);
+  const localizedUrl = toolUrl('time', language);
   const isZh = language === 'zh';
 
   return {
@@ -328,13 +328,13 @@ function getTimezoneEnhancedStructuredData(language: SiteLanguage) {
       name: isZh ? '对比时区' : 'Compare time zones',
       target: localizedUrl,
     },
-    sameAs: [toolUrl('timezone', 'en'), toolUrl('timezone', 'zh')],
+    sameAs: [toolUrl('time', 'en'), toolUrl('time', 'zh')],
   };
 }
 
 function getTimezoneFaqStructuredData(language: SiteLanguage) {
   const isZh = language === 'zh';
-  const localizedUrl = toolUrl('timezone', language);
+  const localizedUrl = toolUrl('time', language);
   const questions = isZh
     ? [
         { name: '怎么比较不同时区的时间？', answer: '添加要比较的城市或 IANA 时区，时间轴会把每个地点对应的当地小时并排显示，并标出跨日期的 +1 或 -1。' },
@@ -378,10 +378,10 @@ function getTimezoneFaqStructuredData(language: SiteLanguage) {
 function getToolBreadcrumbStructuredData(slug: ToolSlug, language: SiteLanguage) {
   const isZh = language === 'zh';
   const config = getToolStructuredDataConfig(slug, language);
-  const categoryName = slug === 'timezone'
+  const categoryName = slug === 'time'
     ? isZh ? '效率工具' : 'Productivity Tools'
     : isZh ? '开发工具' : 'Developer Tools';
-  const categoryAnchor = slug === 'timezone' ? 'productivity-tools' : 'dev-tools';
+  const categoryAnchor = slug === 'time' ? 'productivity-tools' : 'dev-tools';
 
   return {
     '@context': 'https://schema.org',
@@ -425,14 +425,14 @@ export default function StructuredData(props: StructuredDataProps) {
     );
   }
 
-  if (props.slug === 'timezone') {
+  if (props.slug === 'time') {
     const language = props.language === 'zh' ? 'zh' : 'en';
 
     return (
       <Fragment>
         {scriptTag('tool-jsonld', getTimezoneEnhancedStructuredData(language))}
         {scriptTag('timezone-faq-jsonld', getTimezoneFaqStructuredData(language))}
-        {scriptTag('timezone-breadcrumb-jsonld', getToolBreadcrumbStructuredData('timezone', language))}
+        {scriptTag('timezone-breadcrumb-jsonld', getToolBreadcrumbStructuredData('time', language))}
       </Fragment>
     );
   }
