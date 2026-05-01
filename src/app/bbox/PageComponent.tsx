@@ -1001,9 +1001,21 @@ function BBoxDrawingToolContent({ language }: { language: BBoxLanguage }) {
                     ref={mapContainerRef}
                     className="h-full w-full bg-white/[0.035]"
                   />
+                  {!mapboxToken && (
+                    <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-950/88 px-6 text-center">
+                      <div className="max-w-md rounded-[18px] border border-amber-300/20 bg-amber-300/[0.08] px-5 py-4 shadow-2xl backdrop-blur-xl">
+                        <p className="text-sm font-semibold text-amber-100">
+                          {text('mapUnavailable')}
+                        </p>
+                        <p className="mt-2 text-sm leading-6 text-amber-50/72">
+                          {text('mapUnavailableDesc')}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                   
                   {/* Tool Instructions - Inside map container */}
-                  <div className={`pointer-events-none absolute bottom-4 left-4 z-20 hidden max-w-2xl rounded-[18px] border border-white/[0.1] bg-slate-950/72 px-4 py-3 shadow-2xl backdrop-blur-xl transition-opacity duration-700 md:block lg:left-5 ${isDrawHintVisible ? 'opacity-100' : 'opacity-0'}`}>
+                  <div className={`pointer-events-none absolute bottom-4 left-4 z-20 hidden max-w-2xl rounded-[18px] border border-white/[0.1] bg-slate-950/72 px-4 py-3 shadow-2xl backdrop-blur-xl transition-opacity duration-700 md:block lg:left-5 ${isDrawHintVisible && mapboxToken ? 'opacity-100' : 'opacity-0'}`}>
                     <p className="text-sm leading-6 text-white/58">
                       <span className="hidden sm:inline">{text('mapHintDesktop')}</span>
                       <span className="sm:hidden">{text('mapHintMobile')}</span>

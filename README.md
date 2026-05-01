@@ -137,6 +137,8 @@ Do not rely on runtime **Variables and Secrets** alone for these two values; run
 
 The Mapbox value is a browser-visible public `pk.*` token by design. Restrict allowed URLs in Mapbox, for example `https://tools.mofei.life/*` plus any local development origins you use.
 
+If `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN` is missing, the BBox page will still render the control panel but will show a map configuration message instead of the interactive Mapbox map.
+
 ### Develop
 
 ```bash
