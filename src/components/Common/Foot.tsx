@@ -69,7 +69,7 @@ function Foot() {
             <span className="truncate text-sm font-semibold">Mofei Dev Tools</span>
           </Link>
           <span className="hidden h-4 w-px shrink-0 bg-white/12 sm:block" aria-hidden="true" />
-          <span className="hidden truncate text-white/46 sm:block">Made with care in Helsinki ❤️</span>
+          <span className="hidden truncate text-white/46 sm:block">Made with ❤️ in Helsinki, Finland</span>
         </div>
 
         <nav

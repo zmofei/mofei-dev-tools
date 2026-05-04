@@ -280,7 +280,6 @@ export const TOOL_SEO: Record<ToolSlug, Record<SiteLanguage, ToolSeoEntry>> = {
         },
       },
       other: {
-        'google-site-verification': process.env.GOOGLE_SITE_VERIFICATION || '',
         'mobile-web-app-capable': 'yes',
         'apple-mobile-web-app-capable': 'yes',
         'apple-mobile-web-app-status-bar-style': 'default',
@@ -323,7 +322,6 @@ export const TOOL_SEO: Record<ToolSlug, Record<SiteLanguage, ToolSeoEntry>> = {
         },
       },
       other: {
-        'google-site-verification': process.env.GOOGLE_SITE_VERIFICATION || '',
         'mobile-web-app-capable': 'yes',
         'apple-mobile-web-app-capable': 'yes',
         'apple-mobile-web-app-status-bar-style': 'default',
