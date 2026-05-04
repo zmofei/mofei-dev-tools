@@ -17,6 +17,7 @@
 	"dependencies": {
 		"@mofei-dev/ui": "0.1.0",
 		"@opennextjs/cloudflare": "1.4.0",
+		"city-timezones": "^1.3.3",
 		"mapbox-gl": "3.13.0",
 		"motion": "12.23.0",
 		"next": "15.3.4",

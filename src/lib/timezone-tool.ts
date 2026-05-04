@@ -1,3 +1,5 @@
+import { cityMapping, lookupViaCity, type CityData } from 'city-timezones';
+
 export type TimezonePlace = {
   id: string;
   name: string;
@@ -34,6 +36,7 @@ export type WorkRange = {
 
 export const DEFAULT_TIME_PLACES = ['helsinki', 'san-francisco', 'new-york', 'london', 'shanghai', 'tokyo'];
 const CUSTOM_TIMEZONE_PREFIX = 'tz:';
+const CITY_TIMEZONE_PREFIX = 'ct:';
 export const HOME_PLACE_ID = 'helsinki';
 export const DEFAULT_WORK_RANGE_COLOR = '#ffffff';
 export const WORK_RANGE_COLORS = ['#ffffff', '#67e8f9', '#6ee7b7', '#fcd34d', '#fda4af'];
@@ -144,12 +147,117 @@ export function placeInputValues(place: TimezonePlace) {
   ].map((value) => value.toLowerCase());
 }
 
+function slugifyCityPart(value: string | null | undefined) {
+  return (value || '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'na';
+}
+
+export function cityTimeZoneId(city: Pick<CityData, 'city_ascii' | 'city' | 'country' | 'province' | 'timezone'>) {
+  const parts = [
+    slugifyCityPart(city.city_ascii || city.city),
+    slugifyCityPart(city.province || city.country),
+    slugifyCityPart(city.country),
+    slugifyCityPart(city.timezone),
+  ];
+
+  return `${CITY_TIMEZONE_PREFIX}${parts.join(':')}`;
+}
+
+function createPlaceFromCity(city: CityData): TimezonePlace {
+  const province = city.province && city.province !== city.country ? city.province : '';
+  const country = province ? `${city.country}, ${province}` : city.country;
+
+  return {
+    id: cityTimeZoneId(city),
+    name: city.city_ascii || city.city,
+    country,
+    timeZone: city.timezone,
+    workStart: 9,
+    workEnd: 17,
+  };
+}
+
+function citySearchText(city: CityData) {
+  return [
+    city.city,
+    city.city_ascii,
+    city.province,
+    city.country,
+    city.iso2,
+    city.iso3,
+    city.timezone,
+  ].filter(Boolean).join(' ').toLowerCase();
+}
+
+function rankCityMatch(city: CityData, normalizedValue: string) {
+  const cityName = city.city.toLowerCase();
+  const asciiName = city.city_ascii.toLowerCase();
+  const searchText = citySearchText(city);
+
+  if (cityName === normalizedValue || asciiName === normalizedValue) return 0;
+  if (cityName.startsWith(normalizedValue) || asciiName.startsWith(normalizedValue)) return 1;
+  if (searchText.includes(` ${normalizedValue}`)) return 2;
+  if (searchText.includes(normalizedValue)) return 3;
+  return 4;
+}
+
+function uniqueCities(cities: CityData[]) {
+  const seen = new Set<string>();
+
+  return cities.filter((city) => {
+    const id = cityTimeZoneId(city);
+    if (seen.has(id)) return false;
+    seen.add(id);
+    return true;
+  });
+}
+
+export function searchCityTimeZonePlaces(value: string, selectedIds: string[], limit = 8) {
+  const normalizedValue = value.trim().toLowerCase();
+  if (!normalizedValue) return [];
+  const selected = new Set(selectedIds);
+  const selectedPlaces = selectedIds.map((id) => findPlaceById(id)).filter(Boolean) as TimezonePlace[];
+  const exactMatches = lookupViaCity(value);
+  const partialMatches = cityMapping.filter((city) => citySearchText(city).includes(normalizedValue));
+
+  return uniqueCities([...exactMatches, ...partialMatches])
+    .filter((city) => !selected.has(cityTimeZoneId(city)))
+    .filter((city) => !selectedPlaces.some((place) => (
+      place.timeZone === city.timezone &&
+      place.name.toLowerCase() === (city.city_ascii || city.city).toLowerCase()
+    )))
+    .sort((left, right) => {
+      const rankDiff = rankCityMatch(left, normalizedValue) - rankCityMatch(right, normalizedValue);
+      if (rankDiff !== 0) return rankDiff;
+      return (right.pop || 0) - (left.pop || 0);
+    })
+    .slice(0, limit)
+    .map(createPlaceFromCity);
+}
+
 export function matchPlaceInput(value: string, selectedIds: string[]) {
   const normalizedValue = value.trim().toLowerCase();
   if (!normalizedValue) return undefined;
   const selected = new Set(selectedIds);
+  const alreadySelected = selectedIds
+    .map((id) => findPlaceById(id))
+    .filter(Boolean)
+    .some((place) => {
+      const selectedPlace = place as TimezonePlace;
+      return [
+        placeInputLabel(selectedPlace),
+        selectedPlace.name,
+        selectedPlace.timeZone,
+      ].map((candidate) => candidate.toLowerCase()).includes(normalizedValue);
+    });
+  if (alreadySelected) return undefined;
 
-  return TIMEZONE_PLACES.find((place) => !selected.has(place.id) && placeInputValues(place).includes(normalizedValue));
+  return TIMEZONE_PLACES.find((place) => !selected.has(place.id) && placeInputValues(place).includes(normalizedValue)) ||
+    searchCityTimeZonePlaces(value, selectedIds, 1)[0];
 }
 
 export function getSupportedTimeZones() {
@@ -246,6 +354,10 @@ export function dateRelation(date: Date, targetTimeZone: string, referenceTimeZo
 export function findPlaceById(id: string) {
   if (id.startsWith(CUSTOM_TIMEZONE_PREFIX)) {
     return createCustomPlaceFromTimeZone(id.slice(CUSTOM_TIMEZONE_PREFIX.length));
+  }
+  if (id.startsWith(CITY_TIMEZONE_PREFIX)) {
+    const city = cityMapping.find((candidate) => cityTimeZoneId(candidate) === id);
+    return city ? createPlaceFromCity(city) : undefined;
   }
 
   return TIMEZONE_PLACES.find((place) => place.id === id);

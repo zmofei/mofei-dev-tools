@@ -187,6 +187,8 @@ test('timezone search helpers match places and custom IANA zones', () => {
     matchTimeZoneInput,
     normalizePlaceIds,
     placeInputLabel,
+    parseShareState,
+    searchCityTimeZonePlaces,
     timeZoneName,
     timeZoneOption,
   } = loadTsModule('src/lib/timezone-tool.ts');
@@ -206,6 +208,10 @@ test('timezone search helpers match places and custom IANA zones', () => {
   assert.equal(matchTimeZoneInput('Panama', [panamaOption], [])?.timeZone, 'America/Panama');
   assert.equal(matchTimeZoneInput('America/Panama', [panamaOption], [])?.timeZone, 'America/Panama');
   assert.equal(matchTimeZoneInput('Panama', [panamaOption], [customTimeZoneId('America/Panama')]), undefined);
+  assert.equal(searchCityTimeZonePlaces('Munic', [])[0]?.name, 'Munich');
+  assert.equal(matchPlaceInput('Munich', [])?.timeZone, 'Europe/Berlin');
+  const munichId = searchCityTimeZonePlaces('Munic', [])[0].id;
+  assert.deepEqual(plain(parseShareState(new URLSearchParams(`zones=helsinki,${munichId}`)).placeIds), ['helsinki', munichId]);
 
   const panama = createCustomPlaceFromTimeZone('America/Panama');
   assert.equal(panama?.id, customTimeZoneId('America/Panama'));

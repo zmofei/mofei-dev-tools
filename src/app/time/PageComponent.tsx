@@ -30,6 +30,7 @@ import {
   normalizeWorkRange,
   placeInputLabel,
   parseShareState,
+  searchCityTimeZonePlaces,
   timeZoneOption,
   workRangeLabel,
   type WorkRange,
@@ -313,10 +314,13 @@ export default function TimezonePage() {
     if (!normalizedQuery) return [];
     const selected = new Set(placeIds);
 
-    return TIMEZONE_PLACES
+    return [
+      ...TIMEZONE_PLACES
       .filter((place) => !selected.has(place.id))
       .filter((place) => `${place.name} ${place.country} ${place.timeZone}`.toLowerCase().includes(normalizedQuery))
-      .slice(0, 6);
+      .slice(0, 6),
+      ...searchCityTimeZonePlaces(searchQuery, placeIds, 8),
+    ].filter((place, index, places) => places.findIndex((candidate) => candidate.id === place.id) === index).slice(0, 8);
   }, [searchQuery, placeIds]);
   const zoneMatches = useMemo(() => {
     const normalizedQuery = searchQuery.trim().toLowerCase();
