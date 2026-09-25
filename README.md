@@ -286,7 +286,7 @@ This project is open source and available under the [MIT License](LICENSE).
 Public pages are prerendered. `DocumentHtml` reads route params during prerendering
 and client navigation to set the document language without request-time headers.
 Keep the shared root layout free of `headers()`/`cookies()` so public pages remain static.
-The middleware continues forwarding `x-pathname`, but rendering does not depend on it.
+No pathname middleware is needed: document language comes from route params.
 
 OpenNext uses the read-only Workers Static Assets incremental cache with cache
 interception. Each deployment publishes its own build cache; content changes require
