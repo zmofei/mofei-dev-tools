@@ -301,3 +301,12 @@ revalidation is introduced, replace this read-only cache with a writable impleme
 Validate with `pnpm test`, `pnpm run cf:build` (includes `next build`), and
 `node scripts/verify-static-build.mjs`. The last command checks sitemap coverage,
 initial HTML language, canonical presence, and exclusion of APIs from prerendering.
+
+### Lightweight request entry point
+
+`custom-worker.ts` rejects only known private-file probe paths (`.env`, `.git`,
+`.aws`, and `/@vite/env`) with a small 404 before calling OpenNext. Normal pages,
+APIs, static assets, and other unknown paths keep their existing handling.
+This avoids Next.js request processing for those probes within the same Worker;
+it does not create a separate service or eliminate all bundle startup costs.
+Keep the generated OpenNext entry and static cache preparation in `cf:build`.
