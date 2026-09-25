@@ -23,3 +23,17 @@ export function probeResponse(request: Request): Response | undefined {
     },
   });
 }
+
+/** The homepage has no POST forms or Server Actions; do not parse probe bodies. */
+export function homepagePostResponse(request: Request): Response | undefined {
+  if (request.method !== 'POST' || new URL(request.url).pathname !== '/') return undefined;
+
+  return new Response('Method not allowed', {
+    status: 405,
+    headers: {
+      Allow: 'GET, HEAD',
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Cache-Control': 'no-store',
+    },
+  });
+}

@@ -30,3 +30,19 @@ test('pages, APIs, assets, unknown pages and well-known paths fall through', () 
     assert.equal(probeResponse(request(path)), undefined, path);
   }
 });
+
+test('unsupported homepage POST returns 405 without parsing body or action headers', async () => {
+  const req = new Request('https://example.test/?query=1', {
+    method: 'POST', body: 'malformed body', headers: { 'Next-Action': 'unknown' },
+  });
+  const response = exports.homepagePostResponse(req);
+  assert.equal(response.status, 405);
+  assert.equal(response.headers.get('allow'), 'GET, HEAD');
+  assert.equal(req.bodyUsed, false);
+  for (const method of ['GET', 'HEAD', 'OPTIONS']) {
+    assert.equal(exports.homepagePostResponse(request('/', method)), undefined);
+  }
+  for (const path of ['/api/github-device', '/api/github-token', '/unknown']) {
+    assert.equal(exports.homepagePostResponse(request(path, 'POST')), undefined);
+  }
+});
