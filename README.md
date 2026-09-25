@@ -224,7 +224,7 @@ pnpm run deploy
 pnpm run cf-typegen
 ```
 
-`pnpm run build` is useful for a regular Next.js production build, but it is not the Cloudflare Worker artifact. `pnpm run cf:build` runs OpenNext and produces `.open-next/worker.js` plus `.open-next/assets`; `wrangler.jsonc` also uses `pnpm run cf:build` as its build command.
+`pnpm run build` is useful for a regular Next.js production build, but it is not the Cloudflare Worker artifact. `pnpm run cf:build` runs OpenNext and produces `.open-next/worker.js` plus `.open-next/assets`. Use the package scripts so OpenNext populates cache assets after building; Wrangler must not trigger a second build.
 
 Relevant deployment files:
 
@@ -280,3 +280,21 @@ This project is open source and available under the [MIT License](LICENSE).
 
 - Website: [mofei.life](https://mofei.life)
 - GitHub: [@zmofei](https://github.com/zmofei)
+
+### Static page delivery on Cloudflare
+
+Public pages are prerendered. `DocumentHtml` reads route params during prerendering
+and client navigation to set the document language without request-time headers.
+Keep the shared root layout free of `headers()`/`cookies()` so public pages remain static.
+The middleware continues forwarding `x-pathname`, but rendering does not depend on it.
+
+OpenNext uses the read-only Workers Static Assets incremental cache with cache
+interception. Each deployment publishes its own build cache; content changes require
+a new build/deployment. Use `pnpm deploy` / `pnpm preview`, which build before
+OpenNext populates the cache. Do not add a Wrangler custom build: it would rebuild
+after cache population and erase the prepared assets. GitHub API routes remain dynamic. If ISR or on-demand
+revalidation is introduced, replace this read-only cache with a writable implementation.
+
+Validate with `pnpm test`, `pnpm run cf:build` (includes `next build`), and
+`node scripts/verify-static-build.mjs`. The last command checks sitemap coverage,
+initial HTML language, canonical presence, and exclusion of APIs from prerendering.

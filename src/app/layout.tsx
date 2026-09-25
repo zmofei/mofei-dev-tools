@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { headers } from "next/headers";
 import { Suspense } from "react";
 import { AppBackground } from "@mofei-dev/ui";
 import Nav from "@/components/Common/Nav";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { SITE_URL, homeUrl } from "@/lib/site";
-import { BBOX_HREFLANG, isBBoxLanguage } from "@/lib/bbox-i18n";
+import DocumentHtml from "@/components/Common/DocumentHtml";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -73,27 +72,13 @@ export const metadata: Metadata = {
     : undefined,
 };
 
-function htmlLangFromPath(pathname: string) {
-  const [, first] = pathname.split("/");
-
-  if (isBBoxLanguage(first)) {
-    return BBOX_HREFLANG[first];
-  }
-
-  return first === "zh" ? "zh-CN" : "en-US";
-}
-
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const requestHeaders = await headers();
-  const pathname = requestHeaders.get("x-pathname") ?? "/";
-  const htmlLang = htmlLangFromPath(pathname);
-
   return (
-    <html lang={htmlLang}>
+    <DocumentHtml>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
@@ -108,6 +93,6 @@ export default async function RootLayout({
           </div>
         </LanguageProvider>
       </body>
-    </html>
+    </DocumentHtml>
   );
 }
