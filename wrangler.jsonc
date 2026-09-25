@@ -5,7 +5,7 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "mofei-dev-tools",
-	"main": ".open-next/worker.js",
+	"main": "custom-worker.ts",
 	"compatibility_date": "2025-03-01",
 	"compatibility_flags": [
 		"nodejs_compat",
