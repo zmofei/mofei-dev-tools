@@ -224,7 +224,7 @@ pnpm run deploy
 pnpm run cf-typegen
 ```
 
-`pnpm run build` is useful for a regular Next.js production build, but it is not the Cloudflare Worker artifact. `pnpm run cf:build` runs OpenNext and produces `.open-next/worker.js` plus `.open-next/assets`; `wrangler.jsonc` also uses `pnpm run cf:build` as its build command.
+`pnpm run build` is useful for a regular Next.js production build, but it is not the Cloudflare Worker artifact. `pnpm run cf:build` runs OpenNext and produces `.open-next/worker.js` plus `.open-next/assets`. `cf:build` also prepares the static cache assets. The Wrangler custom build runs it for direct commands such as `wrangler versions upload`.
 
 Relevant deployment files:
 
@@ -280,3 +280,24 @@ This project is open source and available under the [MIT License](LICENSE).
 
 - Website: [mofei.life](https://mofei.life)
 - GitHub: [@zmofei](https://github.com/zmofei)
+
+### Static page delivery on Cloudflare
+
+Public pages are prerendered. `DocumentHtml` reads route params during prerendering
+and client navigation to set the document language without request-time headers.
+Keep the shared root layout free of `headers()`/`cookies()` so public pages remain static.
+The middleware continues forwarding `x-pathname`, but rendering does not depend on it.
+
+OpenNext uses the read-only Workers Static Assets incremental cache with cache
+interception. Each deployment publishes its own build cache; content changes require
+a new build/deployment. `cf:build` builds the Worker and then runs
+`opennextjs-cloudflare populateCache local`. With this read-only assets cache,
+that command only copies cache files into the deployment assets; it does not write
+remote resources. Keep the Wrangler custom build for CI commands such as
+`wrangler versions upload`: every build must prepare both the Worker and its cache.
+GitHub API routes remain dynamic. If ISR or on-demand
+revalidation is introduced, replace this read-only cache with a writable implementation.
+
+Validate with `pnpm test`, `pnpm run cf:build` (includes `next build`), and
+`node scripts/verify-static-build.mjs`. The last command checks sitemap coverage,
+initial HTML language, canonical presence, and exclusion of APIs from prerendering.
