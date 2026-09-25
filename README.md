@@ -224,7 +224,7 @@ pnpm run deploy
 pnpm run cf-typegen
 ```
 
-`pnpm run build` is useful for a regular Next.js production build, but it is not the Cloudflare Worker artifact. `pnpm run cf:build` runs OpenNext and produces `.open-next/worker.js` plus `.open-next/assets`. Use the package scripts so OpenNext populates cache assets after building; Wrangler must not trigger a second build.
+`pnpm run build` is useful for a regular Next.js production build, but it is not the Cloudflare Worker artifact. `pnpm run cf:build` runs OpenNext and produces `.open-next/worker.js` plus `.open-next/assets`. `cf:build` also prepares the static cache assets. The Wrangler custom build runs it for direct commands such as `wrangler versions upload`.
 
 Relevant deployment files:
 
@@ -290,9 +290,12 @@ The middleware continues forwarding `x-pathname`, but rendering does not depend 
 
 OpenNext uses the read-only Workers Static Assets incremental cache with cache
 interception. Each deployment publishes its own build cache; content changes require
-a new build/deployment. Use `pnpm deploy` / `pnpm preview`, which build before
-OpenNext populates the cache. Do not add a Wrangler custom build: it would rebuild
-after cache population and erase the prepared assets. GitHub API routes remain dynamic. If ISR or on-demand
+a new build/deployment. `cf:build` builds the Worker and then runs
+`opennextjs-cloudflare populateCache local`. With this read-only assets cache,
+that command only copies cache files into the deployment assets; it does not write
+remote resources. Keep the Wrangler custom build for CI commands such as
+`wrangler versions upload`: every build must prepare both the Worker and its cache.
+GitHub API routes remain dynamic. If ISR or on-demand
 revalidation is introduced, replace this read-only cache with a writable implementation.
 
 Validate with `pnpm test`, `pnpm run cf:build` (includes `next build`), and

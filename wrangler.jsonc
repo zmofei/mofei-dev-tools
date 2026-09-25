@@ -15,6 +15,9 @@
 		"binding": "ASSETS",
 		"directory": ".open-next/assets"
 	},
+	"build": {
+		"command": "pnpm run cf:build"
+	},
 	"observability": {
 		"enabled": true
 	}

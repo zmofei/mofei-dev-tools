@@ -7,7 +7,7 @@
 		"dev": "next dev -H local.mofei.life --turbopack --experimental-https",
 		"build": "next build",
 		"test": "node --test",
-		"cf:build": "opennextjs-cloudflare build",
+		"cf:build": "opennextjs-cloudflare build && opennextjs-cloudflare populateCache local",
 		"start": "next start",
 		"lint": "next lint",
 		"deploy": "pnpm run cf:build && opennextjs-cloudflare deploy",

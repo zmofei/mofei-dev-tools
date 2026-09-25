@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { readFile, access } from 'node:fs/promises';
 
 const manifest = JSON.parse(await readFile('.next/prerender-manifest.json', 'utf8'));
 const sitemap = await readFile('.next/server/app/sitemap.xml.body', 'utf8');
@@ -20,3 +20,11 @@ for (const path of Object.keys(manifest.routes)) {
 }
 assert.ok(!Object.keys(manifest.routes).some((path) => path.startsWith('/api/')), 'APIs must remain dynamic');
 console.log(`Verified ${checked} prerendered pages and ${paths.length} sitemap URLs.`);
+
+const buildId = (await readFile('.next/BUILD_ID', 'utf8')).trim();
+await access('.open-next/worker.js');
+for (const path of paths) {
+  const cachePath = `.open-next/assets/cdn-cgi/_next_cache/${buildId}/${path === '/' ? 'index' : path.slice(1)}.cache`;
+  await access(cachePath);
+}
+console.log('Verified Worker entry point and matching-build cache assets for all sitemap URLs.');
