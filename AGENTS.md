@@ -54,7 +54,7 @@
 - Avoid making root routes depend on `src/app/[lang]/*/page.tsx` directly.
 - Localized pages under `src/app/[lang]/*/page.tsx` should reject unsupported language params with `notFound()` and set `dynamicParams = false` when statically enumerated.
 - Use `generateStaticParams()` from `SITE_LANGUAGES` for ordinary localized tools and from `BBOX_LANGUAGES` for BBox.
-- `src/middleware.ts` passes the pathname through `x-pathname` so [src/app/layout.tsx](/Users/zhuwenlong/dev/mofei-dev-tools/src/app/layout.tsx) can set the correct `<html lang>`. Keep this behavior if route handling changes.
+- `DocumentHtml` in `src/components/Common/DocumentHtml.tsx` sets `<html lang>` from route params during prerendering and client navigation. Preserve this behavior without request-header access or pathname-only middleware.
 - Shared, reusable UI controls belong in `src/components/Common/` when they are used by more than one tool.
 
 ## Metadata Configuration
