@@ -131,7 +131,7 @@ src/
 
 ### Prerequisites
 
-- Node.js 20+ is recommended.
+- Node.js 22+ is required by the Cloudflare build tooling.
 - pnpm 10.10.0, as declared in `package.json`.
 - The default `pnpm dev` script starts Next.js with a custom local HTTPS hostname. You can either map that hostname to your machine or change the `-H` value in `package.json` to use your own local hostname.
 
