@@ -256,17 +256,17 @@ export const TOOL_SEO: Record<ToolSlug, Record<SiteLanguage, ToolSeoEntry>> = {
         description: '即时生成 MongoDB ObjectID，支持时间戳提取和结构分析。为开发者提供的免费在线工具。',
         images: [
           {
-            url: absoluteUrl('/api/og?title=MongoDB%20ObjectID%20%E7%94%9F%E6%88%90%E5%99%A8&description=%E7%94%9F%E6%88%90%E5%94%AF%E4%B8%80%E7%9A%84%20MongoDB%20%E6%A0%87%E8%AF%86%E7%AC%A6'),
-            width: 1200,
-            height: 630,
-            alt: 'MongoDB ObjectID 生成器工具',
+            url: absoluteUrl('/img/logo.png'),
+            width: 300,
+            height: 300,
+            alt: 'Mofei Dev Tools',
           },
         ],
       },
       twitter: {
         title: '免费 MongoDB ObjectID 生成器 - 创建唯一数据库标识符',
         description: '即时生成 MongoDB ObjectID，支持时间戳提取和结构分析。为开发者提供的免费在线工具。',
-        images: [absoluteUrl('/api/og?title=MongoDB%20ObjectID%20%E7%94%9F%E6%88%90%E5%99%A8&description=%E7%94%9F%E6%88%90%E5%94%AF%E4%B8%80%E7%9A%84%20MongoDB%20%E6%A0%87%E8%AF%86%E7%AC%A6')],
+        images: [absoluteUrl('/img/logo.png')],
       },
       robots: {
         index: true,
@@ -298,17 +298,17 @@ export const TOOL_SEO: Record<ToolSlug, Record<SiteLanguage, ToolSeoEntry>> = {
         description: 'Generate MongoDB ObjectIDs instantly with timestamp extraction and structure analysis. Free online tool for developers.',
         images: [
           {
-            url: absoluteUrl('/api/og?title=MongoDB%20ObjectID%20Generator&description=Generate%20unique%20MongoDB%20identifiers'),
-            width: 1200,
-            height: 630,
-            alt: 'MongoDB ObjectID Generator Tool',
+            url: absoluteUrl('/img/logo.png'),
+            width: 300,
+            height: 300,
+            alt: 'Mofei Dev Tools',
           },
         ],
       },
       twitter: {
         title: 'Free MongoDB ObjectID Generator - Create Unique Database IDs',
         description: 'Generate MongoDB ObjectIDs instantly with timestamp extraction and structure analysis. Free online tool for developers.',
-        images: [absoluteUrl('/api/og?title=MongoDB%20ObjectID%20Generator&description=Generate%20unique%20MongoDB%20identifiers')],
+        images: [absoluteUrl('/img/logo.png')],
       },
       robots: {
         index: true,
