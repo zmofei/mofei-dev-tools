@@ -310,3 +310,7 @@ APIs, static assets, and other unknown paths keep their existing handling.
 This avoids Next.js request processing for those probes within the same Worker;
 it does not create a separate service or eliminate all bundle startup costs.
 Keep the generated OpenNext entry and static cache preparation in `cf:build`.
+
+The entry point also returns 405 for `POST /`: the homepage has no POST form or
+Server Action. GitHub API POST requests still reach their original handlers.
+If a homepage POST form or Server Action is introduced, remove or revise this guard.
