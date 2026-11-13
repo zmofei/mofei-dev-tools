@@ -251,7 +251,7 @@ For BBox-specific language work, update `src/lib/bbox-i18n.ts` first because BBo
 
 ## Analytics And Privacy
 
-Google Analytics is loaded from `src/components/GoogleAnalytics.tsx` when `NEXT_PUBLIC_GA_ID` is configured. Because this is a `NEXT_PUBLIC_*` variable, it must be available at build time, including in the Cloudflare build environment. The same component exposes a shared event helper used by tool-level “Tool Usage” events.
+Google Analytics is loaded from `src/components/GoogleAnalytics.tsx` only when `NEXT_PUBLIC_GA_ID` is configured and the visitor opts in through Cookie settings. Because this is a `NEXT_PUBLIC_*` variable, it must be available at build time, including in the Cloudflare build environment. The same component exposes a shared event helper used by tool-level “Tool Usage” events.
 
 Tool processing is primarily client-side. API routes under `/api/` are used for GitHub device/token proxying and are disallowed in robots.
 

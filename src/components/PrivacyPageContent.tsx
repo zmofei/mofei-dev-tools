@@ -14,7 +14,7 @@ const privacyCopy = {
       {
         title: 'Google Analytics',
         body:
-          'This site uses Google Analytics to understand aggregate usage, such as which tools are opened and which pages are useful. Analytics helps decide what to maintain and improve for this free project.',
+          'If you allow analytics in Cookie settings, this site uses Google Analytics to understand aggregate usage, such as which tools are opened and which pages are useful. You can withdraw consent at any time in Cookie settings.',
       },
       {
         title: 'Tool input data',
@@ -49,7 +49,7 @@ const privacyCopy = {
       {
         title: 'Google Analytics',
         body:
-          '本站使用 Google Analytics 了解整体访问情况，例如哪些工具被打开、哪些页面更有用。这些统计用于判断这个免费项目应该维护和改进哪些部分。',
+          '如果你在 Cookie 设置中允许分析，本站会使用 Google Analytics 了解整体访问情况，例如哪些工具被打开、哪些页面更有用。你可以随时在 Cookie 设置中撤回同意。',
       },
       {
         title: '工具输入内容',
