@@ -251,7 +251,7 @@ BBox 的语言配置比较特殊。它支持 `en`、`zh`、`de`、`es`、`fr`，
 
 ## 分析与隐私
 
-配置 `NEXT_PUBLIC_GA_ID` 后，Google Analytics 会通过 `src/components/GoogleAnalytics.tsx` 加载。因为这是 `NEXT_PUBLIC_*` 变量，它必须在构建时可用，包括 Cloudflare 的构建环境。同一个组件还导出了共享 event helper，用于各工具的 “Tool Usage” 事件。
+配置 `NEXT_PUBLIC_GA_ID` 后，只有访客在 Cookie 设置中允许分析，才会通过 `src/components/GoogleAnalytics.tsx` 加载 Google Analytics。因为这是 `NEXT_PUBLIC_*` 变量，它必须在构建时可用，包括 Cloudflare 的构建环境。同一个组件还导出了共享 event helper，用于各工具的 “Tool Usage” 事件。
 
 工具处理主要在浏览器本地完成。`/api/` 下的接口用于 GitHub device/token 代理，并在 robots 中禁止索引。
 
